@@ -1,6 +1,12 @@
 {
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "whatwg-fetch": "^3.6.20"
+    "docx": "^9.5.1",
+    "file-saver": "^2.0.5",
+    "jspdf": "^4.1.0",
+    "jspdf-autotable": "^5.0.7",
+    "lucide-react": "^0.563.0",
+    "whatwg-fetch": "^3.6.20",
+    "xlsx": "^0.18.5"
   }
 }

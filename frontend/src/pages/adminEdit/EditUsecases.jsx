@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import AddSection from "../../components/AddSection";
 import NewSectionEditor from "./NewSectionEditor";
+import ExportButton from "../../components/ExportButton";
 
 const EditUsecases = () => {
   const [pageData, setPageData] = useState(null);
@@ -292,6 +293,9 @@ const EditUsecases = () => {
       <div className="flex flex-row justify-between items-center w-full mb-10">
         <h2 className="text-4xl font-bold text-slate-800">Use Cases</h2>
         <div className="flex justify-end gap-2">
+          <button>
+            <ExportButton  data={currentRows}/>
+          </button>
           <button
             onClick={() => setShowFullPreview(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"

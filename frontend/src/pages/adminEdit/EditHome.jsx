@@ -6,6 +6,7 @@ import HomeSr3 from "../HomeSr.jsx/HomeSr3";
 import MainImage from "../../assets/images/main.avif";
 import Second from "../../assets/images/second.avif";
 import AddSection from "../../components/AddSection";
+import ExportButton from "../../components/ExportButton";
 
 const EditHome = ({ pageTitle }) => {
   const [homeData, setHomeData] = useState({});
@@ -77,6 +78,8 @@ const EditHome = ({ pageTitle }) => {
 
     return baseData;
   }, [s, stats.length, whatWeDo.length, howWeWork.length, cta.mainText, cta.secondaryText]);
+
+
 
   // --- STEP 1: FILTER THE DATA --
   const filteredData = React.useMemo(() => {
@@ -263,6 +266,10 @@ const EditHome = ({ pageTitle }) => {
           {'Home'}
         </h2>
         <div className="flex justify-end gap-2">
+          <button>
+            <ExportButton  data={currentRows}/>
+          </button>
+          
           <button
             onClick={() => setShowFullPreview(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
@@ -607,7 +614,7 @@ const EditHome = ({ pageTitle }) => {
                       <div key={id} className="flex flex-col md:flex-row items-center gap-8">
                         <div>
                           <h1 className="text-5xl font-bold leading-tight ml-10 mb-6 text-gray-900 whitespace-pre-wrap">
-                            {(data?.mainText || "").split("\n").map((line, i) => (
+                            {(data?.mainText || "").split("\\n").map((line, i) => (
                               <span key={i}>{line.includes("hidden value") ? <span className="text-blue-600">{line}</span> : line}<br /></span>
                             ))}
                           </h1>

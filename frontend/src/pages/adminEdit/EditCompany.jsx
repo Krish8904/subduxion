@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import AddSection from "../../components/AddSection";
 import NewSectionEditor from "./NewSectionEditor";
+import ExportButton from "../../components/ExportButton";
 
 const EditCompany = ({ pageTitle }) => {
   const [companyData, setCompanyData] = useState({});
@@ -317,6 +318,9 @@ const EditCompany = ({ pageTitle }) => {
           <h2 className="text-4xl font-bold text-slate-800">{'Company '}</h2>
         </div>
         <div className="flex gap-2">
+          <button>
+            <ExportButton data={currentRows} />
+          </button>
           <button onClick={() => setShowFullPreview(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-all">Preview</button>
 
           <button
