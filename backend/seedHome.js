@@ -33,7 +33,7 @@ const seedHomePage = async () => {
         intro: {
           mainText: "",
           secondaryText:
-            "Applied AI built on data sovereignty, privacy, security, and EU-ready governance.",
+            "Applied AI built on data sovereignty, privacy, security, and EU-ready governance. Our architectures enforce strict data control, encryption, and compliance frameworks to meet GDPR and related regulatory requirements. This ensures scalable AI adoption without compromising trust, control, or accountability.",
           image: "",
           button: {
             label: "",

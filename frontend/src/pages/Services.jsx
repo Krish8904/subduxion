@@ -62,7 +62,6 @@ const Services = () => {
           }
 
           // --- SERVICES GRID ---
-          // --- SERVICES GRID ---
           if (key === "services") {
             const services = section.items || []; // 👈 alias once
 

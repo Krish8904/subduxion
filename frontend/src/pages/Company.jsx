@@ -135,7 +135,7 @@ const Company = () => {
         // Render Hero
         if (type === 'hero') {
           return (
-            <section key={id} className="bg-gray-900 text-white py-24">
+            <section key={id} className="bg-linear-to-r  from-gray-600 to-gray-500 text-white py-24">
               <div className="max-w-7xl mx-auto px-6 text-center">
                 <h1 className="text-5xl font-bold mb-6">
                   {data.mainText || "About SubDuxion"}
@@ -223,7 +223,7 @@ const Company = () => {
           return (
             <section key={id} className="bg-gray-900 text-white py-20 text-center">
               <div className="max-w-6xl mx-auto px-6">
-                <h2 className="text-3xl text-blue-600 font-bold mb-4">
+                <h2 className="text-3xl text-blue-500 font-bold mb-4">
                   {data.above?.mainText || "Built for momentum"}
                 </h2>
                 <p className="mb-12">
@@ -232,7 +232,7 @@ const Company = () => {
 
                 <hr className="mb-10 opacity-20" />
 
-                <h2 className="text-3xl text-blue-600 font-bold mb-4">
+                <h2 className="text-3xl text-blue-500 font-bold mb-4">
                   {data.below?.mainText || "Let's talk"}
                 </h2>
                 <p className="mb-6">

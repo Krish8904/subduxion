@@ -114,10 +114,10 @@ export default function Home() {
           return (
             <div key={id} className="flex flex-col md:flex-row items-center gap-8">
               <div className="md:w-1/2">
-                <img src={Second} alt="Secondary" className="ml-15 h-80 rounded-xl shadow-lg object-cover" />
+                <img src={Second} alt="Secondary" className="ml-10 h-80 rounded-xl shadow-lg object-cover" />
               </div>
               <div className="md:w-1/2">
-                <h3 className="text-xl font-medium leading-relaxed mb-6 text-gray-700">
+                <h3 className="text-xl font-medium text-left mr-5 leading-relaxed mb-6 text-gray-700">
                   {section.secondaryText || "Applied AI built on data sovereignty..."}
                 </h3>
               </div>
@@ -179,7 +179,7 @@ export default function Home() {
         // 7. CTA SECTION
         if (id === "cta") {
           return (
-            <div key={id} className="text-center space-y-6 p-10 bg-linear-to-r from-blue-50 to-white rounded-xl">
+            <div key={id} className="text-center space-y-6 p-10 bg-linear-to-r from-blue-200 to-purple-100 rounded-xl">
               <h2 className="text-4xl font-bold text-gray-900">{section.mainText}</h2>
               <p className="max-w-xl mx-auto text-gray-700">{section.secondaryText}</p>
               <a href={section.button?.link || "/contact"}>

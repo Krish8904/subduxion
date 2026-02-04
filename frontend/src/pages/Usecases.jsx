@@ -117,7 +117,7 @@ const Usecases = () => {
         // Render Hero Section
         if (type === 'hero') {
           return (
-            <section key={id} className="bg-gray-900 text-white py-24">
+            <section key={id} className="bg-linear-to-r from-gray-700 to-gray-500 text-white py-24">
               <div className="max-w-7xl mx-auto px-6 text-center">
                 <h1 className="text-5xl font-bold mb-6">
                   {data.mainText || "Real Problems. Real Solutions."}
@@ -133,40 +133,71 @@ const Usecases = () => {
         // Render Use Cases Array
         if (type === 'usecases') {
           return data.map((uc, i) => (
-            <section key={`usecase-${i}`} className={`py-20 ${i % 2 !== 0 ? "bg-gray-50" : ""}`}>
-              <div className={`max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center`}>
+            <section
+              key={`usecase-${i}`}
+              className={`py-15 ${i % 2 !== 0 ? "bg-gray-50" : "bg-white"}`}
+            >
+              <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+
+                {/* LEFT CONTENT */}
                 <div className={i % 2 !== 0 ? "order-2 md:order-1" : ""}>
-                  <span className="text-blue-600 text-xl font-semibold">
+
+                  {/* Category Badge */}
+                  <span className="inline-block mb-4 px-4 py-1 text-sm font-semibold rounded-full 
+            bg-linear-to-r from-blue-600 to-purple-500 text-white shadow-md">
                     {uc.category}
                   </span>
-                  <h2 className="text-3xl font-bold mt-2 mb-4">
+
+                  {/* Title */}
+                  <h2 className="text-4xl font-bold mt-2 mb-6 leading-tight text-gray-900">
                     {uc.title}
                   </h2>
-                  <p className="text-gray-600 mb-4">
+
+                  {/* Description */}
+                  <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                     {uc.description}
                   </p>
-                  <ul className="space-y-2 text-gray-700">
+
+                  {/* Highlights */}
+                  <ul className="space-y-3">
                     {uc.highlights?.map((h, hIdx) => (
-                      <li key={hIdx}>• {h}</li>
+                      <li key={hIdx} className="flex items-start gap-3 text-gray-700">
+                        <span className="text-blue-600 mt-1 text-xl">✓</span>
+                        <span className="leading-relaxed">{h}</span>
+                      </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className={`bg-gray-100 rounded-2xl p-8 ${i % 2 !== 0 ? "order-1 md:order-2" : ""}`}>
-                  <h4 className="font-semibold mb-4">Outcome</h4>
-                  <div className="flex flex-col gap-3">
+                {/* RIGHT OUTCOME CARD */}
+                <div
+                  className={`rounded-3xl p-10 border border-gray-200 shadow-lg 
+          bg-gradient-to-br from-white to-gray-50 
+          hover:shadow-2xl transition-all duration-300
+          ${i % 2 !== 0 ? "order-1 md:order-2" : ""}`}
+                >
+                  <h4 className="font-bold text-xl mb-6 text-gray-900">
+                    Outcome
+                  </h4>
+
+                  <div className="flex flex-col gap-5">
                     {uc.outcome?.map((o, oIdx) => (
-                      <div key={oIdx} className="flex items-start gap-3">
-                        <span className="mt-1">▶</span>
-                        <p className="text-gray-600">{o}</p>
+                      <div key={oIdx} className="flex items-start gap-4">
+                        <div className="min-w-8 h-8 flex items-center justify-center 
+                  rounded-full bg-blue-100 text-blue-600 font-bold">
+                          {oIdx + 1}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed">{o}</p>
                       </div>
                     ))}
                   </div>
                 </div>
+
               </div>
             </section>
           ));
         }
+
 
         // Render CTA Section
         if (type === 'cta') {
