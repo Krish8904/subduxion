@@ -1,12 +1,12 @@
 import React from "react";
-import { FileDown } from "lucide-react";   
+import { FileDown } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType } from "docx";
 import { saveAs } from "file-saver";
 
-const ExportButton = ({ data }) => {
+const ExportButton = ({ data, fileName = "ExportData" }) => {
 
   const handleExport = async (format) => {
     if (!data || data.length === 0) {
@@ -34,8 +34,7 @@ const ExportButton = ({ data }) => {
         startY: 15,
         styles: { fontSize: 10, cellPadding: 3 },
       });
-
-      doc.save("HomeSections.pdf");
+      doc.save(`${fileName}.pdf`);
     }
 
     // ✅ Excel
@@ -52,7 +51,7 @@ const ExportButton = ({ data }) => {
       );
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Home Sections");
-      XLSX.writeFile(wb, "HomeSections.xlsx");
+      XLSX.writeFile(wb, `${fileName}.xlsx`);
     }
 
     // ✅ Word
@@ -80,7 +79,7 @@ const ExportButton = ({ data }) => {
       });
 
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, "HomeSections.docx");
+      saveAs(blob, `${fileName}.docx`);
     }
   };
 
@@ -113,8 +112,6 @@ const ExportButton = ({ data }) => {
     </div>
   </div>
   </>
-
-
   );
 };
 

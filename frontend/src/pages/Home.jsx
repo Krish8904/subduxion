@@ -97,7 +97,7 @@ export default function Home() {
                   {Array.isArray(section.buttons) &&
                     section.buttons.map((btn, i) => (
                       <a href={btn.link || "/services"} key={i}>
-                        <button className={`px-6 py-3 rounded-lg transition ${i === 0 ? "bg-blue-600 text-white hover:bg-blue-700" : "border border-blue-600 text-blue-600 hover:bg-blue-50"}`}>
+                        <button className={`px-6 py-3 rounded-lg cursor-pointer transition ${i === 0 ? "bg-blue-600 text-white hover:bg-blue-700" : "border border-blue-600 text-blue-600 hover:bg-blue-50"}`}>
                           {btn.label}
                         </button>
                       </a>
@@ -183,7 +183,7 @@ export default function Home() {
               <h2 className="text-4xl font-bold text-gray-900">{section.mainText}</h2>
               <p className="max-w-xl mx-auto text-gray-700">{section.secondaryText}</p>
               <a href={section.button?.link || "/contact"}>
-                <button className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition">
+                <button className="bg-linear-to-r cursor-pointer from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition">
                   {section.button?.label || "Plan a Free Quick Scan"}
                 </button>
               </a>

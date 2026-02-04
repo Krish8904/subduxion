@@ -25,25 +25,25 @@ const Footer = () => {
             <div className="space-y-2 ml-10">
               <button 
                 onClick={() => navigate("/services")} 
-                className="block text-gray-400 hover:text-white"
+                className="block text-gray-400 cursor-pointer hover:text-white"
               >
                 Services
               </button>
               <button 
                 onClick={() => navigate("/careers")} 
-                className="block text-gray-400 hover:text-white"
+                className="block text-gray-400 cursor-pointer hover:text-white"
               >
                 Careers
               </button>
               <button 
                 onClick={() => navigate("/usecases")} 
-                className="block text-gray-400 hover:text-white"
+                className="block text-gray-400 cursor-pointer hover:text-white"
               >
                 Use Cases
               </button>
               <button 
                 onClick={() => navigate("/contact")} 
-                className="block text-gray-400 hover:text-white"
+                className="block text-gray-400 cursor-pointer hover:text-white"
               >
                 Contact
               </button>

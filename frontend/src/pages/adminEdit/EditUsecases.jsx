@@ -294,7 +294,7 @@ const EditUsecases = () => {
         <h2 className="text-4xl font-bold text-slate-800">Use Cases</h2>
         <div className="flex justify-end gap-2">
           <button>
-            <ExportButton  data={currentRows}/>
+            <ExportButton  data={currentRows} fileName="UseCasesPage" />
           </button>
           <button
             onClick={() => setShowFullPreview(true)}

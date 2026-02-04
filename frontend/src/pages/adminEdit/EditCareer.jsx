@@ -339,7 +339,7 @@ const EditCareer = ({ pageTitle }) => {
         <h2 className="text-4xl font-bold text-slate-800">{'Career '}</h2>
         <div className="flex justify-end gap-2">
           <button>
-            <ExportButton  data={currentRows}/>
+            <ExportButton  data={currentRows} fileName="CareerPage" />
           </button>
           <button
             onClick={() => setShowFullPreview(true)}

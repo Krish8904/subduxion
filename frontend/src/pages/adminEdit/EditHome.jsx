@@ -267,7 +267,7 @@ const EditHome = ({ pageTitle }) => {
         </h2>
         <div className="flex justify-end gap-2">
           <button>
-            <ExportButton  data={currentRows}/>
+            <ExportButton  data={currentRows} fileName="HomePage" />
           </button>
           
           <button

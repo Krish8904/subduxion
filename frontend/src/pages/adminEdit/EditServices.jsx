@@ -257,7 +257,7 @@ const EditService = ({ pageTitle }) => {
         <h2 className="text-4xl font-bold text-slate-800">Services</h2>
         <div className="flex gap-2">
           <button>
-            <ExportButton  data={currentRows}/>
+            <ExportButton  data={currentRows} fileName="ServicesPage" />
           </button>
           <button onClick={() => setShowFullPreview(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors font-medium">
             Preview
