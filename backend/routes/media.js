@@ -8,8 +8,9 @@ const router = express.Router();
 const storage = multer.diskStorage({
   destination: "uploads/images",
   filename: (req, file, cb) => {
-    const unique = Date.now() + path.extname(file.originalname);
-    cb(null, unique);
+    // If oldFilename is provided, use it (overwrite mode)
+    const filename = req.body.filename || Date.now() + path.extname(file.originalname);
+    cb(null, filename);
   },
 });
 
@@ -17,7 +18,11 @@ const upload = multer({ storage });
 
 // Upload image
 router.post("/upload", upload.single("image"), (req, res) => {
-  res.json({ path: `/uploads/images/${req.file.filename}` });
+  // Return consistent field name
+  res.json({ 
+    filePath: `/uploads/images/${req.file.filename}`,
+    filename: req.file.filename 
+  });
 });
 
 // Get all images
@@ -29,8 +34,14 @@ router.get("/all", (req, res) => {
 
 // Delete image
 router.delete("/delete/:name", (req, res) => {
-  fs.unlinkSync(`uploads/images/${req.params.name}`);
-  res.json({ message: "Deleted" });
+  const filePath = path.join("uploads/images", req.params.name);
+  
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    res.json({ message: "Deleted successfully" });
+  } else {
+    res.status(404).json({ message: "File not found" });
+  }
 });
 
 export default router;

@@ -4,169 +4,323 @@ import axios from "axios";
 const ImageManager = () => {
   const [pages, setPages] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const isFetchingRef = useRef(false);
+  const hasInitializedRef = useRef(false);
 
-  // Fetch pages
+  // Fetch all pages - WITH STRICT GUARDS
   const fetchPages = async () => {
+    if (isFetchingRef.current) return;
+
     try {
+      isFetchingRef.current = true;
+      setLoading(true);
+      setError(null);
+      
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages`);
       setPages(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to fetch pages:", err);
+      setError("Failed to load pages. Please check your connection and API URL.");
+    } finally {
+      setLoading(false);
+      isFetchingRef.current = false;
     }
   };
 
+  // ONLY fetch once on mount
   useEffect(() => {
+    if (hasInitializedRef.current) return;
+    
+    hasInitializedRef.current = true;
     fetchPages();
   }, []);
 
-  // Recursively extract all "image" fields
-  const extractImages = (obj, path = "") => {
+  // Recursively extract all "image" fields from objects and arrays
+  const extractImages = (obj, path = "sections") => {
     let results = [];
+
     if (Array.isArray(obj)) {
-      obj.forEach((item, i) => {
-        results = results.concat(extractImages(item, `${path}[${i}]`));
+      obj.forEach((item, index) => {
+        results = results.concat(extractImages(item, `${path}[${index}]`));
       });
-    } else if (typeof obj === "object" && obj !== null) {
+    } else if (obj && typeof obj === "object") {
       Object.keys(obj).forEach((key) => {
+        const newPath = `${path}.${key}`;
         if (key === "image" && typeof obj[key] === "string") {
-          results.push({ path: `${path}.${key}`, value: obj[key] });
+          results.push({ path: newPath, value: obj[key] });
         } else {
-          results = results.concat(extractImages(obj[key], `${path}.${key}`));
+          results = results.concat(extractImages(obj[key], newPath));
         }
       });
     }
+
     return results;
   };
 
-  // Update image in page JSON
+  // Build safe image URL
+  const getImageUrl = (value) => {
+    if (!value) return "";
+    const base = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
+    const path = value.includes("/") ? value : `/uploads/${value}`;
+    return `${base}${path}`;
+  };
+
+  // Update image path in page JSON
   const updateImage = async (pageName, imgPath, newImg) => {
     try {
-      const pageRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`);
-      const pageData = pageRes.data;
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`);
+      const pageData = res.data;
 
       const pathParts = imgPath.split(".").filter((p) => p && p !== "sections");
       let current = pageData.sections;
 
+      if (!current) {
+        throw new Error("Page sections not found");
+      }
+
       for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i];
+        
         if (part.includes("[")) {
           const key = part.substring(0, part.indexOf("["));
-          const index = parseInt(part.match(/\[(\d+)\]/)[1]);
+          const indexMatch = part.match(/\[(\d+)\]/);
+          
+          if (!indexMatch) {
+            throw new Error(`Invalid array path: ${part}`);
+          }
+          
+          const index = parseInt(indexMatch[1]);
+          
+          if (!current[key]) {
+            throw new Error(`Key not found: ${key}`);
+          }
+          
+          if (!Array.isArray(current[key])) {
+            throw new Error(`Expected array at ${key}, got ${typeof current[key]}`);
+          }
+          
+          if (index >= current[key].length) {
+            throw new Error(`Index ${index} out of bounds for ${key}`);
+          }
+          
           current = current[key][index];
         } else {
+          if (!current[part]) {
+            throw new Error(`Key not found: ${part}`);
+          }
+          
           current = current[part];
         }
       }
 
-      current[pathParts[pathParts.length - 1]] = newImg;
+      const finalKey = pathParts[pathParts.length - 1];
+      current[finalKey] = newImg;
 
       await axios.put(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`, pageData);
-      fetchPages();
+
+      if (!isFetchingRef.current) {
+        await fetchPages();
+      }
+      
       setSelected(null);
       alert("Image updated successfully!");
     } catch (err) {
-      console.error("Error updating image:", err);
-      alert("Failed to update image");
+      console.error("Failed to update image:", err);
+      alert(`Failed to update image: ${err.message}`);
     }
   };
 
   // Delete image
-  const deleteImage = async (imgPath) => {
+  const deleteImage = async (imgValue) => {
     if (!window.confirm("Are you sure you want to delete this image?")) return;
     try {
-      const fileName = imgPath.split("/").pop();
+      const fileName = imgValue.split("/").pop();
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/images/delete/${fileName}`);
-      fetchPages();
+      
+      if (!isFetchingRef.current) {
+        await fetchPages();
+      }
+      
       alert("Image deleted successfully!");
     } catch (err) {
       console.error("Failed to delete image:", err);
-      alert("Failed to delete image");
+      alert(`Failed to delete image: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  const filteredPages = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
-
-  // Direct file upload handler
+  // Handle file upload and update
   const handleFileChange = async (e) => {
     if (!e.target.files?.length || !selected) return;
     const file = e.target.files[0];
 
-    // Extract the old filename
-    const oldImgValue = selected?.oldPath;
-    if (!oldImgValue) return; // prevent errors  
-    const oldFileName = oldImgValue.split("/").pop();
-
     const formData = new FormData();
     formData.append("image", file);
-    formData.append("filename", oldFileName); // tell backend to overwrite
 
     try {
-      const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/images/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const uploadRes = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/images/upload`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-      await updateImage(selected.page, selected.path, selected.oldPath); 
+      const newFilePath = uploadRes.data.filePath || uploadRes.data.path;
+      
+      if (!newFilePath) {
+        throw new Error("Backend didn't return the new file path");
+      }
+
+      await updateImage(selected.page, selected.path, newFilePath);
+      
+      const oldFileName = selected.oldPath.split("/").pop();
+      const newFileName = newFilePath.split("/").pop();
+      
+      if (oldFileName !== newFileName) {
+        try {
+          await axios.delete(`${import.meta.env.VITE_API_URL}/api/images/delete/${oldFileName}`);
+        } catch (err) {
+          console.warn("Couldn't delete old image:", err);
+        }
+      }
+      
       setSelected(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("Failed to upload image");
+      alert(`Failed to upload image: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-blue-600 mb-5">Media Management</h1>
-
-      {filteredPages.map((page) => {
-        const images = page.sections ? extractImages(page.sections) : [];
-        if (!images.length) return null;
-
-        return (
-          <div key={page.pageName} className="mb-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h2 className="text-2xl font-bold mb-4 capitalize text-slate-800">{page.pageName} Page Images</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {images.map((img, i) => (
-                <div key={i} className="border border-slate-200 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                  <img
-                    src={`${import.meta.env.VITE_API_URL}${img.value.startsWith("/") ? "" : "/uploads/"}${img.value}`}
-                    className="h-32 w-full object-cover rounded mb-2"
-                    alt=""
-                    onError={(e) => (e.target.src = "https://via.placeholder.com/150?text=Image+Not+Found")}
-                  />
-                  <p className="text-xs mb-2 break-all text-slate-600">{img.value}</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setSelected({ page: page.pageName, path: img.path, oldPath: img.value });
-                        fileInputRef.current.click(); // directly open file picker
-                      }}
-                      className="flex-1 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
-                    >
-                      Change
-                    </button>
-
-                    <button
-                      onClick={() => deleteImage(`${import.meta.env.VITE_API_URL}${img.value}`)}
-                      className="flex-1 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-
-      {filteredPages.length === 0 && (
+  if (loading) {
+    return (
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-blue-600 mb-5">Media Management</h1>
         <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
-          <p className="text-slate-600">No images found in Home or Services pages</p>
+          <p className="text-slate-600">Loading images...</p>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Hidden input for direct PC upload */}
+  if (error) {
+    return (
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-blue-600 mb-5">Media Management</h1>
+        <div className="bg-red-50 p-12 rounded-xl shadow-sm border border-red-200 text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-sm text-slate-600">API URL: {import.meta.env.VITE_API_URL || 'Not configured'}</p>
+          <button 
+            onClick={() => {
+              if (!isFetchingRef.current) {
+                fetchPages();
+              }
+            }}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredPages = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 pt-0 to-blue-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 ">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Media Management</h1>
+          <hr className="text-blue-500" />
+        </div>
+
+        {filteredPages.map((page) => {
+          const images = page.sections ? extractImages(page.sections) : [];
+          if (!images.length) return null;
+
+          return (
+            <div key={page.pageName} className="mb-12">
+              <div className="flex items-center mt-8 gap-3 mb-6">
+                <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
+                <h2 className="text-2xl font-bold text-slate-800 capitalize">
+                  {page.pageName} Page
+                </h2>
+                <span className="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full">
+                  {images.length} {images.length === 1 ? 'image' : 'images'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {images.map((img, i) => (
+                  <div 
+                    key={i} 
+                    className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
+                  >
+                    {/* Image Container */}
+                    <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                      <img
+                        src={getImageUrl(img.value)}
+                        className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-300"
+                        alt=""
+                        onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
+                      />
+                      
+                      {/* Overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <p className="text-white text-xs font-medium truncate">
+                            {img.value.split('/').pop()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="p-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelected({ page: page.pageName, path: img.path, oldPath: img.value });
+                            fileInputRef.current?.click();
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          Replace
+                        </button>
+                        <button
+                          onClick={() => deleteImage(img.value)}
+                          className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-95 transition-all duration-200 border border-red-200 cursor-pointer"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {filteredPages.length === 0 && (
+          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-200 text-center">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <p className="text-slate-600 text-lg">No images found in Home or Services pages</p>
+          </div>
+        )}
+      </div>
+
       <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
     </div>
   );
