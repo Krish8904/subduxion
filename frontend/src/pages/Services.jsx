@@ -66,18 +66,18 @@ const Services = () => {
             const services = section.items || []; // 👈 alias once
 
             return (
-              <section key={key} className="bg-gray-50 py-24">
-                <div className="max-w-7xl mx-auto px-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <section key={key} className="bg-gray-50 py-15">
+                <div className="max-w-7xl mx-auto px-6 pb-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-15 p-5 pt-0">
                     {services.map((item, i) => (
                       <div
                         key={i}
                         className={`bg-white p-8 rounded-xl border-t-4 ${item.color || "border-blue-600"
                           } shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col`}
                       >
-                        <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 overflow-hidden">
+                        <div className="w-full h-70 bg-gray-100 rounded-2xl mb-6 overflow-hidden">
                           <img
-                            src={`/images/${item.img}`}
+                              src={`${import.meta.env.VITE_API_URL}${item.image.startsWith('/') ? '' : '/uploads/'}${item.image}`}
                             alt={item.title}
                             className="w-full h-full object-cover"
                           />

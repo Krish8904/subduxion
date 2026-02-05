@@ -5,7 +5,7 @@ import Page from "./models/page.js";
 
 dotenv.config();
 
-const seedServicesPage = async () => {
+const seedServices = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB connected");
@@ -22,47 +22,45 @@ const seedServicesPage = async () => {
         },
         services: {
           position: 2,
-
           items: [
             {
               title: "AI Strategy",
               desc: "Align AI initiatives with your business goals. We provide strategy roadmaps, feasibility studies, and measurable KPIs to maximize ROI.",
-              img: "ai.webp",
+              image: "/uploads/images/ai.webp", // filename only
               color: "border-blue-600",
             },
             {
               title: "Data Engineering",
               desc: "Build secure, scalable, and compliant data foundations. We ensure clean, governed, and accessible data for AI and analytics.",
-              img: "dataeng.jpg",
+              image: "/uploads/images/dataeng.jpg",
               color: "border-green-600",
             },
             {
               title: "AI Copilots & Agents",
               desc: "Deploy production-ready AI agents and copilots to augment workflows, improve productivity, and enhance customer experience.",
-              img: "aico.jpg",
+              image: "/uploads/images/aico.jpg",
               color: "border-purple-600",
             },
             {
               title: "Workflow Automation",
               desc: "Automate repetitive tasks with intelligent workflows. Reduce errors and accelerate business processes with AI-powered automation.",
-              img: "workflow.jpg",
+              image: "/uploads/images/workflow.jpg",
               color: "border-orange-600",
             },
             {
               title: "AI Governance",
               desc: "Ensure AI systems are privacy-compliant, secure, and EU-ready. We implement policies, monitoring, and audit-ready pipelines.",
-              img: "aigo.jpg",
+              image: "/uploads/images/aigo.jpg",
               color: "border-teal-600",
             },
             {
               title: "Analytics & Insights",
               desc: "Transform data into actionable insights. Dashboards, reports, and predictive analytics empower smarter decision-making.",
-              img: "analytics.jpg",
+              image: "/uploads/images/analytics.jpg",
               color: "border-pink-600",
             },
           ],
         },
-
         cta: {
           title: "Ready to transform your business with AI?",
           text: "Let’s plan a free quick scan to see how AI can drive measurable impact in your organization.",
@@ -87,4 +85,4 @@ const seedServicesPage = async () => {
   }
 };
 
-seedServicesPage();
+seedServices();

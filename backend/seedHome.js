@@ -18,6 +18,7 @@ const seedHomePage = async () => {
             "Subduxion discovers hidden value in your existing data with reliable applied AI.",
           secondaryText:
             "Partner with us to leverage applied AI that is compliant, secure, and designed for measurable impact.",
+          image: "/uploads/images/main.avif", // <-- added hero image
           buttons: [
             {
               label: "Get on a call",
@@ -34,7 +35,7 @@ const seedHomePage = async () => {
           mainText: "",
           secondaryText:
             "Applied AI built on data sovereignty, privacy, security, and EU-ready governance. Our architectures enforce strict data control, encryption, and compliance frameworks to meet GDPR and related regulatory requirements. This ensures scalable AI adoption without compromising trust, control, or accountability.",
-          image: "",
+          image: "/uploads/images/second.avif", // <-- added intro image
           button: {
             label: "",
             link: ""
