@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import CallInquiries from '../components/Callinquiries';
 import EditCareer from './adminEdit/EditCareer';
@@ -7,12 +8,15 @@ import EditServices from "./adminEdit/EditServices";
 import EditCompany from "./adminEdit/EditCompany";
 import EditUsecases from './adminEdit/EditUsecases';
 import NewSectionEditor from './adminEdit/NewSectionEditor';
+import ManageJobs from '../components/ManageJobs';
 import ImageManager from './adminEdit/ImageManger';   
 import { ImagePlus } from 'lucide-react';
 
 import { LayoutDashboard, FileText, Briefcase, Users, TrendingUp, Settings, ChevronDown, ChevronRight, Wrench, Building2, MessageSquare, BarChart3, Bell, Save, Edit, Plus, Edit2, Trash2, X, MapPin, Clock, DollarSign, MoreVertical } from 'lucide-react';
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
   const [activeSection, setActiveSection] = useState('overview');
   const [pagesExpanded, setPagesExpanded] = useState(false);
   const [activePage, setActivePage] = useState('');
@@ -389,7 +393,7 @@ export default function AdminDashboard() {
         </button>
 
         <button
-          onClick={() => setActiveSection('careers')}
+          onClick={() => navigate("/admin/manage-jobs")}
           className={`w-full cursor-pointer flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeSection === 'careers' ? 'bg-blue-600' : 'hover:bg-slate-800'
             }`}
         >
@@ -450,7 +454,7 @@ export default function AdminDashboard() {
                   <Briefcase className="text-blue-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-4xl font-bold text-slate-800">{stats.openRoles}</h3>
+              <h3 className="text-4xl font-bold text-blue-600 ml-3 mb-1">{stats.openRoles}</h3>
               <p className="text-sm text-slate-600">Open Roles</p>
             </div>
 
@@ -460,7 +464,7 @@ export default function AdminDashboard() {
                   <Wrench className="text-purple-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-4xl font-bold text-slate-800">{stats.services}</h3>
+              <h3 className="text-4xl font-bold text-purple-600 ml-3 mb-1">{stats.services}</h3>
               <p className="text-sm text-slate-600">Total Services</p>
             </div>
 
@@ -470,7 +474,7 @@ export default function AdminDashboard() {
                   <Building2 className="text-orange-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-4xl font-bold text-slate-800">{stats.useCases}</h3>
+              <h3 className="text-4xl font-bold text-orange-500 ml-3 mb-1">{stats.useCases}</h3>
               <p className="text-sm text-slate-600">Use Cases</p>
             </div>
 
@@ -480,7 +484,7 @@ export default function AdminDashboard() {
                   <FileText className="text-green-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-4xl font-bold text-slate-800">{allPages.length}</h3>
+              <h3 className="text-4xl font-bold text-green-600 ml-3 mb-1">{allPages.length}</h3>
               <p className="text-sm text-slate-600">Total Pages</p>
             </div>
           </div>

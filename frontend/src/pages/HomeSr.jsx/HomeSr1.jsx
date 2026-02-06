@@ -129,7 +129,7 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 z-250 flex items-center justify-center font-['Poppins']">
-      <div className="bg-white w-[100%] h-[100%] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+      <div className="bg-white w-full h-full shadow-2xl flex flex-col overflow-hidden border border-slate-200">
         
         <div className="p-6 border-b border-slate-100 flex justify-between items-center pt-3 pb-3 bg-white px-10">
           <h2 className="text-2xl font-bold text-slate-900">Edit Section: <span className="text-blue-600">{section.name}</span></h2>

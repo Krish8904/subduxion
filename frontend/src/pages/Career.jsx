@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { MapPin, Clock } from "lucide-react";
 
 const Career = () => {
   const [page, setPage] = useState(null);
@@ -166,18 +167,59 @@ const Career = () => {
               </h2>
               <div className="grid gap-8 md:grid-cols-2">
                 {cat.jobs.map((job, j) => (
-                  <div key={j} className="border-l-4 border-blue-600 bg-white rounded-xl p-6 hover:shadow-lg transition-shadow">
-                    <h3 className="text-2xl font-semibold mb-2 text-gray-900">{job.title}</h3>
-                    <p className="text-gray-500 mb-1">
-                      <span className="font-medium">Location:</span> {job.location}
-                    </p>
-                    <p className="text-gray-500 mb-4">
-                      <span className="font-medium">Type:</span> {job.type}
-                    </p>
-                    <p className="mb-4 text-gray-700">{job.description}</p>
-                    <button className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 cursor-pointer transition">
-                      Apply Now
-                    </button>
+                  <div
+                    key={j}
+                    className="group relative rounded-3xl p-[1px] bg-gradient-to-br from-blue-500/40 via-purple-500/30 to-blue-400/40 hover:from-blue-500 hover:via-purple-500 hover:to-blue-400 transition-all duration-500"
+                  >
+                    <div className="relative bg-white rounded-3xl p-8 overflow-hidden">
+
+                      {/* floating glow */}
+                      <div className="absolute -top-16 -right-16 w-56 h-56 bg-blue-100 rounded-full blur-3xl opacity-30 group-hover:opacity-60 transition" />
+
+                      {/* header */}
+                      <div className="flex justify-between items-start mb-6">
+                        <div>
+                          <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
+                            {job.title}
+                          </h3>
+
+                          <div className="flex items-center gap-3 mt-4">
+                            <span className="flex items-center gap-2 text-xs font-semibold bg-slate-100 text-slate-700 px-4 py-1.5 rounded-full shadow-inner">
+                              <MapPin size={13} />
+                              {job.location}
+                            </span>
+
+                            <span className="flex items-center gap-2 text-xs font-semibold bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full shadow-inner">
+                              <Clock size={13} />
+                              {job.type}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* arrow indicator */}
+                        <div className="translate-x-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                          
+                        </div>
+                      </div>
+
+                      {/* separator */}
+                      <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-6" />
+
+                      {/* description */}
+                      <p className="text-slate-600 leading-relaxed line-clamp-4 mb-8">
+                        {job.description}
+                      </p>
+
+                      {/* CTA */}
+                      <button className="relative text-sm font-semibold text-blue-700 group/btn">
+                        Apply 
+                        <span className="ml-2 inline-block transition-transform group-hover/btn:translate-x-1">
+                          →
+                        </span>
+                        <div className="absolute -bottom-1 left-0 w-0 h-[2px] bg-blue-600 group-hover/btn:w-full transition-all duration-300" />
+                      </button>
+
+                    </div>
                   </div>
                 ))}
               </div>

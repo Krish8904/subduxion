@@ -225,7 +225,7 @@ const ImageManager = () => {
   const filteredPages = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 pt-0 to-blue-50 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 pt-0 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 ">
           <h1 className="text-4xl font-bold text-slate-900 mb-2">Media Management</h1>
@@ -262,7 +262,7 @@ const ImageManager = () => {
                         onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
                       />
                       
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="absolute bottom-3 left-3 right-3">
                           <p className="text-white text-xs font-medium truncate">
                             {img.value.split('/').pop()}

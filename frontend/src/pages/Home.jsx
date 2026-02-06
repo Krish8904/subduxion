@@ -103,7 +103,7 @@
                   </div>
                 </div>
                 <img src={`${import.meta.env.VITE_API_URL}${section.image}`} 
-                  alt="Main" className="h-70 w-250 rounded-xl shadow-lg object-cover" />
+                  alt="Main" className="h-70 w-250 rounded-xl mr-5 shadow-lg object-cover" />
               </div>
             );
           }
