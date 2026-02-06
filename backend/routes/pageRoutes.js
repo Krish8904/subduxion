@@ -104,15 +104,32 @@ router.put("/:pageName", async (req, res) => {
     const added = newKeys.filter(k => !oldKeys.includes(k));
     // Section Deleted
     const deleted = oldKeys.filter(k => !newKeys.includes(k));
-    // Section Updated
+    // Section Updated (structure level)
     const updated = newKeys.filter(k => oldKeys.includes(k));
+
+    // ADDED: Detect image changes specifically
+    let imageChanged = false;
+    for (const key of updated) {
+      const oldImage = oldSections[key]?.image;
+      const newImage = newSections[key]?.image;
+      
+      if (oldImage !== newImage && (oldImage || newImage)) {
+        imageChanged = true;
+        break;
+      }
+    }
 
     // Update page
     oldPage.sections = newSections;
     await oldPage.save();
 
-    // Logging logic
-    if (added.length) {
+    // Logging logic - prioritize image changes
+    if (imageChanged) {
+      await addLog(
+        `Image updated in ${pageName} page`,
+        "image"
+      );
+    } else if (added.length) {
       await addLog(
         `Section added to ${pageName} page`,
         "section"
@@ -125,7 +142,6 @@ router.put("/:pageName", async (req, res) => {
     } else if (updated.length) {
       await addLog(
         `Section updated in ${pageName} page`,
-
         "section"
       );
     }

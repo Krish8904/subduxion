@@ -7,7 +7,8 @@ import EditServices from "./adminEdit/EditServices";
 import EditCompany from "./adminEdit/EditCompany";
 import EditUsecases from './adminEdit/EditUsecases';
 import NewSectionEditor from './adminEdit/NewSectionEditor';
-import ImageManager from './adminEdit/ImageManger';
+import ImageManager from './adminEdit/ImageManger';   
+import { ImagePlus } from 'lucide-react';
 
 import { LayoutDashboard, FileText, Briefcase, Users, TrendingUp, Settings, ChevronDown, ChevronRight, Wrench, Building2, MessageSquare, BarChart3, Bell, Save, Edit, Plus, Edit2, Trash2, X, MapPin, Clock, DollarSign, MoreVertical } from 'lucide-react';
 
@@ -407,10 +408,9 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveSection('manage')}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${activeSection === 'manage' ? 'bg-blue-600' : 'hover:bg-slate-800'
-
             }`}
         >
-          <Settings size={20} />
+          <ImagePlus size={20} />
           <span>Manage </span>
         </button>
       </nav>
@@ -443,14 +443,14 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border 4xl border-slate-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Briefcase className="text-blue-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">{stats.openRoles}</h3>
+              <h3 className="text-4xl font-bold text-slate-800">{stats.openRoles}</h3>
               <p className="text-sm text-slate-600">Open Roles</p>
             </div>
 
@@ -460,7 +460,7 @@ export default function AdminDashboard() {
                   <Wrench className="text-purple-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">{stats.services}</h3>
+              <h3 className="text-4xl font-bold text-slate-800">{stats.services}</h3>
               <p className="text-sm text-slate-600">Total Services</p>
             </div>
 
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                   <Building2 className="text-orange-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">{stats.useCases}</h3>
+              <h3 className="text-4xl font-bold text-slate-800">{stats.useCases}</h3>
               <p className="text-sm text-slate-600">Use Cases</p>
             </div>
 
@@ -480,7 +480,7 @@ export default function AdminDashboard() {
                   <FileText className="text-green-600" size={24} />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">{allPages.length}</h3>
+              <h3 className="text-4xl font-bold text-slate-800">{allPages.length}</h3>
               <p className="text-sm text-slate-600">Total Pages</p>
             </div>
           </div>

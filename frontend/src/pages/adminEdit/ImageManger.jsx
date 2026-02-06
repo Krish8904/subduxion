@@ -6,11 +6,11 @@ const ImageManager = () => {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageTimestamps, setImageTimestamps] = useState({}); // NEW: Track when images were updated
   const fileInputRef = useRef(null);
   const isFetchingRef = useRef(false);
   const hasInitializedRef = useRef(false);
 
-  // Fetch all pages - WITH STRICT GUARDS
   const fetchPages = async () => {
     if (isFetchingRef.current) return;
 
@@ -30,7 +30,6 @@ const ImageManager = () => {
     }
   };
 
-  // ONLY fetch once on mount
   useEffect(() => {
     if (hasInitializedRef.current) return;
     
@@ -38,7 +37,6 @@ const ImageManager = () => {
     fetchPages();
   }, []);
 
-  // Recursively extract all "image" fields from objects and arrays
   const extractImages = (obj, path = "sections") => {
     let results = [];
 
@@ -60,15 +58,17 @@ const ImageManager = () => {
     return results;
   };
 
-  // Build safe image URL
+  // FIXED: Add cache busting with timestamp
   const getImageUrl = (value) => {
     if (!value) return "";
     const base = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
     const path = value.includes("/") ? value : `/uploads/${value}`;
-    return `${base}${path}`;
+    
+    // Use tracked timestamp if available, otherwise use current time
+    const timestamp = imageTimestamps[value] || Date.now();
+    return `${base}${path}?t=${timestamp}`;
   };
 
-  // Update image path in page JSON
   const updateImage = async (pageName, imgPath, newImg) => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`);
@@ -121,6 +121,12 @@ const ImageManager = () => {
 
       await axios.put(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`, pageData);
 
+      // NEW: Update timestamp for this image to force reload
+      setImageTimestamps(prev => ({
+        ...prev,
+        [newImg]: Date.now()
+      }));
+
       if (!isFetchingRef.current) {
         await fetchPages();
       }
@@ -133,7 +139,6 @@ const ImageManager = () => {
     }
   };
 
-  // Delete image
   const deleteImage = async (imgValue) => {
     if (!window.confirm("Are you sure you want to delete this image?")) return;
     try {
@@ -151,13 +156,15 @@ const ImageManager = () => {
     }
   };
 
-  // Handle file upload and update
   const handleFileChange = async (e) => {
     if (!e.target.files?.length || !selected) return;
     const file = e.target.files[0];
 
     const formData = new FormData();
     formData.append("image", file);
+    
+    const oldFileName = selected.oldPath.split("/").pop();
+    formData.append("oldFileName", oldFileName);
 
     try {
       const uploadRes = await axios.post(
@@ -173,17 +180,6 @@ const ImageManager = () => {
       }
 
       await updateImage(selected.page, selected.path, newFilePath);
-      
-      const oldFileName = selected.oldPath.split("/").pop();
-      const newFileName = newFilePath.split("/").pop();
-      
-      if (oldFileName !== newFileName) {
-        try {
-          await axios.delete(`${import.meta.env.VITE_API_URL}/api/images/delete/${oldFileName}`);
-        } catch (err) {
-          console.warn("Couldn't delete old image:", err);
-        }
-      }
       
       setSelected(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -258,7 +254,6 @@ const ImageManager = () => {
                     key={i} 
                     className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
                   >
-                    {/* Image Container */}
                     <div className="relative aspect-video bg-slate-100 overflow-hidden">
                       <img
                         src={getImageUrl(img.value)}
@@ -267,7 +262,6 @@ const ImageManager = () => {
                         onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
                       />
                       
-                      {/* Overlay on hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="absolute bottom-3 left-3 right-3">
                           <p className="text-white text-xs font-medium truncate">
@@ -277,7 +271,6 @@ const ImageManager = () => {
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="p-4">
                       <div className="flex gap-2">
                         <button

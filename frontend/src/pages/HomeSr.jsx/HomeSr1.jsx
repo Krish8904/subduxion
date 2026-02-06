@@ -14,13 +14,18 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
   });
 
   const [saving, setSaving] = useState(false);
+  const [imageFile, setImageFile] = useState(null); // NEW: Store the actual file
+  const [imagePreview, setImagePreview] = useState(formData.image); // NEW: Separate preview
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file); // Store the file for upload
+      
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, image: reader.result }));
+        setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -35,6 +40,32 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
     if (!homeData || !homeData.sections) return;
     setSaving(true);
     try {
+      let uploadedImagePath = formData.image; // Default to existing image
+
+      // NEW: Upload image if a new file was selected
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append("image", imageFile);
+        
+        // Send old filename so backend can overwrite it (prevents duplicates)
+        if (formData.image) {
+          const oldFileName = formData.image.split("/").pop();
+          imageFormData.append("oldFileName", oldFileName);
+        }
+
+        const uploadRes = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/images/upload`,
+          imageFormData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        uploadedImagePath = uploadRes.data.filePath || uploadRes.data.path;
+
+        if (!uploadedImagePath) {
+          throw new Error("Backend didn't return the new file path");
+        }
+      }
+
       const updatedSections = JSON.parse(JSON.stringify(homeData.sections));
       
       // Ensure numerical position for sorting
@@ -45,17 +76,17 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
           ...updatedSections.hero, 
           mainText: formData.primary, 
           secondaryText: formData.secondary,
-          image: formData.image,
+          image: uploadedImagePath, // Use the uploaded path
           pos: numericPos,
-          position: numericPos // Syncing with Home.jsx sorter
+          position: numericPos
         };
       } else if (section.id === 'intro') {
         updatedSections.intro = { 
           ...updatedSections.intro, 
           secondaryText: formData.secondary,
-          image: formData.image,
+          image: uploadedImagePath, // Use the uploaded path
           pos: numericPos,
-          position: numericPos // Syncing with Home.jsx sorter
+          position: numericPos
         };
       } else if (section.id === 'cta') {
         updatedSections.cta = { 
@@ -63,14 +94,14 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
           mainText: formData.primary, 
           secondaryText: formData.secondary,
           pos: numericPos,
-          position: numericPos // Syncing with Home.jsx sorter
+          position: numericPos
         };
       } else if (section.isCustom) {
-        // Handle custom dynamic sections if they use this component
         updatedSections[section.id] = {
           ...updatedSections[section.id],
           mainText: formData.primary,
           secondaryText: formData.secondary,
+          image: uploadedImagePath, // Add image support for custom sections
           pos: numericPos,
           position: numericPos
         };
@@ -81,10 +112,19 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      alert(`Failed to save: ${err.response?.data?.message || err.message}`);
     } finally {
       setSaving(false);
     }
+  };
+
+  // NEW: Helper to build image URL for display
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("data:")) return imagePath; // Base64 preview
+    const base = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
+    const path = imagePath.includes("/") ? imagePath : `/uploads/${imagePath}`;
+    return `${base}${path}`;
   };
 
   return (
@@ -97,10 +137,6 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-12 space-y-6 bg-white">
-          
-          {/* IMAGE UPLOAD AREA */}
-          
-
           <div className="grid grid-cols-1 gap-10 max-w-5xl">
             {section.id !== 'intro' && (
               <div className="space-y-3">
@@ -115,27 +151,31 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
                 <textarea name="secondary" value={formData.secondary} onChange={handleChange} className="w-full border border-slate-200 rounded-lg p-5 text-base outline-none focus:ring-2 focus:ring-blue-600 shadow-sm h-20 resize-none" />
               </div>
             )}
+            
             {['hero', 'intro'].includes(section.id) && (
-            <div className="max-w-5xl">
-              <label className="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Section Image (Drag & Drop)</label>
-              <div 
-                className="relative w-full h-48 border-2 border-dashed border-slate-400 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all group overflow-hidden"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {  
-                  e.preventDefault();
-                  const file = e.dataTransfer.files[0];
-                  handleImageChange({ target: { files: [file] } });
-                }}
-              >
-                {formData.image ? (
-                  <img src={formData.image} alt="Preview" className="w-full h-full object-contain" />
-                ) : (
-                  <p className="text-slate-400 text-sm">Drag image here or click to upload</p>
+              <div className="max-w-5xl">
+                <label className="text-[15px] font-bold text-slate-500 uppercase tracking-widest">Section Image (Drag & Drop)</label>
+                <div 
+                  className="relative w-full h-48 border-2 border-dashed border-slate-400 rounded-xl flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-all group overflow-hidden"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {  
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    handleImageChange({ target: { files: [file] } });
+                  }}
+                >
+                  {imagePreview ? (
+                    <img src={getImageUrl(imagePreview)} alt="Preview" className="w-full h-full object-contain" />
+                  ) : (
+                    <p className="text-slate-400 text-sm">Drag image here or click to upload</p>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                </div>
+                {imageFile && (
+                  <p className="text-xs text-green-600 mt-2">✓ New image selected: {imageFile.name}</p>
                 )}
-                <input type="file" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
               </div>
-            </div>
-          )}
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-8 border-t border-slate-100 max-w-2xl pt-6">
@@ -156,17 +196,14 @@ const HomeSr1 = ({ section, homeData, onClose, onRefresh, onDelete }) => {
           </div>
         </div>
 
-        {/* --- UPDATED FOOTER WITH DELETE BUTTON --- */}
         <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-between items-center px-12">
           <div className="flex gap-6">
-            
             <button onClick={onClose} className="bg-slate-900 hover:bg-black text-white px-14 py-4 rounded-lg text-sm font-bold uppercase tracking-widest transition-all">Cancel</button>
             <button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-4 rounded-lg text-sm font-bold uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50">
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
 
-          {/* Delete button only appears for custom sections */}
           {section.isCustom && (
             <button 
               onClick={() => {
