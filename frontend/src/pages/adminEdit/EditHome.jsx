@@ -256,7 +256,7 @@ const EditHome = ({ pageTitle }) => {
   };
 
   return (
-    <div className="p-5  font-poppins bg-white min-h-screen">
+    <div className="p-15 font-poppins bg-white min-h-screen">
 
       {/* --- HEADER SECTION --- */}
       <div className='flex flex-row justify-between items-center w-full mb-10'>
@@ -286,7 +286,7 @@ const EditHome = ({ pageTitle }) => {
             onClick={() => setShowAddSection(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
           >
-            Create Home
+            Create Home 
           </button>
         </div>
       </div>

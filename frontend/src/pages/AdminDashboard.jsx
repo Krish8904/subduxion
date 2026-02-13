@@ -10,6 +10,7 @@ import EditUsecases from './adminEdit/EditUsecases';
 import NewSectionEditor from './adminEdit/NewSectionEditor';
 import ManageJobs from '../components/ManageJobs';
 import ImageManager from './adminEdit/ImageManager';
+import AllLogs from '../components/AllLogs';
 import { ImagePlus, LucidePhoneCall, PhoneCall, PhoneCallIcon, PhoneIncoming } from 'lucide-react';
 import { LayoutDashboard, FileText, Briefcase, Users, TrendingUp, Settings, ChevronDown, ChevronRight, Wrench, Building2, MessageSquare, BarChart3, Bell, Save, Edit, Plus, Edit2, Trash2, X, MapPin, Clock, DollarSign, MoreVertical, Menu, LogOut, User } from 'lucide-react';
 
@@ -291,14 +292,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const pageComponentMap = {
-    home: (props) => <EditHome {...props} onNavigate={setPageView} />,
-    services: (props) => <EditServices {...props} onNavigate={setPageView} />,
-    company: (props) => <EditCompany {...props} onNavigate={setPageView} />,
-    career: (props) => <EditCareer {...props} onNavigate={setPageView} />,
-    usecases: (props) => <EditUsecases {...props} onNavigate={setPageView} />,
-  };
-
   const handlePageSelect = (pageName) => {
     setActiveSection('pages');
     setActivePage(pageName);
@@ -312,14 +305,13 @@ export default function AdminDashboard() {
   };
 
   const Sidebar = () => (
-    <div 
-      className={`${
-        sidebarCollapsed ? 'w-20' : 'w-72'
-      } bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white h-screen flex flex-col transition-all duration-300 ease-in-out border-r  border-slate-700/50 backdrop-blur-xl relative overflow-hidden`}
+    <div
+      className={`${sidebarCollapsed ? 'w-20' : 'w-72'
+        } bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white h-screen flex flex-col transition-all duration-300 ease-in-out border-r  border-slate-700/50 backdrop-blur-xl relative overflow-hidden`}
     >
       {/* Animated background linear */}
       <div className="absolute inset-0 bg-linear-to-br from-blue-600/5 via-transparent to-purple-600/5 opacity-50"></div>
-      
+
       {/* Header */}
       <div className="relative p-6 border-b border-slate-700/50">
         <div className="flex items-center justify-between mb-1">
@@ -365,12 +357,11 @@ export default function AdminDashboard() {
               {allPages.map((page) => (
                 <button
                   key={page._id}
-                  onClick={() => handlePageSelect(page.pageName)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${
-                    activePage === page.pageName
-                      ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                  }`}
+                  onClick={() => navigate(`/admin/${page.pageName}`)}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === page.pageName
+                    ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                    }`}
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
                   <span className="capitalize">{page.pageName}</span>
@@ -433,7 +424,7 @@ export default function AdminDashboard() {
               <p className="font-medium text-sm truncate">Admin User</p>
               <p className="text-xs text-slate-400 truncate">admin@example.com</p>
             </div>
-            
+
           </div>
         ) : (
           <div className="flex justify-center">
@@ -449,11 +440,10 @@ export default function AdminDashboard() {
   const NavItem = ({ icon, label, active, collapsed, onClick, hasSubmenu, submenuExpanded }) => (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-lg transition-all duration-200 group relative ${
-        active
-          ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20 scale-[1.02]'
-          : 'text-slate-300 hover:bg-slate-700/50 hover:text-white hover:scale-[1.01]'
-      }`}
+      className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-lg transition-all duration-200 group relative ${active
+        ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20 scale-[1.02]'
+        : 'text-slate-300 hover:bg-slate-700/50 hover:text-white hover:scale-[1.01]'
+        }`}
     >
       <div className={`${active ? 'scale-110' : 'group-hover:scale-110'} transition-transform duration-200`}>
         {icon}
@@ -468,18 +458,18 @@ export default function AdminDashboard() {
           )}
         </>
       )}
-      
+
     </button>
   );
 
   const StatCard = ({ icon, value, label, color, delay }) => (
-    <div 
+    <div
       className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Animated linear background */}
       <div className={`absolute inset-0 bg-linear-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-      
+
       <div className="relative">
         <div className="flex items-start justify-between mb-6">
           <div className={`w-14 h-14 bg-linear-to-br ${color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300`}>
@@ -489,7 +479,7 @@ export default function AdminDashboard() {
             <TrendingUp size={18} className="text-green-500" />
           </div>
         </div>
-        
+
         <div className="space-y-1">
           <h3 className={`text-4xl font-bold bg-linear-to-br ${color} bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300 origin-left`}>
             {value}
@@ -519,7 +509,7 @@ export default function AdminDashboard() {
             </span>
           </p>
         </div>
-        
+
       </div>
 
       {loading ? (
@@ -569,7 +559,10 @@ export default function AdminDashboard() {
             <div className="p-6 border-b border-slate-100 bg-linear-to-r from-slate-50 to-white">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900">Recent Activity</h3>
-                <button className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
+                <button
+                  className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
+                  onClick={() => setActiveSection('logs')} >
+
                   View All
                   <ChevronRight size={16} />
                 </button>
@@ -578,8 +571,8 @@ export default function AdminDashboard() {
 
             <div className="divide-y divide-slate-100">
               {logs.map((log, index) => (
-                <div 
-                  key={log._id} 
+                <div
+                  key={log._id}
                   className="p-6 hover:bg-slate-50 transition-all duration-200 group cursor-pointer animate-slide-in-left"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -616,39 +609,7 @@ export default function AdminDashboard() {
     </div>
   );
 
-  const PageContent = () => {
-    const PresetComponent = pageComponentMap[activePage];
 
-    if (PresetComponent) {
-      return PresetComponent({ pageTitle: activePage });
-    }
-
-    if (activePage) {
-      return (
-        <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center animate-fade-in">
-          <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <FileText className="text-blue-600" size={40} />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">Dynamic Page Editor</h3>
-            <p className="text-slate-600">Editing: <span className="font-semibold text-blue-600 capitalize">{activePage}</span></p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center animate-fade-in">
-        <div className="max-w-md mx-auto">
-          <div className="w-20 h-20 bg-linear-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <FileText className="text-slate-400" size={40} />
-          </div>
-          <h3 className="text-2xl font-bold text-slate-900 mb-2">Select a Page</h3>
-          <p className="text-slate-600">Choose a page from the sidebar to start editing</p>
-        </div>
-      </div>
-    );
-  };
 
   const CareersContent = () => {
     const JobForm = ({ isEditing = false, job = null }) => (
@@ -923,6 +884,8 @@ export default function AdminDashboard() {
             </div>
           </div>
         );
+      case 'logs':
+        return <AllLogs />;
       default:
         return <OverviewContent />;
     }
@@ -1008,9 +971,9 @@ export default function AdminDashboard() {
           background: #64748b;
         }
       `}</style>
-      
+
       <Sidebar />
-      
+
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-400 mx-auto">
           {renderContent()}

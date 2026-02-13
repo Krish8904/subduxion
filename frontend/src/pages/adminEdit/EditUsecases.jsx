@@ -316,7 +316,7 @@ const EditUsecases = () => {
   };
 
   return (
-    <div className="p-5 pt-2 font-poppins bg-white min-h-screen text-left">
+    <div className="p-15 font-poppins bg-white min-h-screen text-left">
 
       {/* --- HEADER --- */}
       <div className="flex flex-row justify-between items-center w-full mb-10">

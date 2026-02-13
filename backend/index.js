@@ -10,6 +10,7 @@ import logRoutes from "./routes/logRoutes.js";
 import media from "./routes/media.js";
 import nodemailer from "nodemailer";
 
+
 dotenv.config();
 
 console.log("\n ENVIRONMENT VARIABLES CHECK:");

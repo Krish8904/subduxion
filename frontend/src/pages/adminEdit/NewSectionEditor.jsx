@@ -32,62 +32,42 @@ const NewSectionEditor = ({ section, pageData, onClose, pageName, onRefresh, onD
 
     setLoading(true);
     try {
-      // Get the current section data
-      const currentSection = pageData.sections[section.id];
-      
-      // Update ONLY the current section with new form data
-      const updatedCurrentSection = {
-        ...currentSection,
+      const sectionsArray = Object.entries(pageData.sections).map(([id, sec]) => ({
+        id,
+        ...sec,
+      }));
+
+      // Remove the current section
+      const currentIndex = sectionsArray.findIndex(sec => sec.id === section.id);
+      const [currentSec] = sectionsArray.splice(currentIndex, 1);
+
+      // Clamp desired position
+      let updatedPosition = Number(formData.position);
+      if (updatedPosition < 1) updatedPosition = 1;
+      if (updatedPosition > sectionsArray.length + 1) updatedPosition = sectionsArray.length + 1;
+
+      // Insert the current section at the new position
+      sectionsArray.splice(updatedPosition - 1, 0, {
+        ...currentSec,
         mainText: formData.mainText,
         secondaryText: formData.secondaryText,
         alignment: formData.alignment,
-        position: Number(formData.position),
-        type: currentSection.type || "custom"
-      };
+        position: updatedPosition,
+        type: currentSec.type || "custom",
+      });
 
-      // Create updated sections object
-      const updatedSections = {
-        ...pageData.sections,
-        [section.id]: updatedCurrentSection
-      };
+      // Reassign consecutive positions
+      const reorderedSections = {};
+      sectionsArray.forEach((sec, index) => {
+        const { id, ...secData } = sec;
+        reorderedSections[id] = { ...secData, position: index + 1 };
+      });
 
-      // If position changed, reorder all sections
-      if (Number(formData.position) !== currentSection.position) {
-        const sectionsArray = Object.entries(updatedSections).map(([id, sec]) => ({
-          id,
-          ...sec
-        }));
-
-        // Sort by position
-        sectionsArray.sort((a, b) => (a.position || 999) - (b.position || 999));
-
-        // Reassign consecutive positions
-        const reorderedSections = {};
-        sectionsArray.forEach((sec, index) => {
-          const { id, ...sectionData } = sec;
-          reorderedSections[id] = {
-            ...sectionData,
-            position: index + 1
-          };
-        });
-
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/api/pages/${pageName}`,
-          {
-            ...pageData,
-            sections: reorderedSections,
-          }
-        );
-      } else {
-        // Position didn't change, just update the section
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/api/pages/${pageName}`,
-          {
-            ...pageData,
-            sections: updatedSections,
-          }
-        );
-      }
+      // Save
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`, {
+        ...pageData,
+        sections: reorderedSections,
+      });
 
       await onRefresh();
       onClose();

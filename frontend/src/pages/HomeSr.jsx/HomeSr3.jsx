@@ -72,7 +72,7 @@ const HomeSr3 = ({ section, homeData, onClose, onRefresh }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 z-[9999]  flex items-center justify-center backdrop-blur-sm">
       <div className="bg-white w-[100%] h-[100%] shadow-2xl flex flex-col overflow-hidden font-poppins">
 
         <div className="p-5 border-b flex justify-between items-center bg-gray-50 px-10">

@@ -22,6 +22,7 @@ import ManageJobs from "./components/ManageJobs";
 import Logs from "./components/Logs";
 import ImageManager from "./pages/adminEdit/ImageManager";
 import Apply from "./pages/Apply";
+import EditUsecases from "./pages/adminEdit/EditUsecases";
 
 function App() {
   const location = useLocation();
@@ -61,12 +62,14 @@ function App() {
 
         {/* Dynamic edit pages */}
         <Route path="/admin/home" element={<EditHome />} />
-        <Route path="/admin/services/edit" element={<EditServices />} />
+        <Route path="/admin/services" element={<EditServices />} />
         <Route path="/admin/company" element={<EditCompany />} />
+        <Route path="/admin/usecases" element={<EditUsecases />} />
         <Route path="/admin/career" element={<EditCareer />} />
         <Route path="/page/:pageName" element={<DynamicPage />} />
 
       </Routes>
+      
       {!hideHeaderFooter && <Footer />}
     </>
   );

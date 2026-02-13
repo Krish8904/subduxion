@@ -133,7 +133,7 @@ const Call = () => {
             disabled={isSubmitting}
             className="w-full bg-blue-600 text-white px-6 py-4 rounded-xl cursor-pointer font-bold hover:bg-blue-700 transition shadow-lg disabled:bg-gray-400"
           >
-            {isSubmitting ? "Booking you call..." : "Confirm Booking"}
+            {isSubmitting ? "Booking your call..." : "Confirm Booking"}
           </button>
         </form>
       </div>

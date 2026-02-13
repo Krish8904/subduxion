@@ -261,7 +261,7 @@
     };
 
     return (
-      <div className="p-5 font-poppins bg-white min-h-screen text-left">
+      <div className="p-15 font-poppins bg-white min-h-screen text-left">
 
         {/* HEADER */}
         <div className="flex justify-between items-center mb-10">
