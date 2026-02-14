@@ -9,6 +9,20 @@ const applicationSchema = new mongoose.Schema(
     phone: String,
     coverLetter: String,
     resumePath: String,
+
+    // ✅ NEW FIELD
+    status: {
+      type: String,
+      enum: [
+        "Screening",
+        "1st Round",
+        "2nd Round",
+        "Final Round",
+        "Rejected",
+        "Hired"
+      ],
+      default: "Screening"
+    }
   },
   { timestamps: true }
 );

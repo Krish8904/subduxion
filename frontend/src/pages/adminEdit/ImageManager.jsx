@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, ChevronRight } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
 
@@ -196,8 +196,17 @@ const ImageManager = () => {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold text-blue-600  mb-5">Media Management</h1>
+      <div className="space-y-8">
+        <div className="flex items-center gap-2 text-sm text-slate-600 mb-6">
+          <button
+            onClick={() => navigate("/admin")}
+            className="text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+          >
+            Admin
+          </button>
+          <ChevronRight size={16} className="text-slate-400" />
+          <span className="text-slate-900 font-semibold">Manage Media</span>
+        </div>
         <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
           <p className="text-slate-600">Loading images...</p>
         </div>
@@ -207,8 +216,17 @@ const ImageManager = () => {
 
   if (error) {
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold text-blue-600 mb-5">Media Management</h1>
+      <div className="space-y-8">
+        <div className="flex items-center gap-2 text-sm text-slate-600 mb-6">
+          <button
+            onClick={() => navigate("/admin")}
+            className="text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+          >
+            Admin
+          </button>
+          <ChevronRight size={16} className="text-slate-400" />
+          <span className="text-slate-900 font-semibold">Manage Media</span>
+        </div>
         <div className="bg-red-50 p-12 rounded-xl shadow-sm border border-red-200 text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <p className="text-sm text-slate-600">API URL: {import.meta.env.VITE_API_URL || 'Not configured'}</p>
@@ -230,116 +248,100 @@ const ImageManager = () => {
   const filteredPages = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 pt-0 to-blue-50 p-6">
-      <div className="w-full mx-auto">
-        <div className="flex items-center w-full justify-between bg-white/80  p-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-100 p-4 rounded-2xl shadow-inner">
-              <ImagePlus className="text-blue-600" size={28} />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold text-slate-800">
-                Media Management
-              </h2>
-              <p className="text-gray-500 pt-2">
-                Update & Manage media across your website :
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => navigate("/admin")}
-            className="flex items-center gap-2 border px-6 py-3 rounded-xl cursor-pointer hover:bg-slate-50 shadow-sm"
-          >
-            <ArrowLeft size={18} />
-            Dashboard
-          </button>
+    <div className="space-y-8">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-4xl font-bold text-slate-900 mb-2 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text">
+            Media Management
+          </h2>
+          <p className="text-slate-600">Update & Manage media across your website</p>
         </div>
+      </div>
 
-        {filteredPages.map((page) => {
-          const images = page.sections ? extractImages(page.sections) : [];
-          if (!images.length) return null;
+      {filteredPages.map((page) => {
+        const images = page.sections ? extractImages(page.sections) : [];
+        if (!images.length) return null;
 
-          return (
-            <div key={page.pageName} className="mb-12">
-              <div className="flex items-center mt-8 gap-3 mb-6">
-                <div className="h-1 w-8 bg-blue-600 rounded-full mb-3"></div>
-                <h2 className="text-2xl font-bold mb-3 text-slate-800 capitalize">
-                  {page.pageName} Page
-                </h2>
-                <span className="text-sm text-slate-500 bg-slate-200 px-3 py-1 mb-3 rounded-full">
-                  {images.length} {images.length === 1 ? 'image' : 'images'}
-                </span>
-              </div>
+        return (
+          <div key={page.pageName} className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
+              <h2 className="text-2xl font-bold text-slate-800 capitalize">
+                {page.pageName} Page
+              </h2>
+              <span className="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full">
+                {images.length} {images.length === 1 ? 'image' : 'images'}
+              </span>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {images.map((img, i) => (
-                  <div
-                    key={i}
-                    className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
-                  >
-                    <div className="relative aspect-video bg-slate-100 overflow-hidden">
-                      <img
-                        src={getImageUrl(img.value)}
-                        className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
-                        alt=""
-                        onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
-                      />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {images.map((img, i) => (
+                <div
+                  key={i}
+                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
+                >
+                  <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                    <img
+                      src={getImageUrl(img.value)}
+                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+                      alt=""
+                      onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
+                    />
 
-                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <p className="text-white text-xs font-medium truncate">
-                            {img.value.split('/').pop()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setSelected({ page: page.pageName, path: img.path, oldPath: img.value });
-                            fileInputRef.current?.click();
-                          }}
-                          className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Replace
-                        </button>
-                        <button
-                          onClick={() => deleteImage(img.value)}
-                          className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-95 transition-all duration-200 border border-red-200 cursor-pointer"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="text-white text-xs font-medium truncate">
+                          {img.value.split('/').pop()}
+                        </p>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
 
-        {filteredPages.length === 0 && (
-          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-200 text-center">
-            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+                  <div className="p-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setSelected({ page: page.pageName, path: img.path, oldPath: img.value });
+                          fileInputRef.current?.click();
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Replace
+                      </button>
+                      <button
+                        onClick={() => deleteImage(img.value)}
+                        className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-95 transition-all duration-200 border border-red-200 cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="text-slate-600 text-lg">No images found in Home or Services pages</p>
           </div>
-        )}
-      </div>
+        );
+      })}
+
+      {filteredPages.length === 0 && (
+        <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-200 text-center">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <p className="text-slate-600 text-lg">No images found in Home or Services pages</p>
+        </div>
+      )}
 
       <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
-
     </div>
   );
 };

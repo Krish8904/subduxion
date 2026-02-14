@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Plus,
   Layers,
+  ChevronRight,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL;
@@ -126,44 +127,30 @@ export default function ManageJobs() {
   if (loading) return <p className="p-10">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 p-12 space-y-12">
-      {/* Header */}
-      <div className="flex items-center justify-between bg-white/80 backdrop-blur p-6 rounded-2xl shadow-lg border border-slate-200">
-        <div className="flex items-center gap-4">
-          <div className="bg-blue-100 p-4 rounded-2xl shadow-inner">
-            <Briefcase className="text-blue-600" size={28} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-slate-800">
-              Manage Career Openings
-            </h2>
-            <p className="text-gray-500 pt-2">
-              Manage departments and job listings shown on your website :
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8">
 
-        <button
-          onClick={() => navigate("/admin")}
-          className="flex items-center gap-2 border px-6 py-3 rounded-xl cursor-pointer hover:bg-slate-50 shadow-sm"
-        >
-          <ArrowLeft size={18} />
-          Dashboard
-        </button>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-4xl font-bold text-slate-900 mb-2 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text">
+            Manage Career Openings
+          </h2>
+          <p className="text-slate-600">Manage departments and job listings shown on your website</p>
+        </div>
       </div>
 
       {/* Add Category */}
-      <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-lg border flex gap-4 items-center">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex gap-4 items-center">
         <FolderPlus className="text-blue-600" size={22} />
         <input
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           placeholder="Add new department (e.g. Engineering, Marketing)"
-          className="border px-4 py-3 rounded-xl flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="border border-slate-200 px-4 py-3 rounded-xl flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
         <button
           onClick={addCategory}
-          className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white px-8 py-3 rounded-xl font-medium shadow"
+          className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white px-8 py-3 rounded-xl font-medium shadow-sm"
         >
           Add
         </button>
@@ -173,23 +160,23 @@ export default function ManageJobs() {
       {categories.map((cat, catIndex) => (
         <div
           key={catIndex}
-          className="bg-white/90 backdrop-blur p-8 rounded-2xl shadow-xl border border-slate-200 space-y-6"
+          className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6"
         >
           {/* Category Header */}
-          <div className="flex justify-between items-center border-b pb-5">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-5">
             <div className="flex items-center gap-3">
               <Layers className="text-blue-600" />
               <input
                 value={cat.category}
                 onChange={(e) => updateCatName(catIndex, e.target.value)}
-                className="text-2xl font-semibold outline-none focus:text-blue-600 bg-transparent  h-10 leading-loose"
+                className="text-2xl font-semibold outline-none focus:text-blue-600 bg-transparent h-10 leading-loose"
               />
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => addJob(catIndex)}
-                className="flex items-center gap-2 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm shadow"
+                className="flex items-center gap-2 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm shadow-sm"
               >
                 <SquarePlus size={16} />
                 Add Job
@@ -213,7 +200,7 @@ export default function ManageJobs() {
           {cat.jobs.map((job, jobIndex) => (
             <div
               key={jobIndex}
-              className="border border-slate-200 rounded-2xl p-6 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white hover:shadow-lg transition"
+              className="border border-slate-200 rounded-2xl p-6 flex justify-between items-center bg-slate-50 hover:shadow-md transition"
             >
               <div className="space-y-2">
                 <p className="font-semibold text-slate-800 flex items-center gap-2 text-lg">
@@ -257,7 +244,7 @@ export default function ManageJobs() {
 
       {/* Modal */}
       {editing && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white w-[75vw] h-[83vh] p-10 rounded-2xl shadow-2xl flex flex-col">
 
             {/* Header */}
@@ -282,7 +269,7 @@ export default function ManageJobs() {
                     onChange={(e) =>
                       setJobForm({ ...jobForm, title: e.target.value })
                     }
-                    className="border mt-2 w-full px-4 py-3 rounded-xl"
+                    className="border border-slate-200 mt-2 w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -295,7 +282,7 @@ export default function ManageJobs() {
                     onChange={(e) =>
                       setJobForm({ ...jobForm, location: e.target.value })
                     }
-                    className="border mt-2 w-full px-4 py-3 rounded-xl"
+                    className="border border-slate-200 mt-2 w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select Location</option>
                     <option>On Site</option>
@@ -315,7 +302,7 @@ export default function ManageJobs() {
                   onChange={(e) =>
                     setJobForm({ ...jobForm, type: e.target.value })
                   }
-                  className="border mt-2 w-full px-4 py-3 rounded-xl"
+                  className="border border-slate-200 mt-2 w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select Type</option>
                   <option>Full Time</option>
@@ -334,7 +321,7 @@ export default function ManageJobs() {
                   onChange={(e) =>
                     setJobForm({ ...jobForm, description: e.target.value })
                   }
-                  className="border mt-2 w-full px-4 py-3 rounded-xl flex-1 resize-none"
+                  className="border border-slate-200 mt-2 w-full px-4 py-3 rounded-xl flex-1 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -344,13 +331,13 @@ export default function ManageJobs() {
             <div className="flex justify-end gap-4 pt-6">
               <button
                 onClick={() => setEditing(null)}
-                className="px-6 py-2 rounded-xl border"
+                className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveJob}
-                className="bg-blue-600 text-white px-8 py-2 rounded-xl shadow"
+                className="bg-blue-600 text-white px-8 py-2 rounded-xl shadow-sm hover:bg-blue-700"
               >
                 Save Job
               </button>

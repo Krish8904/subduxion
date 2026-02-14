@@ -40,7 +40,7 @@ export default function LogsPage() {
 
 
   return (
-    <div className="space-y-6 animate-fade-in p-6">
+    <div className="space-y-6 animate-fade-in ">
       <h2 className="text-4xl font-bold text-slate-900">All Activity Logs</h2>
 
       {/* Filters Card */}

@@ -300,7 +300,7 @@ const Apply = () => {
               } text-white`}
           >
             {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex items-center cursor-pointer justify-center gap-2">
                 <svg
                   className="animate-spin h-5 w-5"
                   fill="none"

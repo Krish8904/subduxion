@@ -218,7 +218,7 @@ const Career = () => {
                       {/* CTA */}
                       <button
                         onClick={() => navigate(`/career/applyforjobs?job=${encodeURIComponent(job.title)}`)}
-                        className="relative text-sm font-semibold text-blue-700 group/btn"
+                        className="relative text-sm cursor-pointer font-semibold text-blue-700 group/btn"
                       >
                         Apply
                         <span className="ml-2 inline-block transition-transform group-hover/btn:translate-x-1">→</span>

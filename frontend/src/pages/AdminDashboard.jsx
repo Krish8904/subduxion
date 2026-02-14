@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import CallInquiries from '../components/Callinquiries';
+import CallInquiries from '../inquiries/Callinquiries';
+import ContactInquiries from '../inquiries/ContactInquiries';
+import JobInquiries from '../inquiries/JobInquiries';
 import EditCareer from './adminEdit/EditCareer';
 import EditHome from './adminEdit/EditHome';
 import EditServices from "./adminEdit/EditServices";
@@ -16,10 +18,77 @@ import { LayoutDashboard, FileText, Briefcase, Users, TrendingUp, Settings, Chev
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [activeSection, setActiveSection] = useState('overview');
   const [pagesExpanded, setPagesExpanded] = useState(false);
+  const [inquiriesExpanded, setInquiriesExpanded] = useState(false);
   const [activePage, setActivePage] = useState('');
+  const [activeInquiry, setActiveInquiry] = useState('');
+
+  // Sync URL with active section
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (path === '/admin' || path === '/admin/') {
+      setActiveSection('overview');
+      setActivePage('');
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/manage-jobs')) {
+      setActiveSection('manage-jobs');
+      setActivePage('');
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/manage-media')) {
+      setActiveSection('manage-media');
+      setActivePage('');
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/inquiries/call')) {
+      setActiveSection('inquiries');
+      setActiveInquiry('call');
+      setInquiriesExpanded(true);
+      setActivePage('');
+    } else if (path.startsWith('/admin/inquiries/contact')) {
+      setActiveSection('inquiries');
+      setActiveInquiry('contact');
+      setInquiriesExpanded(true);
+      setActivePage('');
+    } else if (path.startsWith('/admin/inquiries/job')) {
+      setActiveSection('inquiries');
+      setActiveInquiry('job');
+      setInquiriesExpanded(true);
+      setActivePage('');
+    } else if (path.startsWith('/admin/logs')) {
+      setActiveSection('logs');
+      setActivePage('');
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/home')) {
+      setActiveSection('pages');
+      setActivePage('home');
+      setPagesExpanded(true);
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/services')) {
+      setActiveSection('pages');
+      setActivePage('services');
+      setPagesExpanded(true);
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/company')) {
+      setActiveSection('pages');
+      setActivePage('company');
+      setPagesExpanded(true);
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/career')) {
+      setActiveSection('pages');
+      setActivePage('career');
+      setPagesExpanded(true);
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/usecases')) {
+      setActiveSection('pages');
+      setActivePage('usecases');
+      setPagesExpanded(true);
+      setActiveInquiry('');
+    }
+  }, [location.pathname]);
+
   const [logs, setLogs] = useState([]);
   const [bookingCount, setBookingCount] = useState(0);
   const [pageView, setPageView] = useState('list');
@@ -304,6 +373,75 @@ export default function AdminDashboard() {
     });
   };
 
+  // Breadcrumb component
+  const Breadcrumb = () => {
+    const getBreadcrumbs = () => {
+      const crumbs = [{ label: 'Admin', action: () => navigate('/admin') }];
+
+      if (activeSection === 'overview') {
+        crumbs.push({ label: 'Overview', action: null });
+      } else if (activeSection === 'pages' && activePage) {
+        crumbs.push({ label: 'Pages', action: () => { navigate('/admin'); setPagesExpanded(true); } });
+        crumbs.push({ label: activePage.charAt(0).toUpperCase() + activePage.slice(1), action: null });
+        if (editMode) {
+          crumbs.push({ label: 'Edit Section', action: null });
+        }
+      } else if (activeSection === 'inquiries') {
+        crumbs.push({ label: 'Inquiries', action: () => { navigate('/admin'); setInquiriesExpanded(true); } });
+        if (activeInquiry === 'call') {
+          crumbs.push({ label: 'Call Inquiries', action: null });
+        } else if (activeInquiry === 'contact') {
+          crumbs.push({ label: 'General Inquiries', action: null });
+        } else if (activeInquiry === 'job') {
+          crumbs.push({ label: 'Career Inquiries', action: null });
+        }
+      } else if (activeSection === 'manage-jobs') {
+        crumbs.push({ label: 'Manage Career Openings', action: null });
+      } else if (activeSection === 'manage-media') {
+        crumbs.push({ label: 'Manage Media', action: null });
+      } else if (activeSection === 'careers') {
+        crumbs.push({ label: 'Career Openings', action: () => { setShowAddForm(false); setEditingJob(null); } });
+        if (showAddForm) {
+          crumbs.push({ label: 'Add New Opening', action: null });
+        } else if (editingJob) {
+          crumbs.push({ label: 'Edit Opening', action: null });
+        }
+      } else if (activeSection === 'analytics') {
+        crumbs.push({ label: 'Analytics', action: null });
+      } else if (activeSection === 'settings') {
+        crumbs.push({ label: 'Settings', action: null });
+      } else if (activeSection === 'logs') {
+        crumbs.push({ label: 'All Logs', action: null });
+      }
+
+      return crumbs;
+    };
+
+    const breadcrumbs = getBreadcrumbs();
+
+    return (
+      <div className="flex items-center gap-2 text-sm text-slate-600 mb-6">
+        {breadcrumbs.map((crumb, index) => (
+          <React.Fragment key={index}>
+            {index > 0 && <ChevronRight size={16} className="text-slate-400" />}
+            {crumb.action ? (
+              <button
+                onClick={crumb.action}
+                className="text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
+              >
+                {crumb.label}
+              </button>
+            ) : (
+              <span className={index === breadcrumbs.length - 1 ? 'text-slate-900 font-semibold' : 'text-slate-600'}>
+                {crumb.label}
+              </span>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
   const Sidebar = () => (
     <div
       className={`${sidebarCollapsed ? 'w-20' : 'w-72'
@@ -339,7 +477,7 @@ export default function AdminDashboard() {
           label="Overview"
           active={activeSection === 'overview'}
           collapsed={sidebarCollapsed}
-          onClick={() => setActiveSection('overview')}
+          onClick={() => navigate('/admin')}
         />
 
         <div className="relative">
@@ -358,7 +496,7 @@ export default function AdminDashboard() {
                 <button
                   key={page._id}
                   onClick={() => navigate(`/admin/${page.pageName}`)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === page.pageName
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === page.pageName && activeSection === 'pages'
                     ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
                     : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                     }`}
@@ -371,13 +509,51 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <NavItem
-          icon={<MessageSquare size={20} />}
-          label="Inquiries"
-          active={activeSection === 'inquiries'}
-          collapsed={sidebarCollapsed}
-          onClick={() => setActiveSection('inquiries')}
-        />
+        <div className="relative">
+          <NavItem
+            icon={<MessageSquare size={20} />}
+            label="Inquiries"
+            collapsed={sidebarCollapsed}
+            onClick={() => setInquiriesExpanded(!inquiriesExpanded)}
+            hasSubmenu
+            submenuExpanded={inquiriesExpanded}
+          />
+
+          {inquiriesExpanded && !sidebarCollapsed && (
+            <div className="ml-4 mt-1 space-y-1 animate-slide-down">
+              <button
+                onClick={() => navigate('/admin/inquiries/call')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activeInquiry === 'call' && activeSection === 'inquiries'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                <span>Call Inquiries</span>
+              </button>
+              <button
+                onClick={() => navigate('/admin/inquiries/contact')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activeInquiry === 'contact' && activeSection === 'inquiries'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                <span>General Inquiries</span>
+              </button>
+              <button
+                onClick={() => navigate('/admin/inquiries/job')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activeInquiry === 'job' && activeSection === 'inquiries'
+                    ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                <span>Career Inquiries</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         <NavItem
           icon={<BarChart3 size={20} />}
@@ -390,16 +566,16 @@ export default function AdminDashboard() {
         <NavItem
           icon={<Briefcase size={20} />}
           label="Career Openings"
-          active={activeSection === 'careers'}
+          active={activeSection === 'manage-jobs'}
           collapsed={sidebarCollapsed}
-          onClick={() => navigate("/admin/manage-jobs")}
+          onClick={() => navigate('/admin/manage-jobs')}
           className="cursor-pointer"
         />
 
         <NavItem
           icon={<ImagePlus size={20} />}
           label="Manage Media"
-          active={activeSection === 'manage'}
+          active={activeSection === 'manage-media'}
           collapsed={sidebarCollapsed}
           onClick={() => navigate('/admin/manage-media')}
         />
@@ -561,7 +737,7 @@ export default function AdminDashboard() {
                 <h3 className="text-xl font-bold text-slate-900">Recent Activity</h3>
                 <button
                   className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
-                  onClick={() => setActiveSection('logs')} >
+                  onClick={() => navigate('/admin/logs')} >
 
                   View All
                   <ChevronRight size={16} />
@@ -609,286 +785,72 @@ export default function AdminDashboard() {
     </div>
   );
 
+  // Render content based on URL/route
+  const renderContent = () => {
+    // Check URL path to determine what to render
+    const path = location.pathname;
 
+    // Edit pages
+    if (path.startsWith('/admin/home')) return <EditHome />;
+    if (path.startsWith('/admin/services')) return <EditServices />;
+    if (path.startsWith('/admin/company')) return <EditCompany />;
+    if (path.startsWith('/admin/career')) return <EditCareer />;
+    if (path.startsWith('/admin/usecases')) return <EditUsecases />;
 
-  const CareersContent = () => {
-    const JobForm = ({ isEditing = false, job = null }) => (
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-1">
-              {isEditing ? 'Edit Job Opening' : 'Add New Job Opening'}
-            </h3>
-            <p className="text-sm text-slate-600">Fill in the details below</p>
-          </div>
-          <button
-            onClick={() => {
-              if (isEditing) {
-                setEditingJob(null);
-              } else {
-                setShowAddForm(false);
-              }
-              resetJobForm();
-            }}
-            className="p-2.5 hover:bg-slate-100 rounded-xl transition-all duration-200 hover:rotate-90"
-          >
-            <X size={20} className="text-slate-600" />
-          </button>
-        </div>
+    // Manage sections
+    if (path.startsWith('/admin/manage-jobs')) return <ManageJobs />;
+    if (path.startsWith('/admin/manage-media')) return <ImageManager />;
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">Job Title *</label>
-              <input
-                type="text"
-                name="title"
-                value={jobFormData.title}
-                onChange={handleJobInputChange}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                placeholder="e.g., AI Consultant"
-                required
-              />
-            </div>
+    // Inquiries - THE FIX IS HERE!
+    if (path.startsWith('/admin/inquiries/call')) return <CallInquiries />;
+    if (path.startsWith('/admin/inquiries/contact')) return <ContactInquiries />;
+    if (path.startsWith('/admin/inquiries/job')) return <JobInquiries />;
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">Category *</label>
-              <select
-                name="category"
-                value={jobFormData.category}
-                onChange={handleJobInputChange}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-              >
-                <option value="AI & Data Science">AI & Data Science</option>
-                <option value="Business Strategy">Business Strategy</option>
-                <option value="Engineering & Development">Engineering & Development</option>
-              </select>
-            </div>
+    // Logs
+    if (path.startsWith('/admin/logs')) return <AllLogs />;
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">Location *</label>
-              <input
-                type="text"
-                name="location"
-                value={jobFormData.location}
-                onChange={handleJobInputChange}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                placeholder="e.g., Remote / EU"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700">Employment Type *</label>
-              <select
-                name="type"
-                value={jobFormData.type}
-                onChange={handleJobInputChange}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-              >
-                <option value="Full-Time">Full-Time</option>
-                <option value="Part-Time">Part-Time</option>
-                <option value="Contract">Contract</option>
-                <option value="Internship">Internship</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700">Job Description *</label>
-            <textarea
-              name="description"
-              value={jobFormData.description}
-              onChange={handleJobInputChange}
-              rows="5"
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white resize-none"
-              placeholder="Describe the role and responsibilities..."
-              required
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
-            <button
-              onClick={() => {
-                if (isEditing) {
-                  setEditingJob(null);
-                } else {
-                  setShowAddForm(false);
-                }
-                resetJobForm();
-              }}
-              className="px-6 py-3 border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 transition-all duration-200 font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => isEditing ? handleUpdateJob(job) : handleAddJob()}
-              className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 flex items-center gap-2 font-medium hover:scale-105"
-            >
-              <Save size={18} />
-              {isEditing ? 'Update Job' : 'Add Job'}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-
-    if (jobsLoading) {
+    // Analytics
+    if (activeSection === 'analytics') {
       return (
-        <div className="flex flex-col justify-center items-center py-24">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div className="space-y-8 animate-fade-in">
+          <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
+            Website Analytics
+          </h2>
+          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="text-blue-600" size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Analytics Dashboard</h3>
+              <p className="text-slate-600">View detailed analytics and insights</p>
+            </div>
           </div>
-          <p className="mt-6 text-slate-600 font-medium">Loading career openings...</p>
         </div>
       );
     }
 
-    return (
-      <div className="space-y-8 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-4xl font-bold text-slate-900 mb-2 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text">
-              Career Openings
-            </h2>
-            <p className="text-slate-600">Manage job postings displayed on your careers page</p>
-          </div>
-          {!showAddForm && !editingJob && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 flex items-center gap-2 font-medium hover:scale-105"
-            >
-              <Plus size={20} />
-              Add New Opening
-            </button>
-          )}
-        </div>
-
-        {showAddForm && <JobForm />}
-        {editingJob && <JobForm isEditing={true} job={jobs.find(j => j.id === editingJob)} />}
-
-        {jobs.length === 0 && !showAddForm ? (
-          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center animate-fade-in">
+    // Settings
+    if (activeSection === 'settings') {
+      return (
+        <div className="space-y-8 animate-fade-in">
+          <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
+            Settings
+          </h2>
+          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
             <div className="max-w-md mx-auto">
               <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Briefcase className="text-blue-600" size={40} />
+                <Settings className="text-blue-600" size={40} />
               </div>
-              <h4 className="text-2xl font-bold text-slate-900 mb-2">No Job Openings</h4>
-              <p className="text-slate-600 mb-6">Start by adding your first career opening</p>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 inline-flex items-center gap-2 font-medium hover:scale-105"
-              >
-                <Plus size={20} />
-                Add Opening
-              </button>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Settings</h3>
+              <p className="text-slate-600">Configure your dashboard preferences</p>
             </div>
           </div>
-        ) : (
-          <div className="grid gap-6">
-            {jobs.map((job, index) => (
-              <div
-                key={job.id}
-                className="group bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 animate-slide-in-left"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h4 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                        {job.title}
-                      </h4>
-                      <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg">
-                        {job.category}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg">
-                        <MapPin size={16} className="text-slate-400" />
-                        <span className="font-medium">{job.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg">
-                        <Clock size={16} className="text-slate-400" />
-                        <span className="font-medium">{job.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditJob(job)}
-                      className="p-3 text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-110"
-                      title="Edit"
-                    >
-                      <Edit2 size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteJob(job)}
-                      className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 hover:scale-110"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-slate-700 leading-relaxed">{job.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'overview':
-        return <OverviewContent />;
-      case 'pages':
-        return <PageContent />;
-      case 'careers':
-        return <CareersContent />;
-      case 'inquiries':
-        return <CallInquiries />;
-      case 'analytics':
-        return (
-          <div className="space-y-8 animate-fade-in">
-            <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
-              Website Analytics
-            </h2>
-            <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="max-w-md mx-auto">
-                <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <BarChart3 className="text-blue-600" size={40} />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Analytics Dashboard</h3>
-                <p className="text-slate-600">View detailed analytics and insights</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'settings':
-        return (
-          <div className="space-y-8 animate-fade-in">
-            <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
-              Settings
-            </h2>
-            <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="max-w-md mx-auto">
-                <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Settings className="text-blue-600" size={40} />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Settings</h3>
-                <p className="text-slate-600">Configure your dashboard preferences</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'logs':
-        return <AllLogs />;
-      default:
-        return <OverviewContent />;
+        </div>
+      );
     }
+
+    // Default: Overview
+    return <OverviewContent />;
   };
 
   return (
@@ -975,7 +937,8 @@ export default function AdminDashboard() {
       <Sidebar />
 
       <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-400 mx-auto">
+        <div className="p-8 max-w-7xl mx-auto">
+          <Breadcrumb />
           {renderContent()}
         </div>
       </div>
