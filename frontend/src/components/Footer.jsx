@@ -14,45 +14,64 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Subduxion</h3>
             <p className="text-gray-400">
-              Subduxion is a consulting company that design, build, and operate
-              intelligent systems for organizations all over the world.
+              Subduxion is a consulting company that design, build, and operate intelligent systems for organizations all over the world, delivering innovative solutions with efficiency and reliability.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold ml-10 mb-4">Quick Links</h4>
-            <div className="space-y-2 ml-10">
-              <button 
-                onClick={() => navigate("/services")} 
-                className="block text-gray-400 cursor-pointer hover:text-white"
+            <h4 className="font-semibold text-center mb-6">Quick Links</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => navigate("/services")}
+                className="text-gray-400 cursor-pointer hover:text-white transition-colors"
               >
                 Services
               </button>
-              <button 
-                onClick={() => navigate("/careers")} 
-                className="block text-gray-400 cursor-pointer hover:text-white"
+              <button
+                onClick={() => navigate("/contact")}
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
               >
-                Careers
+                Inquire
               </button>
-              <button 
-                onClick={() => navigate("/usecases")} 
-                className="block text-gray-400 cursor-pointer hover:text-white"
+              <button
+                onClick={() => navigate("/usecases")}
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
               >
                 Use Cases
               </button>
-              <button 
-                onClick={() => navigate("/contact")} 
-                className="block text-gray-400 cursor-pointer hover:text-white"
+              <button
+                onClick={() => navigate("/call")}
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
+              >
+                Book a Call
+              </button>
+
+              <button
+                onClick={() => navigate("/careers")}
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
+              >
+                Careers
+              </button>
+              <button
+                onClick={() => navigate("/career/applyforjobs")}
+
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
+              >
+                Apply for Jobs
+              </button>
+              <button
+                onClick={() => navigate("/contact")}
+                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
               >
                 Contact
               </button>
-
+              <div></div> {/* empty div to complete the 2x4 grid if needed */}
             </div>
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="ml-15">
             <h4 className="font-semibold mb-4">Contact</h4>
             <div className="space-y-2 text-gray-400">
               <p className="flex items-center gap-2"><Mail size={16} /> info@example.com</p>
@@ -62,17 +81,16 @@ const Footer = () => {
           </div>
 
           {/* Socials */}
-          <div>
+          <div className="ml-10">
             <h4 className="font-semibold mb-4">Follow Us</h4>
             <div className="flex gap-4">
-              <Linkedin className="cursor-pointer hover:text-blue-400" />
-              <Twitter className="cursor-pointer hover:text-blue-400" />
-              <Facebook className="cursor-pointer hover:text-blue-400" />
+              <Linkedin className="cursor-pointer hover:text-blue-400 transition-colors" />
+              <Twitter className="cursor-pointer hover:text-blue-400 transition-colors" />
+              <Facebook className="cursor-pointer hover:text-blue-400 transition-colors" />
             </div>
           </div>
 
         </div>
-
       </div>
     </footer>
   );

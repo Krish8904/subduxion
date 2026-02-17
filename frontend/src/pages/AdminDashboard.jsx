@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
 import axios from 'axios';
 import CallInquiries from '../inquiries/Callinquiries';
 import ContactInquiries from '../inquiries/ContactInquiries';
 import JobInquiries from '../inquiries/JobInquiries';
 import EditCareer from './adminEdit/EditCareer';
 import EditHome from './adminEdit/EditHome';
-import EditServices from "./adminEdit/EditServices";
+import EditServices from "./adminEdit/EditService";
 import EditCompany from "./adminEdit/EditCompany";
 import EditUsecases from './adminEdit/EditUsecases';
-import NewSectionEditor from './adminEdit/NewSectionEditor';
 import ManageJobs from '../components/ManageJobs';
 import ImageManager from './adminEdit/ImageManager';
 import AllLogs from '../components/AllLogs';
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
       setActiveInquiry('job');
       setInquiriesExpanded(true);
       setActivePage('');
-    } else if (path.startsWith('/admin/logs')) {
+    } else if (path.startsWith('/admin/all-logs')) {
       setActiveSection('logs');
       setActivePage('');
       setActiveInquiry('');
@@ -194,7 +194,9 @@ export default function AdminDashboard() {
     }
   };
 
-  fetchBookingsCount();
+  useEffect(() => {
+    fetchBookingsCount();
+  }, []);
 
   const addLogToUI = (newLog) => {
     setLogs((prev) => [newLog, ...prev.slice(0, 5)]);
@@ -393,7 +395,7 @@ export default function AdminDashboard() {
         } else if (activeInquiry === 'contact') {
           crumbs.push({ label: 'General Inquiries', action: null });
         } else if (activeInquiry === 'job') {
-          crumbs.push({ label: 'Career Inquiries', action: null });
+          crumbs.push({ label: 'Job Applications', action: null });
         }
       } else if (activeSection === 'manage-jobs') {
         crumbs.push({ label: 'Manage Career Openings', action: null });
@@ -544,12 +546,12 @@ export default function AdminDashboard() {
               <button
                 onClick={() => navigate('/admin/inquiries/job')}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activeInquiry === 'job' && activeSection === 'inquiries'
-                    ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
-                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                   }`}
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
-                <span>Career Inquiries</span>
+                <span>Job Applications</span>
               </button>
             </div>
           )}
@@ -680,7 +682,7 @@ export default function AdminDashboard() {
           <p className="text-slate-600 flex items-center gap-2">
             <span>Welcome back! Here's what's happening with SubDuxion</span>
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
               Live
             </span>
           </p>
@@ -736,9 +738,9 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900">Recent Activity</h3>
                 <button
+                  onClick={() => navigate('/admin/all-logs')}
                   className="text-sm cursor-pointer font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
-                  onClick={() => navigate('/admin/logs')} >
-
+                >
                   View All
                   <ChevronRight size={16} />
                 </button>
@@ -785,77 +787,10 @@ export default function AdminDashboard() {
     </div>
   );
 
-  // Render content based on URL/route
-  const renderContent = () => {
-    // Check URL path to determine what to render
-    const path = location.pathname;
-
-    // Edit pages
-    if (path.startsWith('/admin/home')) return <EditHome />;
-    if (path.startsWith('/admin/services')) return <EditServices />;
-    if (path.startsWith('/admin/company')) return <EditCompany />;
-    if (path.startsWith('/admin/career')) return <EditCareer />;
-    if (path.startsWith('/admin/usecases')) return <EditUsecases />;
-
-    // Manage sections
-    if (path.startsWith('/admin/manage-jobs')) return <ManageJobs />;
-    if (path.startsWith('/admin/manage-media')) return <ImageManager />;
-
-    // Inquiries - THE FIX IS HERE!
-    if (path.startsWith('/admin/inquiries/call')) return <CallInquiries />;
-    if (path.startsWith('/admin/inquiries/contact')) return <ContactInquiries />;
-    if (path.startsWith('/admin/inquiries/job')) return <JobInquiries />;
-
-    // Logs
-    if (path.startsWith('/admin/logs')) return <AllLogs />;
-
-    // Analytics
-    if (activeSection === 'analytics') {
-      return (
-        <div className="space-y-8 animate-fade-in">
-          <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
-            Website Analytics
-          </h2>
-          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="text-blue-600" size={40} />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Analytics Dashboard</h3>
-              <p className="text-slate-600">View detailed analytics and insights</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Settings
-    if (activeSection === 'settings') {
-      return (
-        <div className="space-y-8 animate-fade-in">
-          <h2 className="text-4xl font-bold text-slate-900 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
-            Settings
-          </h2>
-          <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-100 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Settings className="text-blue-600" size={40} />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Settings</h3>
-              <p className="text-slate-600">Configure your dashboard preferences</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Default: Overview
-    return <OverviewContent />;
-  };
 
   return (
     <div className="flex h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-purple-50/30" onClick={() => setShowPageMenu(null)}>
-      <style jsx>{`
+      <style >{`
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -939,7 +874,11 @@ export default function AdminDashboard() {
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
           <Breadcrumb />
-          {renderContent()}
+          {activeSection === 'overview' ? (
+            <OverviewContent />
+          ) : (
+            <Outlet />
+          )}
         </div>
       </div>
     </div>

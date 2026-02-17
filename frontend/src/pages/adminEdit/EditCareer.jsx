@@ -351,7 +351,7 @@ const EditCareer = ({ pageTitle }) => {
   // If editing or adding, show full-page editor
   if (editingSection || showAddSection) {
     return (
-      <div className="h-full flex flex-col bg-white">
+      <div className="h-full flex flex-col bg-transparent">
         {showAddSection ? (
           <AddSection
             pageName="career"
@@ -610,7 +610,6 @@ const EditCareer = ({ pageTitle }) => {
             <div className="p-4 border-b flex justify-between items-center bg-gray-50 px-10">
               <div className="flex items-center gap-4">
                 <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Live Career Preview</span>
-                <span className="text-xs text-gray-400">Updates automatically</span>
               </div>
               <button onClick={() => setShowFullPreview(false)} className="bg-white border border-gray-200 text-gray-400 hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm">&times;</button>
             </div>

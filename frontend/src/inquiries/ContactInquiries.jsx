@@ -96,9 +96,9 @@ const ContactInquiries = () => {
             {contacts.map((item) => (
               <div
                 key={item._id}
-                className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-300 group"
+                className="bg-white rounded-2xl shadow-sm border border-slate-200 min-h-70 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-300 group"
               >
-                <div className="p-6">
+                <div className="p-6 ">
 
                   {/* Header */}
                   <div className="flex items-start justify-between mb-5">
@@ -137,7 +137,7 @@ const ContactInquiries = () => {
 
                     <button
                       onClick={() => deleteContact(item._id)}
-                      className="text-slate-300 hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-lg"
+                      className="text-slate-300 cursor-pointer hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-lg"
                       title="Delete message"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ const ContactInquiries = () => {
                   </div>
 
                   {/* Footer */}
-                  <div className="text-sm text-slate-400">
+                  <div className="text-sm  text-slate-400">
                     Received: {new Date(item.createdAt).toLocaleString()}
                   </div>
 

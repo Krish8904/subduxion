@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Map from "../components/Map";
+import { useNavigate } from "react-router-dom";
+import { PhoneCall, Building2, Mail } from "lucide-react";
 
 const Touch = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -62,8 +65,9 @@ const Touch = () => {
         {/* Toast Notification */}
         {notification && (
           <div
-            className={`fixed top-6 right-6 z-50 max-w-md p-4 rounded-lg shadow-2xl transform transition-all duration-300 animate-slide-in ${notification.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-              }`}
+            className={`fixed top-6 right-6 z-50 max-w-md p-4 rounded-lg shadow-2xl transform transition-all duration-300 animate-slide-in ${
+              notification.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className="shrink-0">
@@ -94,21 +98,81 @@ const Touch = () => {
 
         {/* Intro Text */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl text-blue-600 font-bold mb-4">Contact Us</h1>
-          <p className="text-gray-600 text-xxl">
-            Our experts are always happy to discuss your challenge. Reach out, and we will connect <br /> you with a member of our team.
-          </p>
-           <div className="flex flex-row gap-5">
-            <div className="max-w-5xl">Book a call</div>
-            <div>Email us directly</div>
-          </div>
+          <h1 className="text-5xl text-blue-600 font-bold mb-4">
+            Contact Us
+          </h1>
 
+          <p className="text-gray-600 text-lg mb-10">
+            Our experts are always happy to discuss your challenge. Reach out, and we will connect <br />
+            you with a member of our team.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center items-stretch gap-6 max-w-4xl mx-auto">
+            {/* Book a Call */}
+            <div
+              onClick={() => navigate("/call")}
+              className="flex-1 bg-white shadow-blue-100 cursor-pointer border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-blue-400 transition-all duration-300 group "
+            >
+              <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 rounded-xl bg-blue-600 text-white shadow-md cursor-pointer group-hover:scale-110 transition">
+                <PhoneCall size={26} />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Book a Call
+              </h3>
+
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Schedule a consultation and speak directly with one of our experts.
+                Choose a time that works best for you.
+              </p>
+            </div>
+
+            {/* Email Directly */}
+            <div
+              onClick={() =>
+                document.querySelector("form")?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="flex-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-slate-600 transition-all duration-300 group cursor-pointer shadow-slate-300"
+            >
+              <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 rounded-xl bg-slate-600 text-white shadow-md group-hover:scale-110 transition">
+                <Mail size={26} />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Email Us Directly
+              </h3>
+
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Prefer writing? Send us your message using the form below and
+                we'll respond within 24 hours.
+              </p>
+            </div>
+
+            {/* Company Registration */}
+            <div
+              onClick={() => navigate("/companyform")}
+              className="flex-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-green-500 transition-all duration-300 group cursor-pointer shadow-green-100"
+            >
+              <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 rounded-xl bg-green-500 text-white shadow-md group-hover:scale-110 transition">
+                <Building2 size={26} />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Company Registration
+              </h3>
+
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Register your company with us and unlock partnership opportunities.
+                Quick and easy process.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Form */}
-        <div className="bg-gray-50 p-8 pt-2  rounded-lg shadow-lg">
+        <div className="bg-gray-50 p-8 pt-2 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-10 text-center">The opportunities are here. So why wait?</h2>
-         
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block mb-1 font-medium">First Name</label>
@@ -181,8 +245,9 @@ const Touch = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-[30%] px-6 py-3 rounded-xl font-bold transition shadow-lg ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                  } text-white`}
+                className={`w-[30%] px-6 py-3 rounded-xl font-bold transition shadow-lg ${
+                  isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                } text-white`}
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
@@ -211,20 +276,20 @@ const Touch = () => {
 
       {/* Toast animation */}
       <style>{`
-  @keyframes slide-in {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  .animate-slide-in {
-    animation: slide-in 0.3s ease-out;
-  }
-`}</style>
+        @keyframes slide-in {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };

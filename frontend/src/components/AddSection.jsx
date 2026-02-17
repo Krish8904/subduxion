@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-
 const AddSection = ({ onClose, onSectionAdded, pageName }) => {
   const [formData, setFormData] = useState({
     sectionName: "",
@@ -13,18 +12,13 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-
-
-
     }));
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,9 +93,8 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
 
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[500] flex items-center justify-center backdrop-blur-sm font-poppins text-left">
-      {/* Container set to 98% width and height */}
-      <div className="bg-white w-[100%] h-[100%]  shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-[500] flex items-start justify-end font-poppins text-left">
+      <div className="bg-white w-[77.5%] h-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
 
         {/* HEADER */}
         <div className="p-6 border-b flex justify-between items-center bg-gray-50 px-10">
@@ -118,7 +111,6 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
           </button>
         </div>
 
-
         {/* MAIN FORM AREA */}
         <div className="flex-1 overflow-y-auto p-10 bg-white">
           <div className="max-w-3xl mx-auto"> {/* Centered max-width for better readability without preview */}
@@ -129,11 +121,7 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
                 </div>
               )}
 
-
               <div className="space-y-6">
-
-
-
                 {/* Main Heading */}
                 <div>
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Main Content </label>
@@ -148,7 +136,6 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
                   />
                 </div>
 
-
                 {/* Description */}
                 <div>
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Subtext / Description</label>
@@ -161,7 +148,6 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
                     className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-600 leading-relaxed"
                   />
                 </div>
-
 
                 {/* Settings Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,7 +165,6 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
                     </select>
                   </div>
 
-
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Position Order</label>
                     <input
@@ -196,10 +181,8 @@ const AddSection = ({ onClose, onSectionAdded, pageName }) => {
           </div>
         </div>
 
-
         {/* FOOTER */}
         <div className="p-8 border-t flex justify-end gap-4 bg-gray-50 px-10">
-
 
           <button
             onClick={onClose}
