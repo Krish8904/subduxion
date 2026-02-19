@@ -1,235 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Building2, Globe, Phone, Mail, User, ChevronDown } from "lucide-react";
+import { Building2, Globe, User, ChevronDown } from "lucide-react";
 
 const CompanyForm = () => {
   const [formData, setFormData] = useState({
+    companyName: "", companyEmail: "", website: "",
+    countryCode: "+1", companyMobile: "",
+    natureOfBusiness: [], channel: [], category: "", subcategory: [],
+    firstName: "", middleName: "", lastName: "",
+    personalEmail: "", personalCountryCode: "+1",
+    personalMobile: "", gender: "",
+  });
 
-    companyName: "",
-    companyEmail: "",
-    website: "",
-    countryCode: "+1",
-    companyMobile: "",
-
-    natureOfBusiness: [],
-    channel: [],
-    category: [],
-    subcategory: [],
-
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    personalEmail: "",
-    personalCountryCode: "+1",
-    personalMobile: "",
-    gender: "",
+  const [masterData, setMasterData] = useState({
+    natureOfBusiness: [], channel: [], category: [], subcategory: []
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const dropdownData = {
-    natureOfBusiness: [
-      "Manufacturing",
-      "Retail",
-      "Wholesale",
-      "E-commerce",
-      "Services",
-      "Technology",
-      "Healthcare",
-      "Education",
-      "Finance",
-      "Real Estate"
-    ],
-    channel: [
-      "Direct Sales",
-      "Online Store",
-      "Distributors",
-      "Retailers",
-      "Marketplace",
-      "B2B Platform",
-      "Franchise",
-      "Agent Network"
-    ],
-    category: [
-      "Electronics",
-      "Fashion & Apparel",
-      "Food & Beverages",
-      "Home & Garden",
-      "Beauty & Personal Care",
-      "Sports & Outdoors",
-      "Automotive",
-      "Books & Media",
-      "Toys & Games",
-      "Industrial Equipment"
-    ]
-  };
-
-  const categorySubcategoryMap = {
-    "Electronics": [
-      "Mobile Phones",
-      "Laptops & Computers",
-      "Tablets",
-      "Smart Watches",
-      "Headphones & Earbuds",
-      "Cameras",
-      "Gaming Consoles",
-      "Home Appliances"
-    ],
-    "Fashion & Apparel": [
-      "Men's Clothing",
-      "Women's Clothing",
-      "Kids' Clothing",
-      "Footwear",
-      "Accessories",
-      "Jewelry",
-      "Bags & Luggage",
-      "Ethnic Wear"
-    ],
-    "Food & Beverages": [
-      "Organic Foods",
-      "Beverages",
-      "Snacks",
-      "Dairy Products",
-      "Frozen Foods",
-      "Bakery Items",
-      "Health Foods",
-      "Gourmet Foods"
-    ],
-    "Home & Garden": [
-      "Furniture",
-      "Home Decor",
-      "Kitchen & Dining",
-      "Bedding & Bath",
-      "Lighting",
-      "Garden Tools",
-      "Plants & Seeds",
-      "Storage & Organization"
-    ],
-    "Beauty & Personal Care": [
-      "Skincare",
-      "Makeup",
-      "Hair Care",
-      "Fragrances",
-      "Bath & Body",
-      "Nail Care",
-      "Men's Grooming",
-      "Beauty Tools"
-    ],
-    "Sports & Outdoors": [
-      "Fitness Equipment",
-      "Camping Gear",
-      "Cycling",
-      "Yoga & Pilates",
-      "Team Sports",
-      "Water Sports",
-      "Winter Sports",
-      "Outdoor Recreation"
-    ],
-    "Automotive": [
-      "Car Accessories",
-      "Motorcycle Parts",
-      "Car Care",
-      "Tires & Wheels",
-      "Tools & Equipment",
-      "Audio & Electronics",
-      "Interior Accessories",
-      "Performance Parts"
-    ],
-    "Books & Media": [
-      "Fiction Books",
-      "Non-Fiction Books",
-      "Educational Books",
-      "E-Books",
-      "Magazines",
-      "Music CDs",
-      "Movies & TV",
-      "Video Games"
-    ],
-    "Toys & Games": [
-      "Action Figures",
-      "Board Games",
-      "Educational Toys",
-      "Dolls & Plush",
-      "Building Blocks",
-      "Outdoor Toys",
-      "Puzzles",
-      "RC Toys"
-    ],
-    "Industrial Equipment": [
-      "Manufacturing Machinery",
-      "Construction Equipment",
-      "Material Handling",
-      "Power Tools",
-      "Safety Equipment",
-      "Testing Equipment",
-      "Packaging Equipment",
-      "Electrical Equipment"
-    ]
-  };
-
-  const getAvailableSubcategories = () => {
-    if (formData.category.length === 0) {
-      return [];
-    }
-
-    const subcategories = new Set();
-    formData.category.forEach((cat) => {
-      if (categorySubcategoryMap[cat]) {
-        categorySubcategoryMap[cat].forEach((sub) => subcategories.add(sub));
+  useEffect(() => {
+    const fetchMasters = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/masters");
+        if (response.data.success) {
+          const data = response.data.data;
+          const subcategoryMap = {};
+          (data.subcategory || []).forEach((sub) => {
+            if (!subcategoryMap[sub.parent]) subcategoryMap[sub.parent] = [];
+            subcategoryMap[sub.parent].push(sub.name);
+          });
+          setMasterData({
+            natureOfBusiness: (data.natureOfBusiness || []).map(m => m.name),
+            channel: (data.channel || []).map(m => m.name),
+            category: (data.category || []).map(m => m.name),
+            subcategory: subcategoryMap,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load master data:", err);
+        showNotification("error", "Failed to load form options");
+      } finally {
+        setLoading(false);
       }
-    });
-
-    return Array.from(subcategories);
-  };
+    };
+    fetchMasters();
+  }, []);
 
   const countryCodes = [
-    { code: "+1", country: "USA/Canada" },
-    { code: "+44", country: "UK" },
-    { code: "+91", country: "India" },
-    { code: "+86", country: "China" },
-    { code: "+81", country: "Japan" },
-    { code: "+49", country: "Germany" },
-    { code: "+33", country: "France" },
-    { code: "+61", country: "Australia" },
-    { code: "+971", country: "UAE" },
-    { code: "+65", country: "Singapore" }
+    { code: "+1",   country: "USA/Canada" }, { code: "+44",  country: "UK" },
+    { code: "+91",  country: "India" },      { code: "+86",  country: "China" },
+    { code: "+81",  country: "Japan" },      { code: "+49",  country: "Germany" },
+    { code: "+33",  country: "France" },     { code: "+61",  country: "Australia" },
+    { code: "+971", country: "UAE" },        { code: "+65",  country: "Singapore" },
   ];
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const getAvailableSubcategories = () => {
+    if (!formData.category) return [];
+    return masterData.subcategory[formData.category] || [];
   };
+
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleCheckboxChange = (field, value) => {
     setFormData((prev) => {
-      const currentValues = prev[field];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter((item) => item !== value)
-        : [...currentValues, value];
-
-      if (field === "category") {
-        const availableSubcategories = new Set();
-        newValues.forEach((cat) => {
-          if (categorySubcategoryMap[cat]) {
-            categorySubcategoryMap[cat].forEach((sub) => availableSubcategories.add(sub));
-          }
-        });
-
-        const validSubcategories = prev.subcategory.filter((sub) =>
-          availableSubcategories.has(sub)
-        );
-
-        return { ...prev, [field]: newValues, subcategory: validSubcategories };
-      }
-
-      return { ...prev, [field]: newValues };
+      if (field === "category") return { ...prev, category: value, subcategory: [] };
+      const cur = prev[field];
+      return { ...prev, [field]: cur.includes(value) ? cur.filter(i => i !== value) : [...cur, value] };
     });
   };
 
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
+  const toggleDropdown = (d) => setOpenDropdown(openDropdown === d ? null : d);
 
   const showNotification = (type, message) => {
     setNotification({ type, message });
@@ -239,51 +83,110 @@ const CompanyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log("Form submitted:", formData);
-      showNotification("success", "Company registration submitted successfully!");
-
-      // Reset form
-      setFormData({
-        companyName: "",
-        companyEmail: "",
-        website: "",
-        countryCode: "+1",
-        companyMobile: "",
-        natureOfBusiness: [],
-        channel: [],
-        category: [],
-        subcategory: [],
-        firstName: "",
-        middleName: "",
-        lastName: "",
-        personalEmail: "",
-        personalCountryCode: "+1",
-        personalMobile: "",
-        gender: "",
-      });
+      const response = await axios.post("http://localhost:5000/api/companies", formData);
+      if (response.data.success) {
+        showNotification("success", "Company registration submitted successfully!");
+        setFormData({
+          companyName: "", companyEmail: "", website: "",
+          countryCode: "+1", companyMobile: "",
+          natureOfBusiness: [], channel: [], category: "", subcategory: [],
+          firstName: "", middleName: "", lastName: "",
+          personalEmail: "", personalCountryCode: "+1",
+          personalMobile: "", gender: "",
+        });
+      }
     } catch (err) {
-      console.error(err);
-      showNotification("error", "Something went wrong. Please try again.");
+      showNotification("error", err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="max-w-6xl mt-20 mx-auto px-4 py-16">
+  const inputCls = "w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white";
 
+  const MultiDropdown = ({ id, label, value, options, onChange, placeholder, disabled }) => {
+    const display = Array.isArray(value)
+      ? (value.length > 0 ? value.join(", ") : placeholder)
+      : (value || placeholder);
+    const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
+
+    return (
+      <div>
+        <label className="block mb-1 font-medium text-slate-700">{label}</label>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => !disabled && toggleDropdown(id)}
+            disabled={disabled}
+            className={`w-full border border-slate-300 rounded-lg px-4 py-3 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"} ${openDropdown === id ? "ring-2 ring-blue-400 border-transparent" : ""}`}
+          >
+            <span className={`truncate text-sm ${hasValue ? "text-slate-700" : "text-slate-400"}`}>{display}</span>
+            <ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform duration-200 ${openDropdown === id ? "rotate-180" : ""}`} />
+          </button>
+
+          {openDropdown === id && (
+            <div className="absolute z-20 w-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
+              {options.length === 0
+                ? <div className="px-4 py-3 text-sm text-slate-400 text-center">No options available</div>
+                : options.map((item) => {
+                  const checked = Array.isArray(value) ? value.includes(item) : value === item;
+                  return (
+                    <label key={item}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${checked ? "bg-blue-50" : "hover:bg-slate-50"}`}>
+                      {/* Custom checkbox */}
+                      <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 transition-colors ${checked ? "bg-blue-600 border-blue-600" : "border-slate-300 bg-white"}`}>
+                        {checked && (
+                          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                            <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </div>
+                      <input type="checkbox" checked={checked} onChange={() => onChange(item)} className="hidden" />
+                      <span className={`text-sm ${checked ? "text-blue-700 font-medium" : "text-slate-700"}`}>{item}</span>
+                    </label>
+                  );
+                })
+              }
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const SectionHeader = ({ icon: Icon, title, iconBg, iconColor, iconBorder }) => (
+    <div className="flex items-center gap-3 mb-6">
+      <div className={`w-13 h-13 rounded-xl flex items-center justify-center shrink-0 border ${iconBg} ${iconBorder}`}>
+        <Icon size={28} className={iconColor} />
+      </div>
+      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+    </div>
+  );
+
+  const sections = [
+    { label: "Company Info",      dot: "bg-blue-600"  },
+    { label: "Business Details",  dot: "bg-green-600" },
+    { label: "Contact Person",    dot: "bg-slate-500"  },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-blue-600" />
+        <p className="text-gray-500 text-sm">Loading form...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mt-20 mx-auto px-4 py-16">
+
+      {/* Toast */}
       {notification && (
-        <div
-          className={`fixed top-6 right-6 z-50 max-w-md p-4 rounded-lg shadow-2xl transform transition-all duration-300 animate-slide-in ${notification.type === "success"
-            ? "bg-green-500 text-white"
-            : "bg-red-500 text-white"
-            }`}
-        >
+        <div className={`fixed top-6 right-6 z-50 max-w-md p-4 rounded-lg shadow-2xl animate-slide-in ${
+          notification.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+        }`}>
           <div className="flex items-start gap-3">
             <div className="shrink-0">
               {notification.type === "success" ? (
@@ -297,15 +200,10 @@ const CompanyForm = () => {
               )}
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-sm">
-                {notification.type === "success" ? "Success!" : "Error"}
-              </p>
+              <p className="font-semibold text-sm">{notification.type === "success" ? "Success!" : "Error"}</p>
               <p className="text-sm mt-1">{notification.message}</p>
             </div>
-            <button
-              onClick={() => setNotification(null)}
-              className="shrink-0 ml-2 hover:opacity-75 transition"
-            >
+            <button onClick={() => setNotification(null)} className="shrink-0 ml-2 hover:opacity-75 transition">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -314,500 +212,200 @@ const CompanyForm = () => {
         </div>
       )}
 
+      {/* Page Header */}
       <div className="text-center mb-10">
+        <span className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold tracking-widest  uppercase px-4 py-1.5 rounded-full mb-5">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          Partner With Us
+        </span>
         <h1 className="text-5xl text-blue-600 font-bold mb-4">Company Registration</h1>
-        <p className="text-gray-600 text-lg">
-          Complete your company profile to get started with us
-        </p>
+        <p className="text-gray-600 text-lg">Complete your company profile to get started with us</p>
       </div>
 
-
       <div className="bg-gray-50 p-8 rounded-lg shadow-lg">
-        <form onSubmit={handleSubmit} className="space-y-15">
-          
+
+        {/* Section step indicator */}
+        <div className="flex items-center mb-10 max-w-md">
+          {sections.map((s, i) => (
+            <React.Fragment key={s.label}>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className={`w-6 h-6 rounded-full ${s.dot} text-white text-xs font-bold flex items-center justify-center shrink-0`}>
+                  {i + 1}
+                </div>
+                <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">{s.label}</span>
+              </div>
+              {i < sections.length - 1 && (
+                <div className="flex-1 h-px bg-slate-200 mx-3 min-w-4" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-12">
+
+          {/* ── Company Information ── */}
           <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-blue-200 p-2 rounded-xl"> <Building2 className="text-blue-600 " size={34} /></div>
-
-              <h2 className="text-3xl font-bold text-slate-900">Company Information</h2>
-            </div>
-
+            <SectionHeader icon={Building2} title="Company Information"
+              iconBg="bg-blue-50" iconColor="text-blue-600" iconBorder="border-blue-200" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Company Name *
-                </label>
-                <input
-                  name="companyName"
-                  type="text"
-                  placeholder="Enter company name"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  required
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">Company Name *</label>
+                <input name="companyName" type="text" placeholder="Enter company name"
+                  value={formData.companyName} onChange={handleChange}
+                  className={inputCls} required disabled={isSubmitting} />
               </div>
-
               <div>
-                <label className="block mb-1 font-medium text-slate-700">
-                  Company Email *
-                </label>
-                <input
-                  name="companyEmail"
-                  type="email"
-                  placeholder="company@example.com"
-                  value={formData.companyEmail}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  required
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">Company Email *</label>
+                <input name="companyEmail" type="email" placeholder="company@example.com"
+                  value={formData.companyEmail} onChange={handleChange}
+                  className={inputCls} required disabled={isSubmitting} />
               </div>
-
               <div>
                 <label className="block mb-1 font-medium text-slate-700">Website</label>
-                <input
-                  name="website"
-                  type="url"
-                  placeholder="https://www.example.com"
-                  value={formData.website}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  disabled={isSubmitting}
-                />
+                <input name="website" type="url" placeholder="https://www.example.com"
+                  value={formData.website} onChange={handleChange}
+                  className={inputCls} disabled={isSubmitting} />
               </div>
-
               <div className="md:col-span-2">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Company Mobile Number *
-                </label>
+                <label className="block mb-1 font-medium text-slate-700">Company Mobile Number *</label>
                 <div className="flex gap-2">
-                  <select
-                    name="countryCode"
-                    value={formData.countryCode}
-                    onChange={handleChange}
-                    className="border border-slate-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    disabled={isSubmitting}
-                  >
-                    {countryCodes.map((item) => (
-                      <option key={item.code} value={item.code}>
-                        {item.code} ({item.country})
-                      </option>
-                    ))}
+                  <select name="countryCode" value={formData.countryCode} onChange={handleChange}
+                    className="border border-slate-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+                    disabled={isSubmitting}>
+                    {countryCodes.map(c => <option key={c.code} value={c.code}>{c.code} ({c.country})</option>)}
                   </select>
-                  <input
-                    name="companyMobile"
-                    type="tel"
-                    placeholder="Enter mobile number"
-                    value={formData.companyMobile}
-                    onChange={handleChange}
-                    className="flex-1 border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    required
-                    disabled={isSubmitting}
-                  />
+                  <input name="companyMobile" type="tel" placeholder="Enter mobile number"
+                    value={formData.companyMobile} onChange={handleChange}
+                    className={`${inputCls} flex-1`} required disabled={isSubmitting} />
                 </div>
               </div>
             </div>
           </div>
 
-          
+          {/* Divider */}
+          <div className="border-t border-slate-200" />
+
+          {/* ── Business Details ── */}
           <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-blue-200 p-2 rounded-xl">
-                <Globe className="text-blue-600 " size={34} />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-900"> Business Details</h2>
-            </div>
-
+            <SectionHeader icon={Globe} title="Business Details"
+              iconBg="bg-green-50" iconColor="text-green-600" iconBorder="border-green-200" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <div className="relative">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Nature of Business *
-                </label>
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown("natureOfBusiness")}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
-                  disabled={isSubmitting}
-                >
-                  <span className="text-slate-700">
-                    {formData.natureOfBusiness.length > 0
-                      ? formData.natureOfBusiness.join(", ")
-                      : "Select nature of business"}
-                  </span>
-                  <ChevronDown
-                    className={`transition-transform ${openDropdown === "natureOfBusiness" ? "rotate-180" : ""
-                      }`}
-                    size={20}
-                  />
-                </button>
-                {openDropdown === "natureOfBusiness" && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {dropdownData.natureOfBusiness.map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center px-4 py-3 hover:bg-blue-50 cursor-pointer transition"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.natureOfBusiness.includes(item)}
-                          onChange={() => handleCheckboxChange("natureOfBusiness", item)}
-                          className="mr-3 w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
-                        />
-                        <span className="text-slate-700">{item}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              
-              <div className="relative">
-                <label className="block mb-1 font-medium text-slate-700">Channel *</label>
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown("channel")}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
-                  disabled={isSubmitting}
-                >
-                  <span className="text-slate-700">
-                    {formData.channel.length > 0
-                      ? formData.channel.join(", ")
-                      : "Select channels"}
-                  </span>
-                  <ChevronDown
-                    className={`transition-transform ${openDropdown === "channel" ? "rotate-180" : ""
-                      }`}
-                    size={20}
-                  />
-                </button>
-                {openDropdown === "channel" && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {dropdownData.channel.map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center px-4 py-3 hover:bg-blue-50 cursor-pointer transition"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.channel.includes(item)}
-                          onChange={() => handleCheckboxChange("channel", item)}
-                          className="mr-3 w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
-                        />
-                        <span className="text-slate-700">{item}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              
-              <div className="relative">
-                <label className="block mb-1 font-medium text-slate-700">Category *</label>
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown("category")}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
-                  disabled={isSubmitting}
-                >
-                  <span className="text-slate-700">
-                    {formData.category.length > 0
-                      ? formData.category.join(", ")
-                      : "Select categories"}
-                  </span>
-                  <ChevronDown
-                    className={`transition-transform ${openDropdown === "category" ? "rotate-180" : ""
-                      }`}
-                    size={20}
-                  />
-                </button>
-                {openDropdown === "category" && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {dropdownData.category.map((item) => (
-                      <label
-                        key={item}
-                        className="flex items-center px-4 py-3 hover:bg-blue-50 cursor-pointer transition"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.category.includes(item)}
-                          onChange={() => handleCheckboxChange("category", item)}
-                          className="mr-3 w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
-                        />
-                        <span className="text-slate-700">{item}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              
-              <div className="relative">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Subcategory *
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (formData.category.length > 0) {
-                      toggleDropdown("subcategory");
-                    }
-                  }}
-                  className={`w-full border border-slate-300 rounded-lg px-4 py-3 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent ${formData.category.length === 0
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                    }`}
-                  disabled={isSubmitting || formData.category.length === 0}
-                >
-                  <span className={formData.category.length === 0 ? "text-slate-400" : "text-slate-700"}>
-                    {formData.subcategory.length > 0
-                      ? `${formData.subcategory.length} selected`
-                      : formData.category.length === 0
-                        ? "Please select a category first"
-                        : "Select subcategories"}
-                  </span>
-                  <ChevronDown
-                    className={`transition-transform ${openDropdown === "subcategory" ? "rotate-180" : ""
-                      } ${formData.category.length === 0 ? "text-slate-400" : ""}`}
-                    size={20}
-                  />
-                </button>
-                {openDropdown === "subcategory" && formData.category.length > 0 && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {getAvailableSubcategories().length > 0 ? (
-                      getAvailableSubcategories().map((item) => (
-                        <label
-                          key={item}
-                          className="flex items-center px-4 py-3 hover:bg-blue-50 cursor-pointer transition"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={formData.subcategory.includes(item)}
-                            onChange={() => handleCheckboxChange("subcategory", item)}
-                            className="mr-3 w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
-                          />
-                          <span className="text-slate-700">{item}</span>
-                        </label>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-slate-500 text-center">
-                        No subcategories available
-                      </div>
-                    )}
-                  </div>
-                )}
-                {formData.category.length > 0 && (
-                  <p className="mt-1 text-xs text-slate-500">
-                    Showing subcategories for: {formData.category.join(", ")}
+              <MultiDropdown id="natureOfBusiness" label="Nature of Business *"
+                value={formData.natureOfBusiness} options={masterData.natureOfBusiness}
+                onChange={(v) => handleCheckboxChange("natureOfBusiness", v)}
+                placeholder="Select nature of business" disabled={isSubmitting} />
+              <MultiDropdown id="channel" label="Channel *"
+                value={formData.channel} options={masterData.channel}
+                onChange={(v) => handleCheckboxChange("channel", v)}
+                placeholder="Select channels" disabled={isSubmitting} />
+              <MultiDropdown id="category" label="Category *"
+                value={formData.category} options={masterData.category}
+                onChange={(v) => handleCheckboxChange("category", v)}
+                placeholder="Select category" disabled={isSubmitting} />
+              <div>
+                <MultiDropdown id="subcategory" label="Subcategory *"
+                  value={formData.subcategory} options={getAvailableSubcategories()}
+                  onChange={(v) => handleCheckboxChange("subcategory", v)}
+                  placeholder={!formData.category ? "Select a category first" : "Select subcategories"}
+                  disabled={isSubmitting || !formData.category} />
+                {formData.category && (
+                  <p className="mt-1 text-xs text-slate-400">
+                    Subcategories for: <span className="font-semibold text-slate-500">{formData.category}</span>
                   </p>
                 )}
               </div>
             </div>
           </div>
 
-          
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-blue-200 p-2 rounded-xl">
-                <User className="text-blue-600 " size={34} />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-900">Contact Person Details</h2>
-            </div>
+          {/* Divider */}
+          <div className="border-t border-slate-200" />
 
+          {/* ── Contact Person ── */}
+          <div>
+            <SectionHeader icon={User} title="Contact Person Details"
+              iconBg="bg-slate-100" iconColor="text-slate-600" iconBorder="border-slate-200" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block mb-1 font-medium text-slate-700">
-                  First Name *
-                </label>
-                <input
-                  name="firstName"
-                  type="text"
-                  placeholder="First name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  required
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">First Name *</label>
+                <input name="firstName" type="text" placeholder="First name"
+                  value={formData.firstName} onChange={handleChange}
+                  className={inputCls} required disabled={isSubmitting} />
               </div>
-
               <div>
-                <label className="block mb-1 font-medium text-slate-700">
-                  Middle Name
-                </label>
-                <input
-                  name="middleName"
-                  type="text"
-                  placeholder="Middle name"
-                  value={formData.middleName}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">Middle Name</label>
+                <input name="middleName" type="text" placeholder="Middle name"
+                  value={formData.middleName} onChange={handleChange}
+                  className={inputCls} disabled={isSubmitting} />
               </div>
-
               <div>
-                <label className="block mb-1 font-medium text-slate-700">
-                  Last Name *
-                </label>
-                <input
-                  name="lastName"
-                  type="text"
-                  placeholder="Last name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  required
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">Last Name *</label>
+                <input name="lastName" type="text" placeholder="Last name"
+                  value={formData.lastName} onChange={handleChange}
+                  className={inputCls} required disabled={isSubmitting} />
               </div>
-
               <div className="md:col-span-2">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Personal Email *
-                </label>
-                <input
-                  name="personalEmail"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={formData.personalEmail}
-                  onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  required
-                  disabled={isSubmitting}
-                />
+                <label className="block mb-1 font-medium text-slate-700">Personal Email *</label>
+                <input name="personalEmail" type="email" placeholder="your.email@example.com"
+                  value={formData.personalEmail} onChange={handleChange}
+                  className={inputCls} required disabled={isSubmitting} />
               </div>
-
               <div>
                 <label className="block mb-1 font-medium text-slate-700">Gender *</label>
                 <div className="flex gap-6 mt-3">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      checked={formData.gender === "male"}
-                      onChange={handleChange}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      required
-                      disabled={isSubmitting}
-                    />
-                    <span className="text-slate-700">Male</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      checked={formData.gender === "female"}
-                      onChange={handleChange}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      disabled={isSubmitting}
-                    />
-                    <span className="text-slate-700">Female</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="other"
-                      checked={formData.gender === "other"}
-                      onChange={handleChange}
-                      className="mr-2 w-4 h-4 text-blue-600 focus:ring-blue-500"
-                      disabled={isSubmitting}
-                    />
-                    <span className="text-slate-700">Other</span>
-                  </label>
+                  {["male", "female", "other"].map((g) => (
+                    <label key={g} className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="gender" value={g}
+                        checked={formData.gender === g} onChange={handleChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                        required={g === "male"} disabled={isSubmitting} />
+                      <span className="text-slate-700 capitalize text-sm">{g}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
-
               <div className="md:col-span-3">
-                <label className="block mb-1 font-medium text-slate-700">
-                  Personal Mobile Number *
-                </label>
+                <label className="block mb-1 font-medium text-slate-700">Personal Mobile Number *</label>
                 <div className="flex gap-2">
-                  <select
-                    name="personalCountryCode"
-                    value={formData.personalCountryCode}
-                    onChange={handleChange}
-                    className="border border-slate-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    disabled={isSubmitting}
-                  >
-                    {countryCodes.map((item) => (
-                      <option key={item.code} value={item.code}>
-                        {item.code} ({item.country})
-                      </option>
-                    ))}
+                  <select name="personalCountryCode" value={formData.personalCountryCode} onChange={handleChange}
+                    className="border border-slate-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+                    disabled={isSubmitting}>
+                    {countryCodes.map(c => <option key={c.code} value={c.code}>{c.code} ({c.country})</option>)}
                   </select>
-                  <input
-                    name="personalMobile"
-                    type="tel"
-                    placeholder="Enter mobile number"
-                    value={formData.personalMobile}
-                    onChange={handleChange}
-                    className="flex-1 border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                    required
-                    disabled={isSubmitting}
-                  />
+                  <input name="personalMobile" type="tel" placeholder="Enter mobile number"
+                    value={formData.personalMobile} onChange={handleChange}
+                    className={`${inputCls} flex-1`} required disabled={isSubmitting} />
                 </div>
               </div>
             </div>
           </div>
 
-          
-          <div className="text-center pt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-12 py-4 rounded-xl font-bold transition shadow-lg text-white ${isSubmitting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                }`}
-            >
+          {/* Submit */}
+          <div className="text-center pt-4">
+            <button type="submit" disabled={isSubmitting}
+              className={`px-12 py-4 rounded-xl font-bold transition shadow-lg text-white ${
+                isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              }`}>
               {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
+                <span className="flex items-center gap-2">
                   <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   Submitting...
                 </span>
-              ) : (
-                "Register Company"
-              )}
+              ) : "Register Company"}
             </button>
           </div>
+
         </form>
       </div>
 
-      {/* Toast animation */}
       <style>{`
         @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);   opacity: 1; }
         }
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
+        .animate-slide-in { animation: slide-in 0.3s ease-out; }
       `}</style>
     </div>
   );

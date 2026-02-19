@@ -86,6 +86,14 @@ export default function AdminDashboard() {
       setActivePage('usecases');
       setPagesExpanded(true);
       setActiveInquiry('');
+    } else if (path.startsWith('/admin/newcompany')) {
+      setActiveSection('newcompany');
+      setActivePage('');
+      setActiveInquiry('');
+    } else if (path.startsWith('/admin/analytics')) {
+      setActiveSection('analytics');
+      setActivePage('');
+      setActiveInquiry('');
     }
   }, [location.pathname]);
 
@@ -414,6 +422,8 @@ export default function AdminDashboard() {
         crumbs.push({ label: 'Settings', action: null });
       } else if (activeSection === 'logs') {
         crumbs.push({ label: 'All Logs', action: null });
+      } else if (activeSection === 'newcompany') {
+        crumbs.push({ label: 'Company Inquiries', action: null });
       }
 
       return crumbs;
@@ -562,7 +572,9 @@ export default function AdminDashboard() {
           label="Analytics"
           active={activeSection === 'analytics'}
           collapsed={sidebarCollapsed}
-          onClick={() => setActiveSection('analytics')}
+          onClick={() => {
+            navigate('/admin/analytics');
+          }}
         />
 
         <NavItem
@@ -572,6 +584,14 @@ export default function AdminDashboard() {
           collapsed={sidebarCollapsed}
           onClick={() => navigate('/admin/manage-jobs')}
           className="cursor-pointer"
+        />
+
+        <NavItem
+          icon={<Building2 size={20} />}
+          label="Company Inquiries"
+          active={activeSection === 'newcompany'}
+          collapsed={sidebarCollapsed}
+          onClick={() => navigate('/admin/newcompany')}
         />
 
         <NavItem
@@ -587,8 +607,12 @@ export default function AdminDashboard() {
           label="Settings"
           active={activeSection === 'settings'}
           collapsed={sidebarCollapsed}
-          onClick={() => setActiveSection('settings')}
+          onClick={() => {
+            navigate('/admin'); // Go to overview
+            setActiveSection('overview'); // Update activeSection state for highlighting
+          }}
         />
+
       </nav>
 
       {/* User Profile */}

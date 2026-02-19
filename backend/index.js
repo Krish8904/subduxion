@@ -10,7 +10,8 @@ import logRoutes from "./routes/logRoutes.js";
 import media from "./routes/media.js";
 import nodemailer from "nodemailer";
 import contactRoutes from "./routes/contactRoutes.js"
-
+import companyRoutes from "./routes/companyRoutes.js"
+import masterRoutes from "./routes/masterRoutes.js"
 
 dotenv.config();
 
@@ -56,6 +57,11 @@ app.use("/api/images", media);
 
 app.use("/api/contact", contactRoutes);
 
+app.use("/api/companies", companyRoutes);
+
+app.use("/api/masters", masterRoutes);
+
+  
 
 // MongoDB connection
 mongoose

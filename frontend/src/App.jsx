@@ -30,6 +30,8 @@ import ServicesEditCustomSection from "./core/service/ServicesEditCustomSection"
 import ServicesNewSection from "./core/service/ServicesNewSection";
 import CompanyForm from "./pages/CompanyForm";
 import AllLogs from "./components/AllLogs";
+import CompanyInquiries from "./inquiries/CompanyInquiries";
+import Analytics from "./pages/adminEdit/Analytics";
 
 
 function App() {
@@ -91,6 +93,8 @@ function App() {
           <Route path="createcareer" element={<AddSection />} />
           <Route path="newsection" element={<NewSectionEditor />} />
           <Route path="all-logs" element={<AllLogs />} />
+          <Route path="newcompany" element={<CompanyInquiries />} />
+          <Route path="analytics" element={<Analytics />} />          
 
         </Route>
 

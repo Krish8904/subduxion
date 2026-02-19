@@ -196,19 +196,10 @@ const ImageManager = () => {
 
   if (loading) {
     return (
-      <div className="space-y-8">
-        <div className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-          <button
-            onClick={() => navigate("/admin")}
-            className="text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-          >
-            Admin
-          </button>
-          <ChevronRight size={16} className="text-slate-400" />
-          <span className="text-slate-900 font-semibold">Manage Media</span>
-        </div>
-        <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
-          <p className="text-slate-600">Loading images...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-13 w-13 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 pl-1">Loading...</p>
         </div>
       </div>
     );
