@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Mosaic } from "react-loading-indicators";
 
 const JobInquiries = () => {
   const [applications, setApplications] = useState([]);

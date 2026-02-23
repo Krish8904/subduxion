@@ -32,6 +32,12 @@ import CompanyForm from "./pages/CompanyForm";
 import AllLogs from "./components/AllLogs";
 import CompanyInquiries from "./inquiries/CompanyInquiries";
 import Analytics from "./pages/adminEdit/Analytics";
+{/*----------Masters-------- */}
+import MastersAdmin from "./pages/MastersAdmin";
+import AdminNatureOfBusiness from "./mastersPages/AdminNatureOfBusiness";
+import Channel from "./mastersPages/Channel";
+import Category from "./mastersPages/Category";
+import Subcategory from "./mastersPages/Subcategory";
 
 
 function App() {
@@ -94,7 +100,13 @@ function App() {
           <Route path="newsection" element={<NewSectionEditor />} />
           <Route path="all-logs" element={<AllLogs />} />
           <Route path="newcompany" element={<CompanyInquiries />} />
-          <Route path="analytics" element={<Analytics />} />          
+          <Route path="analytics" element={<Analytics />} />        
+          {/*----------Masters-------- */}  
+          <Route path="mainmasters" element={<MastersAdmin />} />          
+          <Route path="mainmasters/natureofbusiness" element={<AdminNatureOfBusiness />} />          
+          <Route path="mainmasters/channel" element={<Channel />} />          
+          <Route path="mainmasters/category" element={<Category />} />          
+          <Route path="mainmasters/subcategory" element={<Subcategory />} />          
 
         </Route>
 

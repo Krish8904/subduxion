@@ -26,4 +26,14 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const updated = await Company.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ success: false, message: "Not found" });
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
 export default router;

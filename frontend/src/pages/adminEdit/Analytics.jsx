@@ -5,6 +5,8 @@ import {
   Wrench, BarChart3, TrendingUp, RefreshCw,
   CheckCircle, Clock, XCircle, AlertCircle,
 } from "lucide-react";
+import { Mosaic } from "react-loading-indicators";
+
 
 const API = "http://localhost:5000";
 
@@ -99,7 +101,7 @@ function Analytics() {
 
   const handleRefresh = () => { setRefreshing(true); fetchAll(); };
 
-  // ── helpers ──────────────────────────────────────────────────────────
+  // ── helpers ────────────────────
   const fmt = (d) => d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
   const statusColor = {
@@ -200,16 +202,14 @@ function Analytics() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <div className="relative">
-          <div className="w-14 h-14 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
-          <div className="w-14 h-14 border-4 border-transparent border-t-purple-500 rounded-full animate-spin absolute inset-0" style={{ animationDirection: "reverse", animationDuration: "0.8s" }} />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-13 w-13 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 pl-1">Loading...</p>
         </div>
-        <p className="mt-5 text-slate-500 font-medium">Loading analytics…</p>
       </div>
     );
   }
-
   const totalBookings = data.callBookings;
   const totalApps = data.applications;
 
@@ -241,8 +241,8 @@ function Analytics() {
             label="Services"
             color="bg-purple-500"
             linear="from-purple-500 to-purple-600"
-          />          
-          <MiniStat icon={BarChart3} value={data.useCases} label="Use Cases" color="bg-orange-500" linear="from-orange-500 to-orange-600"/>
+          />
+          <MiniStat icon={BarChart3} value={data.useCases} label="Use Cases" color="bg-orange-500" linear="from-orange-500 to-orange-600" />
           <MiniStat icon={Briefcase} value={data.openRoles} label="Open Roles" color="bg-blue-500" linear="from-blue-500 to-blue-600" />
         </div>
       </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation, useParams, } from 'react-router-dom';
 import { Outlet } from "react-router-dom";
 import axios from 'axios';
 import CallInquiries from '../inquiries/Callinquiries';
@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [inquiriesExpanded, setInquiriesExpanded] = useState(false);
   const [activePage, setActivePage] = useState('');
   const [activeInquiry, setActiveInquiry] = useState('');
+  const [mastersExpanded, setMastersExpanded] = useState(false);
 
   // Sync URL with active section
   useEffect(() => {
@@ -94,6 +95,26 @@ export default function AdminDashboard() {
       setActiveSection('analytics');
       setActivePage('');
       setActiveInquiry('');
+    } else if (path.startsWith('/admin/mainmasters/channel')) {
+      setActiveSection('masters');
+      setActivePage('channel');
+      setMastersExpanded(true);
+    } else if (path.startsWith('/admin/mainmasters/natureofbusiness')) {
+      setActiveSection('masters');
+      setActivePage('natureofbusiness');
+      setMastersExpanded(true);
+    } else if (path.startsWith('/admin/mainmasters/category')) {
+      setActiveSection('masters');
+      setActivePage('category');
+      setMastersExpanded(true);
+    } else if (path.startsWith('/admin/mainmasters/subcategory')) {
+      setActiveSection('masters');
+      setActivePage('subcategory');
+      setMastersExpanded(true);
+    } else if (path.startsWith('/admin/mainmasters')) {
+      setActiveSection('masters');
+      setActivePage('');
+      setMastersExpanded(true);
     }
   }, [location.pathname]);
 
@@ -390,12 +411,14 @@ export default function AdminDashboard() {
 
       if (activeSection === 'overview') {
         crumbs.push({ label: 'Overview', action: null });
+
       } else if (activeSection === 'pages' && activePage) {
         crumbs.push({ label: 'Pages', action: () => { navigate('/admin'); setPagesExpanded(true); } });
         crumbs.push({ label: activePage.charAt(0).toUpperCase() + activePage.slice(1), action: null });
         if (editMode) {
           crumbs.push({ label: 'Edit Section', action: null });
         }
+
       } else if (activeSection === 'inquiries') {
         crumbs.push({ label: 'Inquiries', action: () => { navigate('/admin'); setInquiriesExpanded(true); } });
         if (activeInquiry === 'call') {
@@ -405,10 +428,13 @@ export default function AdminDashboard() {
         } else if (activeInquiry === 'job') {
           crumbs.push({ label: 'Job Applications', action: null });
         }
+
       } else if (activeSection === 'manage-jobs') {
-        crumbs.push({ label: 'Manage Career Openings', action: null });
+        crumbs.push({ label: 'Career Openings', action: null });
+
       } else if (activeSection === 'manage-media') {
         crumbs.push({ label: 'Manage Media', action: null });
+
       } else if (activeSection === 'careers') {
         crumbs.push({ label: 'Career Openings', action: () => { setShowAddForm(false); setEditingJob(null); } });
         if (showAddForm) {
@@ -416,14 +442,33 @@ export default function AdminDashboard() {
         } else if (editingJob) {
           crumbs.push({ label: 'Edit Opening', action: null });
         }
+
       } else if (activeSection === 'analytics') {
         crumbs.push({ label: 'Analytics', action: null });
+
       } else if (activeSection === 'settings') {
         crumbs.push({ label: 'Settings', action: null });
+
       } else if (activeSection === 'logs') {
         crumbs.push({ label: 'All Logs', action: null });
+
       } else if (activeSection === 'newcompany') {
         crumbs.push({ label: 'Company Inquiries', action: null });
+
+      } else if (activeSection === 'masters') {
+        crumbs.push({
+          label: 'Masters',
+          action: activePage ? () => { navigate('/admin/mainmasters'); setActivePage(''); } : null
+        });
+        if (activePage === 'natureofbusiness') {
+          crumbs.push({ label: 'Nature of Business', action: null });
+        } else if (activePage === 'channel') {
+          crumbs.push({ label: 'Channel', action: null });
+        } else if (activePage === 'category') {
+          crumbs.push({ label: 'Category', action: null });
+        } else if (activePage === 'subcategory') {
+          crumbs.push({ label: 'Subcategory', action: null });
+        }
       }
 
       return crumbs;
@@ -454,7 +499,7 @@ export default function AdminDashboard() {
     );
   };
 
-  const Sidebar = () => (
+  const Sidebar = React.memo(() => (
     <div
       className={`${sidebarCollapsed ? 'w-20' : 'w-72'
         } bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white h-screen flex flex-col transition-all duration-300 ease-in-out border-r  border-slate-700/50 backdrop-blur-xl relative overflow-hidden`}
@@ -567,6 +612,63 @@ export default function AdminDashboard() {
           )}
         </div>
 
+        <div className="relative">
+          <NavItem
+            icon={<Settings size={20} />}
+            label="Masters"
+            active={activeSection === 'masters'}
+            collapsed={sidebarCollapsed}
+            onClick={() => setMastersExpanded(!mastersExpanded)}
+            hasSubmenu
+            submenuExpanded={mastersExpanded}
+          />
+
+          {mastersExpanded && !sidebarCollapsed && (
+            <div className="ml-4 mt-1 space-y-1 animate-slide-down">
+              <button
+                onClick={() => navigate('/admin/mainmasters/channel')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === 'channel' && activeSection === 'masters'
+                  ? 'bg-linear-to-r bg-slate-700  text-white '
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                Channel
+              </button>
+              <button
+                onClick={() => navigate('/admin/mainmasters/natureofbusiness')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === 'natureofbusiness' && activeSection === 'masters'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                Nature of Business
+              </button>
+              <button
+                onClick={() => navigate('/admin/mainmasters/category')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === 'category' && activeSection === 'masters'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                Category
+              </button>
+              <button
+                onClick={() => navigate('/admin/mainmasters/subcategory')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg text-sm transition-all duration-200 ${activePage === 'subcategory' && activeSection === 'masters'
+                  ? 'bg-linear-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50"></div>
+                Subcategory
+              </button>
+            </div>
+          )}
+        </div>
+
         <NavItem
           icon={<BarChart3 size={20} />}
           label="Analytics"
@@ -608,8 +710,8 @@ export default function AdminDashboard() {
           active={activeSection === 'settings'}
           collapsed={sidebarCollapsed}
           onClick={() => {
-            navigate('/admin'); // Go to overview
-            setActiveSection('overview'); // Update activeSection state for highlighting
+            navigate('/admin');
+            setActiveSection('overview');
           }}
         />
 
@@ -626,7 +728,6 @@ export default function AdminDashboard() {
               <p className="font-medium text-sm truncate">Admin User</p>
               <p className="text-xs text-slate-400 truncate">admin@example.com</p>
             </div>
-
           </div>
         ) : (
           <div className="flex justify-center">
@@ -637,7 +738,7 @@ export default function AdminDashboard() {
         )}
       </div>
     </div>
-  );
+  ));
 
   const NavItem = ({ icon, label, active, collapsed, onClick, hasSubmenu, submenuExpanded }) => (
     <button
@@ -660,7 +761,6 @@ export default function AdminDashboard() {
           )}
         </>
       )}
-
     </button>
   );
 
@@ -669,7 +769,6 @@ export default function AdminDashboard() {
       className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Animated linear background */}
       <div className={`absolute inset-0 bg-linear-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
 
       <div className="relative">
@@ -690,14 +789,12 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Hover effect line */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
     </div>
   );
 
   const OverviewContent = () => (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-4xl font-bold text-slate-900 mb-2 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text ">
@@ -711,7 +808,6 @@ export default function AdminDashboard() {
             </span>
           </p>
         </div>
-
       </div>
 
       {loading ? (
@@ -724,7 +820,6 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               icon={<Briefcase size={24} />}
@@ -756,7 +851,6 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {/* Recent Activity */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-fade-in-up" style={{ animationDelay: '400ms' }}>
             <div className="p-6 border-b border-slate-100 bg-linear-to-r from-slate-50 to-white">
               <div className="flex items-center justify-between">
@@ -811,86 +905,33 @@ export default function AdminDashboard() {
     </div>
   );
 
-
   return (
     <div className="flex h-screen bg-linear-to-br from-slate-50 via-blue-50/30 to-purple-50/30" onClick={() => setShowPageMenu(null)}>
-      <style >{`
+      <style>{`
         @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
-
         @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes slide-down {
-          from {
-            opacity: 0;
-            max-height: 0;
-          }
-          to {
-            opacity: 1;
-            max-height: 500px;
-          }
+          from { opacity: 0; max-height: 0; }
+          to { opacity: 1; max-height: 500px; }
         }
-
         @keyframes slide-in-left {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
         }
-
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.5s ease-out;
-          animation-fill-mode: both;
-        }
-
-        .animate-slide-down {
-          animation: slide-down 0.3s ease-out;
-        }
-
-        .animate-slide-in-left {
-          animation: slide-in-left 0.5s ease-out;
-          animation-fill-mode: both;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: transparent;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: #475569;
-          border-radius: 3px;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: #64748b;
-        }
+        .animate-fade-in { animation: fade-in 0.5s ease-out; }
+        .animate-fade-in-up { animation: fade-in-up 0.5s ease-out; animation-fill-mode: both; }
+        .animate-slide-down { animation: slide-down 0.3s ease-out; }
+        .animate-slide-in-left { animation: slide-in-left 0.5s ease-out; animation-fill-mode: both; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #64748b; }
       `}</style>
 
       <Sidebar />
