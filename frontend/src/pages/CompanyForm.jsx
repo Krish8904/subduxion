@@ -25,49 +25,58 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ── Prefill when editData changes ──
+  // editData now has name strings (from $lookup), 
+  // so we convert them back to _ids for the form
   useEffect(() => {
-    if (editData) {
-      setFormData({
-        companyName:         editData.companyName         || "",
-        companyEmail:        editData.companyEmail        || "",
-        website:             editData.website             || "",
-        countryCode:         editData.countryCode         || "+1",
-        companyMobile:       editData.companyMobile       || "",
-        natureOfBusiness:    editData.natureOfBusiness    || [],
-        channel:             editData.channel             || [],
-        category:            editData.category            || "",
-        subcategory:         editData.subcategory         || [],
-        firstName:           editData.firstName           || "",
-        middleName:          editData.middleName          || "",
-        lastName:            editData.lastName            || "",
-        personalEmail:       editData.personalEmail       || "",
-        personalCountryCode: editData.personalCountryCode || "+1",
-        personalMobile:      editData.personalMobile      || "",
-        gender:              editData.gender              || "",
-      });
-    }
-  }, [editData]);
+    if (!editData || !masterData.category.length) return;
 
-  // ── Fetch masters ──
+    const findId = (list, name) => list.find((x) => x.name === name)?._id || "";
+    const findIds = (list, names = []) =>
+      names.map((n) => list.find((x) => x.name === n)?._id).filter(Boolean);
+
+    const catId = findId(masterData.category, editData.category);
+
+    setFormData({
+      companyName: editData.companyName || "",
+      companyEmail: editData.companyEmail || "",
+      website: editData.website || "",
+      countryCode: editData.countryCode || "+1",
+      companyMobile: editData.companyMobile || "",
+      natureOfBusiness: findIds(masterData.natureOfBusiness, editData.natureOfBusiness),
+      channel: findIds(masterData.channel, editData.channel),
+      category: catId,
+      subcategory: findIds(masterData.subcategory[catId] || [], editData.subcategory),
+      firstName: editData.firstName || "",
+      middleName: editData.middleName || "",
+      lastName: editData.lastName || "",
+      personalEmail: editData.personalEmail || "",
+      personalCountryCode: editData.personalCountryCode || "+1",
+      personalMobile: editData.personalMobile || "",
+      gender: editData.gender || "",
+    });
+  }, [editData, masterData]);
+  // ── Fetch masters — store full {_id, name} objects ──
   useEffect(() => {
     const fetchMasters = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/masters/all");
         if (response.data.success) {
           const data = response.data.data;
+
+          // subcategoryMap keyed by category _id (not name)
           const subcategoryMap = {};
           (data.subcategory || []).forEach((sub) => {
-            const catName = sub.category?.name;
-            if (!catName) return;
-            if (!subcategoryMap[catName]) subcategoryMap[catName] = [];
-            subcategoryMap[catName].push(sub.name);
+            const catId = sub.category?._id || sub.category;
+            if (!catId) return;
+            if (!subcategoryMap[catId]) subcategoryMap[catId] = [];
+            subcategoryMap[catId].push({ _id: sub._id, name: sub.name });
           });
+
           setMasterData({
-            natureOfBusiness: (data.natureOfBusiness || []).map((m) => m.name),
-            channel:          (data.channel          || []).map((m) => m.name),
-            category:         (data.category         || []).map((m) => m.name),
-            subcategory:      subcategoryMap,
+            natureOfBusiness: data.natureOfBusiness || [],  // [{_id, name}]
+            channel: data.channel || [],  // [{_id, name}]
+            category: data.category || [],  // [{_id, name}]
+            subcategory: subcategoryMap,               // { catId: [{_id,name}] }
           });
         }
       } catch (err) {
@@ -81,16 +90,16 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   }, []);
 
   const countryCodes = [
-    { code: "+1",   country: "USA/Canada" },
-    { code: "+44",  country: "UK"         },
-    { code: "+91",  country: "India"      },
-    { code: "+86",  country: "China"      },
-    { code: "+81",  country: "Japan"      },
-    { code: "+49",  country: "Germany"    },
-    { code: "+33",  country: "France"     },
-    { code: "+61",  country: "Australia"  },
-    { code: "+971", country: "UAE"        },
-    { code: "+65",  country: "Singapore"  },
+    { code: "+1", country: "USA/Canada" },
+    { code: "+44", country: "UK" },
+    { code: "+91", country: "India" },
+    { code: "+86", country: "China" },
+    { code: "+81", country: "Japan" },
+    { code: "+49", country: "Germany" },
+    { code: "+33", country: "France" },
+    { code: "+61", country: "Australia" },
+    { code: "+971", country: "UAE" },
+    { code: "+65", country: "Singapore" },
   ];
 
   const getAvailableSubcategories = () => {
@@ -101,6 +110,7 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  // ── handleCheckboxChange — values are now _ids ──
   const handleCheckboxChange = (field, value) => {
     setFormData((prev) => {
       if (field === "category") return { ...prev, category: value, subcategory: [] };
@@ -111,7 +121,6 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
       };
     });
   };
-
   const toggleDropdown = (d) => setOpenDropdown(openDropdown === d ? null : d);
 
   const showNotification = (type, message) => {
@@ -154,9 +163,19 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   const inputCls = "w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white";
 
   function MultiDropdown({ id, label, value, options, onChange, placeholder, disabled }) {
-    const display = Array.isArray(value)
-      ? value.length > 0 ? value.join(", ") : placeholder
-      : value || placeholder;
+    // options is now [{_id, name}] or [] 
+    // value is _id string or [_id strings]
+
+    const getLabel = () => {
+      if (Array.isArray(value)) {
+        if (value.length === 0) return placeholder;
+        return value
+          .map((id) => options.find((o) => o._id === id)?.name || id)
+          .join(", ");
+      }
+      return options.find((o) => o._id === value)?.name || placeholder;
+    };
+
     const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
 
     return (
@@ -174,7 +193,7 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
             }
           >
             <span className={"truncate text-sm " + (hasValue ? "text-slate-700" : "text-slate-400")}>
-              {display}
+              {getLabel()}
             </span>
             <ChevronDown
               size={16}
@@ -188,23 +207,23 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
                 <div className="px-4 py-3 text-sm text-slate-400 text-center">No options available</div>
               ) : (
                 options.map((item) => {
-                  const checked = Array.isArray(value) ? value.includes(item) : value === item;
+                  const checked = Array.isArray(value)
+                    ? value.includes(item._id)
+                    : value === item._id;
                   return (
                     <label
-                      key={item}
+                      key={item._id}
                       className={"flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors " + (checked ? "bg-blue-50" : "hover:bg-slate-50")}
                     >
-                      <div
-                        className={"w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 transition-colors " + (checked ? "bg-blue-600 border-blue-600" : "border-slate-300 bg-white")}
-                      >
+                      <div className={"w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 transition-colors " + (checked ? "bg-blue-600 border-blue-600" : "border-slate-300 bg-white")}>
                         {checked && (
                           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
                             <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </div>
-                      <input type="checkbox" checked={checked} onChange={() => onChange(item)} className="hidden" />
-                      <span className={"text-sm " + (checked ? "text-blue-700 font-medium" : "text-slate-700")}>{item}</span>
+                      <input type="checkbox" checked={checked} onChange={() => onChange(item._id)} className="hidden" />
+                      <span className={"text-sm " + (checked ? "text-blue-700 font-medium" : "text-slate-700")}>{item.name}</span>
                     </label>
                   );
                 })
@@ -228,9 +247,9 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   }
 
   const steps = [
-    { label: "Company Info",     dot: "bg-blue-600"  },
+    { label: "Company Info", dot: "bg-blue-600" },
     { label: "Business Details", dot: "bg-green-600" },
-    { label: "Contact Person",   dot: "bg-slate-500" },
+    { label: "Contact Person", dot: "bg-slate-500" },
   ];
 
   if (loading) {
@@ -530,7 +549,7 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
           Partner With Us
         </span>
         <h1 className="text-5xl text-blue-600 font-bold mb-4">Company Registration</h1>
-        <p className="text-gray-600 text-lg">Complete your company profile to get started with us</p>
+        <p className="text-gray-600 text-md">Complete your company profile to get started with us. Add a few  more details about your business <br /> to unlock all features and opportunities.</p>
       </div>
 
       {formBody}

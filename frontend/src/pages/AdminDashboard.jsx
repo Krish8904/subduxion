@@ -13,13 +13,14 @@ import EditUsecases from './adminEdit/EditUsecases';
 import ManageJobs from '../components/ManageJobs';
 import ImageManager from './adminEdit/ImageManager';
 import AllLogs from '../components/AllLogs';
+import { Target } from 'lucide-react';
 import { ImagePlus, LucidePhoneCall, PhoneCall, PhoneCallIcon, PhoneIncoming } from 'lucide-react';
 import { LayoutDashboard, FileText, Briefcase, Users, TrendingUp, Settings, ChevronDown, ChevronRight, Wrench, Building2, MessageSquare, BarChart3, Bell, Save, Edit, Plus, Edit2, Trash2, X, MapPin, Clock, DollarSign, MoreVertical, Menu, LogOut, User } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const isCompanyPage = location.pathname.includes("company-inquiries");
   const [activeSection, setActiveSection] = useState('overview');
   const [pagesExpanded, setPagesExpanded] = useState(false);
   const [inquiriesExpanded, setInquiriesExpanded] = useState(false);
@@ -501,7 +502,7 @@ export default function AdminDashboard() {
 
   const Sidebar = React.memo(() => (
     <div
-      className={`${sidebarCollapsed ? 'w-20' : 'w-72'
+      className={`${sidebarCollapsed ? 'w-20' : 'w-67'
         } bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white h-screen flex flex-col transition-all duration-300 ease-in-out border-r  border-slate-700/50 backdrop-blur-xl relative overflow-hidden`}
     >
       {/* Animated background linear */}
@@ -614,7 +615,7 @@ export default function AdminDashboard() {
 
         <div className="relative">
           <NavItem
-            icon={<Settings size={20} />}
+            icon={<Target size={20} />}
             label="Masters"
             active={activeSection === 'masters'}
             collapsed={sidebarCollapsed}
@@ -869,7 +870,7 @@ export default function AdminDashboard() {
               {logs.map((log, index) => (
                 <div
                   key={log._id}
-                  className="p-6 hover:bg-slate-50 transition-all duration-200 group cursor-pointer animate-slide-in-left"
+                  className="p-6 hover:bg-slate-50 transition-all duration-200 group animate-slide-in-left"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start gap-4">
@@ -937,12 +938,12 @@ export default function AdminDashboard() {
       <Sidebar />
 
       <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className={`p-7 max-w-7xl mx-auto ${isCompanyPage ? "" : "p-8"}`}>
           <Breadcrumb />
           {activeSection === 'overview' ? (
             <OverviewContent />
           ) : (
-            <Outlet />
+            <Outlet  context={{ sidebarCollapsed }} />
           )}
         </div>
       </div>

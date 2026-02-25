@@ -146,14 +146,14 @@ export default function NatureMasterPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Nature of Business</h1>
+          <h1 className="text-4xl font-bold text-slate-800">Nature of Business</h1>
           <p className="text-slate-500 text-sm mt-1">
             {natures.length} {natures.length === 1 ? "entry" : "entries"} total
           </p>
         </div>
         <button
           onClick={openCreate}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow font-medium transition"
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 cursor-pointer text-white rounded-xl shadow font-medium transition"
         >
           + Add Nature
         </button>
@@ -205,13 +205,13 @@ export default function NatureMasterPage() {
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => openEdit(item)}
-                  className="text-sm px-4 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition"
+                  className="text-sm px-4 py-1.5 bg-blue-50 text-blue-700 cursor-pointer rounded-lg hover:bg-blue-100 font-medium transition"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => openDelete(item)}
-                  className="text-sm px-4 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition"
+                  className="text-sm px-4 py-1.5 bg-red-50 text-red-600 cursor-pointer rounded-lg hover:bg-red-100 font-medium transition"
                 >
                   Delete
                 </button>

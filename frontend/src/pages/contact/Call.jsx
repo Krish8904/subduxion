@@ -28,9 +28,9 @@ const Call = () => {
   };
 
   const perks = [
-    { icon: Clock,     text: "30-minute strategy discussion" },
+    { icon: Clock, text: "30-minute strategy discussion" },
     { icon: BarChart2, text: "Technical & business evaluation" },
-    { icon: Map,       text: "Clear roadmap & recommendations" },
+    { icon: Map, text: "Clear roadmap & recommendations" },
   ];
 
   const steps = [
@@ -87,7 +87,7 @@ const Call = () => {
 
         {/* Left */}
         <div className="space-y-4 mr-10">
-          <h2 className="text-2xl text-blue-600 font-semibold mb-6">What to Expect</h2>
+          <h2 className="text-2xl text-blue-600 font-semibold mb-6">What to Expect <span className="text-3xl">↴</span></h2>
           {perks.map((p) => (
             <div key={p.text}
               className="flex items-center gap-4 border border-slate-200 rounded-2xl p-4 bg-white hover:border-blue-300 hover:shadow-md hover:translate-x-1 transition-all duration-200">
@@ -146,9 +146,8 @@ const Call = () => {
           </div>
 
           <button type="submit" disabled={isSubmitting}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition shadow-lg text-white ${
-              isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            }`}>
+            className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition shadow-lg text-white ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              }`}>
             {isSubmitting ? "Booking your call..." : (
               <><CalendarCheck size={18} /> Confirm Booking</>
             )}

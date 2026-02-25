@@ -1,12 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import {
-  Mail, Search, X, ChevronLeft, ChevronRight,
-  Users, Building2, Globe, Tag, Layers, Radio, Briefcase, Phone, FileInput,
+  Mail, ChevronLeft, ChevronRight,
+  Users, Building2, Globe, Tag, Layers, Radio, Briefcase, Phone,
 } from "lucide-react";
 import CompanyForm from "../pages/CompanyForm";
-
-/* ─── all helpers, WaIcon, Avatar, SectionHeader, TagPill stay exactly the same ─── */
 
 const toStr = (v) => {
   if (v == null) return "";
@@ -19,7 +17,7 @@ const PAGE_SIZES = [6, 12, 24];
 const hueOf = (s = "") => (s.charCodeAt(0) * 47) % 360;
 const avatarColors = (name = "") => {
   const h = hueOf(name);
-  return { bg: "hsl(" + h + ",60%,88%)", color: "hsl(" + h + ",55%,32%)" };
+  return { bg: `hsl(${h},40%,90%)`, color: `hsl(${h},45%,35%)` };
 };
 
 const gmailLink = (email) =>
@@ -51,6 +49,15 @@ function Avatar({ name, size }) {
   );
 }
 
+const S = {
+  category:    { accent: "#6d4fc2", pill: { bg: "#f0ebfa", color: "#5338a0", border: "#cdbef5" } },
+  subcategory: { accent: "#2472b0", pill: { bg: "#e8f2fb", color: "#1a568a", border: "#a8cff0" } },
+  nature:      { accent: "#1e8c68", pill: { bg: "#e4f5ef", color: "#166650", border: "#8fd4bd" } },
+  channel:     { accent: "#b8692a", pill: { bg: "#fdf0e2", color: "#944f15", border: "#efc08a" } },
+  company:     { accent: "#2472b0" },
+  personal:    { accent: "#a04070" },
+};
+
 function SectionHeader({ icon, label, color }) {
   return (
     <div className="flex items-center gap-1.5 mb-2">
@@ -71,8 +78,7 @@ function TagPill({ label, bg, color, border }) {
   );
 }
 
-/* ─── CompanyCard — only footer changes ─────────────────────────── */
-function CompanyCard({ company, index, onImport }) {
+function CompanyCard({ company, index, onEdit }) {
   const c = company;
   const fullName = [c.firstName, c.middleName, c.lastName].filter(Boolean).join(" ");
   const { bg, color } = avatarColors(c.companyName || "");
@@ -80,8 +86,17 @@ function CompanyCard({ company, index, onImport }) {
     ? c.website.startsWith("http") ? c.website : "https://" + c.website
     : null;
 
+  const handleCardClick = () => {
+    onEdit(c);
+  };
+
+  const stopPropagation = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
+      onClick={handleCardClick}
       className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
       style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.06)" }}
     >
@@ -89,18 +104,18 @@ function CompanyCard({ company, index, onImport }) {
       <div
         className="px-5 py-4 flex items-center gap-4"
         style={{
-          background: "linear-gradient(135deg, " + bg + " 0%, white 100%)",
-          borderBottom: "1px solid #f3f4f6",
+          background: "linear-gradient(135deg, #eef2ff 0%, #ffffff 100%)",
+          borderBottom: "1px solid #f0f0f0",
         }}
       >
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black shrink-0 shadow-sm"
-          style={{ background: color + "22", color }}
+          style={{ background: bg, color }}
         >
           {(c.companyName || "?")[0].toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-gray-900 text-base leading-tight truncate">
+          <h3 className="font-extrabold text-gray-900 text-xl leading-tight truncate">
             {c.companyName}
           </h3>
           {websiteHref && (
@@ -108,88 +123,79 @@ function CompanyCard({ company, index, onImport }) {
               href={websiteHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={stopPropagation}
               className="inline-flex items-center gap-1 text-xs font-semibold mt-1 hover:underline"
-              style={{ color: "#7c3aed" }}
+              style={{ color: S.category.accent }}
             >
               <Globe size={11} />
               <span className="truncate max-w-[180px]">{c.website}</span>
             </a>
           )}
         </div>
-        <span
-          className="text-xs font-black px-2.5 py-1 rounded-xl shrink-0"
-          style={{ background: "#ede9fe", color: "#5b21b6" }}
-        >
-          #{index}
-        </span>
       </div>
 
-      {/* ── 2x3 Grid ── */}
+      {/* ── 2×3 Grid ── */}
       <div className="grid grid-cols-2 flex-1">
 
         <div className="px-4 py-3 border-r border-b border-gray-100">
-          <SectionHeader icon={<Tag size={12} />} label="Category" color="#7c3aed" />
+          <SectionHeader icon={<Tag size={12} />} label="Category" color={S.category.accent} />
           <div className="flex flex-wrap gap-1">
-            {c.category ? (
-              <TagPill label={c.category} bg="#ede9fe" color="#5b21b6" border="#c4b5fd" />
-            ) : (
-              <span className="text-xs text-gray-400 italic">—</span>
-            )}
+            {c.category
+              ? <TagPill label={c.category} {...S.category.pill} />
+              : <span className="text-xs text-gray-400 italic">—</span>}
           </div>
         </div>
 
         <div className="px-4 py-3 border-b border-gray-100">
-          <SectionHeader icon={<Layers size={12} />} label="Subcategory" color="#0369a1" />
+          <SectionHeader icon={<Layers size={12} />} label="Subcategory" color={S.subcategory.accent} />
           <div className="flex flex-wrap gap-1">
-            {Array.isArray(c.subcategory) && c.subcategory.length > 0 ? (
-              c.subcategory.map((s, i) => (
-                <TagPill key={i} label={s} bg="#f0f9ff" color="#0369a1" border="#bae6fd" />
-              ))
-            ) : (
-              <span className="text-xs text-gray-400 italic">—</span>
-            )}
+            {Array.isArray(c.subcategory) && c.subcategory.length > 0
+              ? c.subcategory.map((s, i) => <TagPill key={i} label={s} {...S.subcategory.pill} />)
+              : <span className="text-xs text-gray-400 italic">—</span>}
           </div>
         </div>
 
         <div className="px-4 py-3 border-r border-b border-gray-100">
-          <SectionHeader icon={<Briefcase size={12} />} label="Nature of Business" color="#059669" />
+          <SectionHeader icon={<Briefcase size={12} />} label="Nature of Business" color={S.nature.accent} />
           <div className="flex flex-wrap gap-1">
-            {Array.isArray(c.natureOfBusiness) && c.natureOfBusiness.length > 0 ? (
-              c.natureOfBusiness.map((n, i) => (
-                <TagPill key={i} label={n} bg="#f0fdf4" color="#166534" border="#86efac" />
-              ))
-            ) : (
-              <span className="text-xs text-gray-400 italic">—</span>
-            )}
+            {Array.isArray(c.natureOfBusiness) && c.natureOfBusiness.length > 0
+              ? c.natureOfBusiness.map((n, i) => <TagPill key={i} label={n} {...S.nature.pill} />)
+              : <span className="text-xs text-gray-400 italic">—</span>}
           </div>
         </div>
 
         <div className="px-4 py-3 border-b border-gray-100">
-          <SectionHeader icon={<Radio size={12} />} label="Channel" color="#ea580c" />
+          <SectionHeader icon={<Radio size={12} />} label="Channel" color={S.channel.accent} />
           <div className="flex flex-wrap gap-1">
-            {Array.isArray(c.channel) && c.channel.length > 0 ? (
-              c.channel.map((ch, i) => (
-                <TagPill key={i} label={ch} bg="#fff7ed" color="#9a3412" border="#fed7aa" />
-              ))
-            ) : (
-              <span className="text-xs text-gray-400 italic">—</span>
-            )}
+            {Array.isArray(c.channel) && c.channel.length > 0
+              ? c.channel.map((ch, i) => <TagPill key={i} label={ch} {...S.channel.pill} />)
+              : <span className="text-xs text-gray-400 italic">—</span>}
           </div>
         </div>
 
         <div className="px-4 py-3 border-r border-gray-100">
-          <SectionHeader icon={<Building2 size={12} />} label="Company Contact" color="#2563eb" />
+          <SectionHeader icon={<Building2 size={12} />} label="Company Contact" color={S.company.accent} />
           <div className="space-y-1.5">
             {c.companyEmail ? (
-              <a href={gmailLink(c.companyEmail)} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-violet-700 transition-colors group">
-                <Mail size={11} className="text-gray-400 group-hover:text-violet-500 shrink-0" />
+              <a
+                href={gmailLink(c.companyEmail)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={stopPropagation}
+                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-blue-700 transition-colors group"
+              >
+                <Mail size={14} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
                 <span className="truncate">{c.companyEmail}</span>
               </a>
             ) : null}
             {c.companyMobile ? (
-              <a href={whatsappLink(c.countryCode, c.companyMobile)} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-green-600 transition-colors">
+              <a
+                href={whatsappLink(c.countryCode, c.companyMobile)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={stopPropagation}
+                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-green-700 transition-colors"
+              >
                 <span className="text-green-500 shrink-0"><WaIcon /></span>
                 <span>{c.countryCode} {c.companyMobile}</span>
               </a>
@@ -201,18 +207,28 @@ function CompanyCard({ company, index, onImport }) {
         </div>
 
         <div className="px-4 py-3">
-          <SectionHeader icon={<Phone size={12} />} label="Personal Contact" color="#db2777" />
+          <SectionHeader icon={<Phone size={12} />} label="Personal Contact" color={S.personal.accent} />
           <div className="space-y-1.5">
             {c.personalEmail ? (
-              <a href={gmailLink(c.personalEmail)} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-violet-700 transition-colors group">
-                <Mail size={11} className="text-gray-400 group-hover:text-violet-500 shrink-0" />
+              <a
+                href={gmailLink(c.personalEmail)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={stopPropagation}
+                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-blue-700 transition-colors group"
+              >
+                <Mail size={14} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
                 <span className="truncate">{c.personalEmail}</span>
               </a>
             ) : null}
             {c.personalMobile ? (
-              <a href={whatsappLink(c.personalCountryCode, c.personalMobile)} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-green-600 transition-colors">
+              <a
+                href={whatsappLink(c.personalCountryCode, c.personalMobile)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={stopPropagation}
+                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-green-700 transition-colors"
+              >
                 <span className="text-green-500 shrink-0"><WaIcon /></span>
                 <span>{c.personalCountryCode} {c.personalMobile}</span>
               </a>
@@ -224,10 +240,10 @@ function CompanyCard({ company, index, onImport }) {
         </div>
       </div>
 
-      {/* ── Footer: Contact Person + Import button ── */}
+      {/* ── Footer ── */}
       <div
-        className="px-5 py-3 bg-gray-50 flex items-center gap-3"
-        style={{ borderTop: "1px solid #f3f4f6" }}
+        className="px-5 py-3 bg-gray-50 flex items-center gap-2"
+        style={{ borderTop: "1px solid #f0f0f0" }}
       >
         <Avatar name={fullName} size={34} />
         <div className="flex-1 min-w-0">
@@ -238,7 +254,7 @@ function CompanyCard({ company, index, onImport }) {
                 className="text-xs font-semibold px-2 py-0.5 rounded-full"
                 style={{
                   background: c.gender.toLowerCase() === "female" ? "#fce7f3" : "#dbeafe",
-                  color:      c.gender.toLowerCase() === "female" ? "#831843" : "#1e3a8a",
+                  color: c.gender.toLowerCase() === "female" ? "#9d174d" : "#1e40af",
                 }}
               >
                 {c.gender}
@@ -247,21 +263,26 @@ function CompanyCard({ company, index, onImport }) {
           </div>
         </div>
 
-        {/* ── Import / Edit button ── */}
-        <button
-          onClick={() => onImport(c)}
-          className="inline-flex items-center cursor-pointer gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all shrink-0 hover:shadow-md"
-          style={{ background: "#ede9fe", color: "#5b21b6", border: "1px solid #c4b5fd" }}
+        {c.companyId && (
+          <span
+            className="px-2 py-0.5 text-xs font-mono font-semibold rounded-md whitespace-nowrap"
+            style={{ background: S.category.pill.bg, color: S.category.pill.color }}
+          >
+            {c.companyId}
+          </span>
+        )}
+        <span
+          className="text-xs font-bold px-2 py-0.5 rounded-md shrink-0"
+          style={{ background: S.category.pill.bg, color: S.category.pill.color }}
         >
-          <FileInput size={13} />
-          Import
-        </button>
+          {index}
+        </span>
       </div>
     </div>
   );
 }
 
-/* ─── Pagination ──────────────────────────────────────────────── */
+/* ─── Pagination ── */
 function Pagination({ page, totalPages, onPage }) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
     (p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1
@@ -283,9 +304,9 @@ function Pagination({ page, totalPages, onPage }) {
             onClick={() => onPage(p)}
             className="w-7 h-7 text-sm font-semibold rounded transition-colors"
             style={{
-              background: page === p ? "#7c3aed" : "white",
-              color:      page === p ? "white"   : "#374151",
-              border: "1px solid " + (page === p ? "#7c3aed" : "#d1d5db"),
+              background: page === p ? S.category.accent : "white",
+              color: page === p ? "white" : "#374151",
+              border: "1px solid " + (page === p ? S.category.accent : "#d1d5db"),
             }}
           >
             {p}
@@ -296,14 +317,17 @@ function Pagination({ page, totalPages, onPage }) {
   );
 }
 
-/* ─── Main ────────────────────────────────────────────────────── */
-export default function CompanyCards() {
-  const [companies, setCompanies]   = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [search, setSearch]         = useState("");
-  const [page, setPage]             = useState(1);
-  const [pageSize, setPageSize]     = useState(6);
-  const [editingCompany, setEditingCompany] = useState(null); // ← new
+/* ─── Main ── */
+export default function CompanyCards({ search: externalSearch = "" }) {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [internalSearch, setInternalSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(6);
+  const [editingCompany, setEditingCompany] = useState(null);
+
+  // Use external search if provided (from parent), otherwise fall back to internal
+  const search = externalSearch !== "" ? externalSearch : internalSearch;
 
   const fetchCompanies = () => {
     setLoading(true);
@@ -328,18 +352,21 @@ export default function CompanyCards() {
     return [...list].reverse();
   }, [companies, search]);
 
-  const totalPages  = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const paginated   = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const showingFrom = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1;
-  const showingTo   = Math.min(page * pageSize, filtered.length);
+  const showingTo = Math.min(page * pageSize, filtered.length);
 
-  const handleSearch = (v) => { setSearch(v); setPage(1); };
+  const handleSearch = (v) => { setInternalSearch(v); setPage(1); };
+
+  // Reset to page 1 whenever external search changes
+  useEffect(() => { setPage(1); }, [externalSearch]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto mb-4" />
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -349,15 +376,11 @@ export default function CompanyCards() {
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Poppins', sans-serif" }}>
 
-      {/* ── Edit modal ── */}
       {editingCompany && (
         <CompanyForm
           editData={editingCompany}
           onClose={() => setEditingCompany(null)}
-          onSuccess={() => {
-            setEditingCompany(null);
-            fetchCompanies();
-          }}
+          onSuccess={() => { setEditingCompany(null); fetchCompanies(); }}
         />
       )}
 
@@ -370,32 +393,12 @@ export default function CompanyCards() {
           <span className="font-bold text-gray-800">{filtered.length}</span> companies
         </p>
         <div className="flex items-center gap-3">
-          <div className="relative w-64">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search companies…"
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
-            />
-            {search && (
-              <button
-                onClick={() => handleSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
-              >
-                <X size={13} />
-              </button>
-            )}
-          </div>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
-            className="border border-gray-300 rounded-lg text-sm px-3 py-2 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-violet-500"
+            className="border border-gray-300 rounded-lg text-sm px-3 py-2 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-300"
           >
-            {PAGE_SIZES.map((n) => (
-              <option key={n} value={n}>{n} per page</option>
-            ))}
+            {PAGE_SIZES.map((n) => <option key={n} value={n}>{n} per page</option>)}
           </select>
         </div>
       </div>
@@ -409,12 +412,13 @@ export default function CompanyCards() {
             </div>
             <p className="text-base font-semibold text-gray-800">No companies found</p>
             <p className="text-sm text-gray-500">
-              {search ? "No results for \"" + search + "\"." : "No data available."}
+              {search ? `No results for "${search}".` : "No data available."}
             </p>
             {search && (
               <button
                 onClick={() => handleSearch("")}
-                className="text-sm font-semibold text-violet-700 hover:text-violet-900 transition"
+                className="text-sm font-semibold hover:underline"
+                style={{ color: S.category.accent }}
               >
                 Clear search
               </button>
@@ -427,7 +431,7 @@ export default function CompanyCards() {
                 key={c._id}
                 company={c}
                 index={(page - 1) * pageSize + idx + 1}
-                onImport={setEditingCompany}
+                onEdit={setEditingCompany}
               />
             ))}
           </div>
@@ -436,9 +440,7 @@ export default function CompanyCards() {
         {filtered.length > 0 && (
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm font-medium text-gray-600">
-              Page{" "}
-              <span className="font-bold text-gray-900">{page}</span>
-              {" "}of{" "}
+              Page <span className="font-bold text-gray-900">{page}</span> of{" "}
               <span className="font-bold text-gray-900">{totalPages}</span>
             </p>
             <div className="flex items-center gap-2">

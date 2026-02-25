@@ -25,7 +25,6 @@ const ExportButton = ({ data, fileName = "ExportData" }) => {
       row.isCustom ? "Yes" : "No",
     ]);
 
-    // ✅ PDF (UNCHANGED STYLE)
     if (format === "pdf") {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -76,7 +75,6 @@ const ExportButton = ({ data, fileName = "ExportData" }) => {
       doc.save(`${fileName}.pdf`);
     }
 
-    // ✅ Excel
     if (format === "xlsx") {
       const ws = XLSX.utils.json_to_sheet(
         data.map((row, idx) => ({
@@ -93,7 +91,6 @@ const ExportButton = ({ data, fileName = "ExportData" }) => {
       XLSX.writeFile(wb, `${fileName}.xlsx`);
     }
 
-    // ✅ Word
     if (format === "docx") {
       const tableRows = [
         new TableRow({
@@ -128,7 +125,6 @@ const ExportButton = ({ data, fileName = "ExportData" }) => {
       Export <span className="pl-3 pt-0.5"><FileDown size={18} /></span>
     </div>
 
-    {/* Dropdown on hover */}
     <div className="absolute left-0 w-44 bg-white border rounded-lg shadow-lg hidden group-hover:block z-50">
       <div
         onClick={() => handleExport("pdf")}

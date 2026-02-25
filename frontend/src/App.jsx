@@ -32,6 +32,7 @@ import CompanyForm from "./pages/CompanyForm";
 import AllLogs from "./components/AllLogs";
 import CompanyInquiries from "./inquiries/CompanyInquiries";
 import Analytics from "./pages/adminEdit/Analytics";
+import ServicesForm from "./components/ServicesForm";
 {/*----------Masters-------- */}
 import MastersAdmin from "./pages/MastersAdmin";
 import AdminNatureOfBusiness from "./mastersPages/AdminNatureOfBusiness";
@@ -55,6 +56,7 @@ function App() {
       {!hideHeaderFooter && <Header />}
       <Routes>
         {/* Public Pages */}
+
         <Route path="/" element={<Home />} />
         <Route path="/career" element={<Career />} />
         <Route path="/career/applyforjobs" element={<Apply />} />
@@ -63,7 +65,9 @@ function App() {
         <Route path="/usecases" element={<Usecases />} />
         <Route path="/contact" element={<Touch />} />
         <Route path="/call" element={<Call />} />
-        <Route path="companyform" element={<CompanyForm />} />
+        <Route path="/companyform" element={<CompanyForm />} />
+
+        <Route path="services/servicesform" element={<ServicesForm />} />
 
 
         {/* Admin Login */}

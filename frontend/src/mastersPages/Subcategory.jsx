@@ -172,7 +172,7 @@ export default function Subcategory() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Subcategories</h1>
+          <h1 className="text-4xl font-bold text-slate-800">Subcategories</h1>
           
         </div>
         <button

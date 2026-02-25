@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 
 const Services = () => {
+  const navigate=useNavigate();
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -108,12 +110,21 @@ const Services = () => {
                 </div>
               </section>
             );
-          } 
+          }
+
+
 
 
           // --- CTA ---
           if (key === "cta") {
-            return (
+            return (<>
+              <div>
+                <button
+                  className="bg-blue-400 p-3 rounded cursor-pointer"
+                  onClick={()=>navigate("/services/servicesform")}>
+                  book a service
+                </button>
+              </div>
               <section key={key} className="max-w-7xl mx-auto px-6 py-10 pb-10">
                 <div className="bg-blue-50 rounded-[1rem]  p-12 md:p-20 text-center relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[100px]"></div>
@@ -133,6 +144,7 @@ const Services = () => {
                   </div>
                 </div>
               </section>
+            </>
             );
           }
 

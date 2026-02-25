@@ -142,7 +142,7 @@ export default function ChannelMasterPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Channels</h1>
+          <h1 className="text-4xl font-bold text-slate-800">Channels</h1>
           <p className="text-slate-500 text-sm mt-1">
             {channels.length} {channels.length === 1 ? "entry" : "entries"} total
           </p>
@@ -170,7 +170,7 @@ export default function ChannelMasterPage() {
       {loading ? (
         <div className="grid md:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border p-6 animate-pulse">
+            <div key={i} className="bg-white rounded-2xl  p-6 animate-pulse">
               <div className="h-5 bg-slate-200 rounded w-3/4 mb-4" />
               <div className="h-4 bg-slate-100 rounded w-1/2" />
             </div>
@@ -181,7 +181,7 @@ export default function ChannelMasterPage() {
           {filtered.map((item) => (
             <div
               key={item._id}
-              className="bg-white rounded-2xl shadow-sm border p-6 hover:shadow-md transition group"
+              className="bg-white rounded-2xl shadow-sm border border-slate-300 p-6 hover:shadow-md transition group"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -202,13 +202,13 @@ export default function ChannelMasterPage() {
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => openEdit(item)}
-                  className="flex items-center gap-1.5 text-sm px-4 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition"
+                  className="flex items-center gap-1.5 text-sm px-4 cursor-pointer py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition"
                 >
                   <Pencil size={14} /> Edit
                 </button>
                 <button
                   onClick={() => openDelete(item)}
-                  className="flex items-center gap-1.5 text-sm px-4 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition"
+                  className="flex items-center gap-1.5 text-sm px-4 py-1.5 cursor-pointer bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition"
                 >
                   <Trash2 size={14} /> Delete
                 </button>

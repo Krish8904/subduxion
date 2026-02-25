@@ -106,7 +106,7 @@ export default function Category() {
     }
   };
 
-  // ── Delete ─────────────────────────────────────────────
+  // ── Delete ────────────────────────────
   const handleDelete = async () => {
     setDeleting(true);
     try {
@@ -122,7 +122,7 @@ export default function Category() {
     }
   };
 
-  // ── Keyboard shortcuts ─────────────────────────────────
+  // ── Keyboard shortcuts ─────────────────
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSave();
     if (e.key === "Escape") closeModal();
@@ -142,14 +142,14 @@ export default function Category() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Categories</h1>
+          <h1 className="text-4xl font-bold text-slate-800">Categories</h1>
           <p className="text-slate-500 text-sm mt-1">
             {categories.length} {categories.length === 1 ? "entry" : "entries"} total
           </p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow font-medium transition"
+          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white rounded-xl shadow font-medium transition"
         >
           <Plus size={18} />
           Add Category

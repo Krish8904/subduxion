@@ -4,26 +4,25 @@ import { ImagePlus, ChevronRight } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
 
-
 const ImageManager = () => {
   const navigate = useNavigate();
   const [pages, setPages] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [imageTimestamps, setImageTimestamps] = useState({}); // NEW: Track when images were updated
+  const [imageTimestamps, setImageTimestamps] = useState({});
+  const [activeTab, setActiveTab] = useState(null);
+  const [replacingId, setReplacingId] = useState(null);
   const fileInputRef = useRef(null);
   const isFetchingRef = useRef(false);
   const hasInitializedRef = useRef(false);
 
   const fetchPages = async () => {
     if (isFetchingRef.current) return;
-
     try {
       isFetchingRef.current = true;
       setLoading(true);
       setError(null);
-
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages`);
       setPages(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -37,14 +36,20 @@ const ImageManager = () => {
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
-
     hasInitializedRef.current = true;
     fetchPages();
   }, []);
 
+  // Set default active tab once pages load
+  useEffect(() => {
+    const filtered = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
+    if (filtered.length && !activeTab) {
+      setActiveTab(filtered[0].pageName);
+    }
+  }, [pages]);
+
   const extractImages = (obj, path = "sections") => {
     let results = [];
-
     if (Array.isArray(obj)) {
       obj.forEach((item, index) => {
         results = results.concat(extractImages(item, `${path}[${index}]`));
@@ -59,17 +64,13 @@ const ImageManager = () => {
         }
       });
     }
-
     return results;
   };
 
-  // FIXED: Add cache busting with timestamp
   const getImageUrl = (value) => {
     if (!value) return "";
     const base = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
     const path = value.includes("/") ? value : `/uploads/${value}`;
-
-    // Use tracked timestamp if available, otherwise use current time
     const timestamp = imageTimestamps[value] || Date.now();
     return `${base}${path}?t=${timestamp}`;
   };
@@ -78,65 +79,32 @@ const ImageManager = () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`);
       const pageData = res.data;
-
       const pathParts = imgPath.split(".").filter((p) => p && p !== "sections");
       let current = pageData.sections;
-
-      if (!current) {
-        throw new Error("Page sections not found");
-      }
-
+      if (!current) throw new Error("Page sections not found");
       for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i];
-
         if (part.includes("[")) {
           const key = part.substring(0, part.indexOf("["));
           const indexMatch = part.match(/\[(\d+)\]/);
-
-          if (!indexMatch) {
-            throw new Error(`Invalid array path: ${part}`);
-          }
-
+          if (!indexMatch) throw new Error(`Invalid array path: ${part}`);
           const index = parseInt(indexMatch[1]);
-
-          if (!current[key]) {
-            throw new Error(`Key not found: ${key}`);
-          }
-
-          if (!Array.isArray(current[key])) {
-            throw new Error(`Expected array at ${key}, got ${typeof current[key]}`);
-          }
-
-          if (index >= current[key].length) {
-            throw new Error(`Index ${index} out of bounds for ${key}`);
-          }
-
+          if (!current[key]) throw new Error(`Key not found: ${key}`);
+          if (!Array.isArray(current[key])) throw new Error(`Expected array at ${key}`);
+          if (index >= current[key].length) throw new Error(`Index out of bounds`);
           current = current[key][index];
         } else {
-          if (!current[part]) {
-            throw new Error(`Key not found: ${part}`);
-          }
-
+          if (!current[part]) throw new Error(`Key not found: ${part}`);
           current = current[part];
         }
       }
-
       const finalKey = pathParts[pathParts.length - 1];
       current[finalKey] = newImg;
-
       await axios.put(`${import.meta.env.VITE_API_URL}/api/pages/${pageName}`, pageData);
-
-      // NEW: Update timestamp for this image to force reload
-      setImageTimestamps(prev => ({
-        ...prev,
-        [newImg]: Date.now()
-      }));
-
-      if (!isFetchingRef.current) {
-        await fetchPages();
-      }
-
+      setImageTimestamps(prev => ({ ...prev, [newImg]: Date.now() }));
+      if (!isFetchingRef.current) await fetchPages();
       setSelected(null);
+      setReplacingId(null);
       alert("Image updated successfully!");
     } catch (err) {
       console.error("Failed to update image:", err);
@@ -145,15 +113,11 @@ const ImageManager = () => {
   };
 
   const deleteImage = async (imgValue) => {
-    if (!window.confirm("Are you sure you want to delete this image?")) return;
+    if (!window.confirm("Delete this image permanently?")) return;
     try {
       const fileName = imgValue.split("/").pop();
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/images/delete/${fileName}`);
-
-      if (!isFetchingRef.current) {
-        await fetchPages();
-      }
-
+      if (!isFetchingRef.current) await fetchPages();
       alert("Image deleted successfully!");
     } catch (err) {
       console.error("Failed to delete image:", err);
@@ -164,28 +128,19 @@ const ImageManager = () => {
   const handleFileChange = async (e) => {
     if (!e.target.files?.length || !selected) return;
     const file = e.target.files[0];
-
     const formData = new FormData();
     formData.append("image", file);
-
     const oldFileName = selected.oldPath.split("/").pop();
     formData.append("oldFileName", oldFileName);
-
     try {
       const uploadRes = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/images/upload`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
       const newFilePath = uploadRes.data.filePath || uploadRes.data.path;
-
-      if (!newFilePath) {
-        throw new Error("Backend didn't return the new file path");
-      }
-
+      if (!newFilePath) throw new Error("Backend didn't return the new file path");
       await updateImage(selected.page, selected.path, newFilePath);
-
       setSelected(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
@@ -194,141 +149,183 @@ const ImageManager = () => {
     }
   };
 
+  // ── LOADING ──
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-13 w-13 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 pl-1">Loading...</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-2 border-slate-200" />
+          <div className="absolute inset-0 rounded-full border-2 border-t-slate-800 animate-spin" />
         </div>
+        <p className="text-slate-400 text-xs tracking-[0.3em] uppercase font-medium">Fetching media</p>
       </div>
     );
   }
 
+  // ── ERROR ──
   if (error) {
     return (
-      <div className="space-y-8">
-        <div className="flex items-center gap-2 text-sm text-slate-600 mb-6">
-          <button
-            onClick={() => navigate("/admin")}
-            className="text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
-          >
-            Admin
-          </button>
-          <ChevronRight size={16} className="text-slate-400" />
-          <span className="text-slate-900 font-semibold">Manage Media</span>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center">
+          <svg className="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
         </div>
-        <div className="bg-red-50 p-12 rounded-xl shadow-sm border border-red-200 text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <p className="text-sm text-slate-600">API URL: {import.meta.env.VITE_API_URL || 'Not configured'}</p>
-          <button
-            onClick={() => {
-              if (!isFetchingRef.current) {
-                fetchPages();
-              }
-            }}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Retry
-          </button>
+        <div>
+          <p className="text-slate-800 font-semibold mb-1">{error}</p>
+          <p className="text-slate-400 text-sm">API: {import.meta.env.VITE_API_URL || 'Not configured'}</p>
         </div>
+        <button
+          onClick={() => { if (!isFetchingRef.current) fetchPages(); }}
+          className="mt-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-700 px-5 py-2.5 rounded-xl transition-colors"
+        >
+          Try again
+        </button>
       </div>
     );
   }
 
   const filteredPages = pages.filter((p) => ["home", "services"].includes(p.pageName.toLowerCase()));
+  const activePage = filteredPages.find(p => p.pageName === activeTab);
+  const images = activePage?.sections ? extractImages(activePage.sections) : [];
 
   return (
-    <div className="space-y-8">
-      
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-0">
+
+      {/* ── TOP BAR ── */}
+      <div className="flex items-start justify-between mb-10">
         <div>
-          <h2 className="text-4xl font-bold text-slate-900 mb-2 bg-linear-to-r from-slate-900 to-slate-600 bg-clip-text">
-            Media Management
-          </h2>
-          <p className="text-slate-600">Update & Manage media across your website</p>
+          <p className="text-xs font-semibold text-slate-400 tracking-[0.2em] uppercase mb-2">
+            Content Management
+          </p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Media Library</h1>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-slate-400 mb-1">Total assets</p>
+          <p className="text-2xl font-black text-slate-900">
+            {filteredPages.reduce((acc, p) => acc + (p.sections ? extractImages(p.sections).length : 0), 0)}
+          </p>
         </div>
       </div>
 
-      {filteredPages.map((page) => {
-        const images = page.sections ? extractImages(page.sections) : [];
-        if (!images.length) return null;
-
-        return (
-          <div key={page.pageName} className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
-              <h2 className="text-2xl font-bold text-slate-800 capitalize">
-                {page.pageName} Page
-              </h2>
-              <span className="text-sm text-slate-500 bg-slate-200 px-3 py-1 rounded-full">
-                {images.length} {images.length === 1 ? 'image' : 'images'}
+      {/* ── PAGE TABS ── */}
+      <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl w-fit mb-8">
+        {filteredPages.map((page) => {
+          const count = page.sections ? extractImages(page.sections).length : 0;
+          return (
+            <button
+              key={page.pageName}
+              onClick={() => setActiveTab(page.pageName)}
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                activeTab === page.pageName
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              <span className="capitalize">{page.pageName}</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded-md font-bold ${
+                activeTab === page.pageName
+                  ? "bg-slate-900 text-white"
+                  : "bg-slate-200 text-slate-500"
+              }`}>
+                {count}
               </span>
-            </div>
+            </button>
+          );
+        })}
+      </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {images.map((img, i) => (
-                <div
-                  key={i}
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
-                >
-                  <div className="relative aspect-video bg-slate-100 overflow-hidden">
-                    <img
-                      src={getImageUrl(img.value)}
-                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
-                      alt=""
-                      onError={(e) => (e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found")}
-                    />
+      {/* ── IMAGE LIST ── */}
+      {images.length > 0 ? (
+        <div className="space-y-3">
+          {images.map((img, i) => {
+            const filename = img.value.split('/').pop();
+            const sectionName = img.path.split('.')[0] || 'Unknown';
+            const isReplacing = replacingId === i;
 
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <p className="text-white text-xs font-medium truncate">
-                          {img.value.split('/').pop()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+            return (
+              <div
+                key={i}
+                className="group flex items-center gap-5 bg-white border border-slate-100 rounded-2xl p-3 pr-5 hover:border-slate-200 hover:shadow-sm transition-all duration-200"
+              >
+                {/* Thumbnail */}
+                <div className="relative w-24 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                  <img
+                    src={getImageUrl(img.value)}
+                    className="w-full h-full object-cover"
+                    alt=""
+                    onError={(e) => (e.target.src = "https://via.placeholder.com/96x64?text=?")}
+                  />
+                </div>
 
-                  <div className="p-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setSelected({ page: page.pageName, path: img.path, oldPath: img.value });
-                          fileInputRef.current?.click();
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Replace
-                      </button>
-                      <button
-                        onClick={() => deleteImage(img.value)}
-                        className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-95 transition-all duration-200 border border-red-200 cursor-pointer"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-800 font-semibold text-sm truncate mb-0.5">{filename}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md font-medium capitalize">
+                      {sectionName}
+                    </span>
+                    <span className="text-xs text-slate-300">·</span>
+                    <span className="text-xs text-slate-400 font-mono truncate max-w-xs">{img.value}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
 
-      {filteredPages.length === 0 && (
-        <div className="bg-white p-16 rounded-2xl shadow-sm border border-slate-200 text-center">
-          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={() => {
+                      setSelected({ page: activePage.pageName, path: img.path, oldPath: img.value });
+                      setReplacingId(i);
+                      fileInputRef.current?.click();
+                    }}
+                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-slate-700 active:scale-95 transition-all duration-150 cursor-pointer whitespace-nowrap"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Replace
+                  </button>
+                  <button
+                    onClick={() => deleteImage(img.value)}
+                    className="flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:bg-red-50 hover:border-red-200 hover:text-red-500 active:scale-95 transition-all duration-150 cursor-pointer"
+                    title="Delete image"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Always-visible replace button on mobile / small */}
+                <div className="flex items-center gap-2 shrink-0 group-hover:hidden">
+                  <button
+                    onClick={() => {
+                      setSelected({ page: activePage.pageName, path: img.path, oldPath: img.value });
+                      setReplacingId(i);
+                      fileInputRef.current?.click();
+                    }}
+                    className="flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-400 hover:bg-slate-50 active:scale-95 transition-all duration-150 cursor-pointer md:hidden"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  </button>
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* ── EMPTY STATE ── */
+        <div className="flex flex-col items-center justify-center py-24 gap-4 border-2 border-dashed border-slate-200 rounded-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center">
+            <ImagePlus className="w-6 h-6 text-slate-400" />
           </div>
-          <p className="text-slate-600 text-lg">No images found in Home or Services pages</p>
+          <div className="text-center">
+            <p className="text-slate-700 font-semibold text-sm mb-1">No images found</p>
+            <p className="text-slate-400 text-xs">No images are configured in the {activeTab} page sections.</p>
+          </div>
         </div>
       )}
 

@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { Mail, ExternalLink, Search, X, ChevronLeft, ChevronRight, Users, Building2, LayoutGrid, Table } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import {
+  Mail, ExternalLink, X, ChevronLeft, ChevronRight,
+  Users, Building2, LayoutGrid, Table, FilePlus,
+} from "lucide-react";
 import CompanyCards from "./CompanyCards";
+import CompanyExport from "../components/CompanyExport";
+import CompanyForm from "../pages/CompanyForm";
+import FilterCompanyInq, { DEFAULT_FILTERS } from "../utils/FilterCompanyInq";
+import SortCompanyInq from "../utils/SortCompanyInq";
 
 /* ─── helpers ─────────────────────────────────────────────────── */
 const toStr = (v) => {
@@ -11,17 +19,13 @@ const toStr = (v) => {
 };
 
 const PAGE_SIZES = [10, 25, 50];
-
 const hueOf = (s = "") => (s.charCodeAt(0) * 47) % 360;
 const avatarStyle = (name = "") => {
   const h = hueOf(name);
   return { bg: `hsl(${h},60%,88%)`, text: `hsl(${h},55%,32%)` };
 };
-
-const gmailLink = (email) =>
-  `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}`;
-const whatsappLink = (cc, num) =>
-  `https://wa.me/${`${cc ?? ""}${num ?? ""}`.replace(/\D/g, "")}`;
+const gmailLink = (email) => `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}`;
+const whatsappLink = (cc, num) => `https://wa.me/${`${cc ?? ""}${num ?? ""}`.replace(/\D/g, "")}`;
 
 /* ─── WaIcon ──────────────────────────────────────────────────── */
 function WaIcon() {
@@ -49,11 +53,11 @@ function Avatar({ name = "" }) {
 /* ─── Pill ────────────────────────────────────────────────────── */
 function Pill({ label, color = "gray" }) {
   const palettes = {
-    gray:   { bg: "#e9ebee", text: "#1a202c", border: "#c1c7d0" },
-    blue:   { bg: "#dbeafe", text: "#1e3a8a", border: "#93c5fd" },
+    gray: { bg: "#e9ebee", text: "#1a202c", border: "#c1c7d0" },
+    blue: { bg: "#dbeafe", text: "#1e3a8a", border: "#93c5fd" },
     violet: { bg: "#ede9fe", text: "#3730a3", border: "#c4b5fd" },
-    pink:   { bg: "#fce7f3", text: "#831843", border: "#f9a8d4" },
-    green:  { bg: "#dcfce7", text: "#14532d", border: "#86efac" },
+    pink: { bg: "#fce7f3", text: "#831843", border: "#f9a8d4" },
+    green: { bg: "#dcfce7", text: "#14532d", border: "#86efac" },
   };
   const c = palettes[color] ?? palettes.gray;
   return (
@@ -71,12 +75,19 @@ const genderColor = (g = "") =>
 
 /* ─── Main ────────────────────────────────────────────────────── */
 const CompanyInquiries = () => {
+
+  // ── hooks must be INSIDE the component ──────────────────────────
+  const { sidebarCollapsed } = useOutletContext();
+
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [viewMode, setViewMode] = useState("table"); // "table" | "card"
+  const [viewMode, setViewMode] = useState("table");
+  const [showImportForm, setShowImportForm] = useState(false);
+  const [sortValue, setSortValue] = useState(null);
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   useEffect(() => {
     if (!document.getElementById("poppins-font")) {
@@ -102,23 +113,72 @@ const CompanyInquiries = () => {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    const list = q
-      ? companies.filter((c) =>
-          [c.companyName, c.companyEmail, c.personalEmail, c.category,
-           c.firstName, c.lastName, c.website,
-           c.natureOfBusiness, c.channel, c.subcategory]
-            .some((v) => toStr(v).includes(q))
-        )
-      : companies;
-    return [...list].reverse();
-  }, [companies, search]);
 
-  const totalPages  = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const paginated   = filtered.slice((page - 1) * pageSize, page * pageSize);
+    // 1. text search
+    let list = q
+      ? companies.filter((c) =>
+        [c.companyName, c.companyEmail, c.personalEmail, c.category,
+        c.firstName, c.lastName, c.website, c.natureOfBusiness, c.channel, c.subcategory]
+          .some((v) => toStr(v).includes(q))
+      )
+      : [...companies];
+
+    // 2. master filters
+    if (filters.natureOfBusiness.length)
+      list = list.filter((c) =>
+        (Array.isArray(c.natureOfBusiness) ? c.natureOfBusiness : [c.natureOfBusiness])
+          .some((v) => filters.natureOfBusiness.includes(v))
+      );
+    if (filters.channel.length)
+      list = list.filter((c) =>
+        (Array.isArray(c.channel) ? c.channel : [c.channel])
+          .some((v) => filters.channel.includes(v))
+      );
+    if (filters.category.length)
+      list = list.filter((c) => filters.category.includes(c.category));
+    if (filters.subcategory.length)
+      list = list.filter((c) =>
+        (Array.isArray(c.subcategory) ? c.subcategory : [c.subcategory])
+          .some((v) => filters.subcategory.includes(v))
+      );
+
+    // 2.5. date filter
+    if (filters.registeredDate) {
+      list = list.filter((c) => {
+        if (!c.createdAt) return false;
+        const d = new Date(c.createdAt);
+        const sd = new Date(filters.registeredDate);
+        return (
+          d.getFullYear() === sd.getFullYear() &&
+          d.getMonth() === sd.getMonth() &&
+          d.getDate() === sd.getDate()
+        );
+      });
+    }
+
+    // 3. sort
+    if (sortValue === "createdAt_desc") {
+      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortValue === "createdAt_asc") {
+      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else if (sortValue === "az") {
+      list.sort((a, b) => (a.companyName || "").localeCompare(b.companyName || ""));
+    } else if (sortValue === "za") {
+      list.sort((a, b) => (b.companyName || "").localeCompare(a.companyName || ""));
+    } else {
+      list.reverse();
+    }
+
+    return list;
+  }, [companies, search, filters, sortValue]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const showingFrom = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1;
-  const showingTo   = Math.min(page * pageSize, filtered.length);
+  const showingTo = Math.min(page * pageSize, filtered.length);
 
   const handleSearch = (v) => { setSearch(v); setPage(1); };
+  const handleFilterChange = (f) => { setFilters(f); setPage(1); };
 
   if (loading) {
     return (
@@ -134,79 +194,134 @@ const CompanyInquiries = () => {
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Poppins', sans-serif" }}>
 
+      {/* ── Import Form Modal ── */}
+      {showImportForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
+          onClick={() => setShowImportForm(false)}
+        >
+          <div
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto"
+            style={{ minWidth: 700, margin: "0 16px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowImportForm(false)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition"
+            >
+              <X size={16} />
+            </button>
+            <CompanyForm
+              editData={null}
+              onClose={() => setShowImportForm(false)}
+              onSuccess={() => { setShowImportForm(false); fetchCompanies(); }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* ── Sticky Header ── */}
       <div
-        className="bg-white border-b border-gray-300 rounded sticky top-0 z-20"
-        style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}
+        className="bg-white border-b border-gray-200 sticky top-0 z-30" // Increased z-index
+        style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.07)" }}
       >
-        <div className="w-full mx-auto px-6 py-4 flex flex-wrap items-center gap-4">
-
-          {/* Title */}
-          <div className="flex items-center gap-3 mr-auto">
-            <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
-              <Building2 size={26} className="text-white" />
+        <div
+          className="w-full mx-auto px-5 py-3 flex flex-wrap items-center justify-between gap-4"
+        >
+          {/* ── Title Group ── */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div
+              className="flex items-center justify-center rounded-xl bg-blue-600 shrink-0"
+              style={{ width: 42, height: 42 }}
+            >
+              <Building2 size={21} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 leading-none">Registered Companies</h1>
-              <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                Showing {showingFrom}–{showingTo} of {filtered.length} companies
+              <h1
+                className="text-xl font-bold text-gray-900 leading-tight whitespace-nowrap"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                Registered Companies
+              </h1>
+              <p
+                className="text-xs text-gray-400 font-medium whitespace-nowrap mt-0.5"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                {viewMode === "table"
+                  ? `Showing ${showingFrom}–${showingTo} of ${filtered.length} companies`
+                  : `${filtered.length} companies`}
               </p>
             </div>
           </div>
 
-          {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode("table")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
-              style={{
-                background: viewMode === "table" ? "white" : "transparent",
-                color: viewMode === "table" ? "#1e3a8a" : "#6b7280",
-                boxShadow: viewMode === "table" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-              }}
-            >
-              <Table size={15} />
-              Table
-            </button>
-            <button
-              onClick={() => setViewMode("card")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
-              style={{
-                background: viewMode === "card" ? "white" : "transparent",
-                color: viewMode === "card" ? "#5b21b6" : "#6b7280",
-                boxShadow: viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-              }}
-            >
-              <LayoutGrid size={15} />
-              Cards
-            </button>
-          </div>
+          {/* ── Controls Group ── */}
+          {/* Removed overflow-x-auto here to prevent dropdown clipping */}
+          <div className="flex items-center flex-wrap gap-3">
 
-          {/* Search */}
-          <div className="relative w-72">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search companies…"
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-9 py-2 text-sm text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+            <SortCompanyInq
+              search={search}
+              onSearch={handleSearch}
+              sortValue={sortValue}
+              onSort={(v) => { setSortValue(v); setPage(1); }}
             />
-            {search && (
+
+            <FilterCompanyInq
+              filters={filters}
+              onChange={handleFilterChange}
+            />
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-6 bg-gray-200 shrink-0" />
+
+            {/* View Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1 shrink-0">
               <button
-                onClick={() => handleSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition"
+                onClick={() => setViewMode("table")}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  background: viewMode === "table" ? "white" : "transparent",
+                  color: viewMode === "table" ? "#1e3a8a" : "#9ca3af",
+                  boxShadow: viewMode === "table" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                }}
               >
-                <X size={14} />
+                <Table size={14} /> Table
               </button>
-            )}
+              <button
+                onClick={() => setViewMode("card")}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  background: viewMode === "card" ? "white" : "transparent",
+                  color: viewMode === "card" ? "#5b21b6" : "#9ca3af",
+                  boxShadow: viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                }}
+              >
+                <LayoutGrid size={14} /> Cards
+              </button>
+            </div>
+
+            <div className="hidden sm:block w-px h-6 bg-gray-200 shrink-0" />
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowImportForm(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg border border-blue-600 hover:bg-white hover:text-blue-600 transition-all shrink-0 whitespace-nowrap cursor-pointer"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <FilePlus size={15} /> Import
+              </button>
+
+              <CompanyExport data={filtered} />
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── Card View ── */}
-      {viewMode === "card" && <CompanyCards />}
+      {viewMode === "card" && <CompanyCards search={search} />}
 
       {/* ── Table View ── */}
       {viewMode === "table" && (
@@ -229,7 +344,7 @@ const CompanyInquiries = () => {
                       <th
                         key={h}
                         className="px-8 py-3.5 text-left whitespace-nowrap"
-                        style={{ fontSize: 14, fontWeight: 700, color: "black", letterSpacing: "0.03em" }}
+                        style={{ fontSize: 16, fontWeight: 700, color: "black", letterSpacing: "0.02em" }}
                       >
                         {h}
                       </th>
@@ -269,14 +384,14 @@ const CompanyInquiries = () => {
                         <tr
                           key={c._id}
                           className="transition-colors duration-100"
-                          onMouseEnter={(e) => e.currentTarget.style.background = "#f9fafb"}
-                          onMouseLeave={(e) => e.currentTarget.style.background = ""}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = "#f9fafb")}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                         >
                           <td className="px-6 py-4 text-sm font-semibold tabular-nums" style={{ color: "#6b7280" }}>
                             {rowNum}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm text-gray-700 font-semibold whitespace-nowrap">
+                            <span className="text-md text-gray-700 font-semibold whitespace-nowrap">
                               {c.companyName}
                             </span>
                           </td>
@@ -303,10 +418,10 @@ const CompanyInquiries = () => {
                               target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
                               style={{ color: "#374151" }}
-                              onMouseEnter={(e) => e.currentTarget.style.color = "#5b21b6"}
-                              onMouseLeave={(e) => e.currentTarget.style.color = "#374151"}>
-                            
-                              <Mail size={15}  className="text-violet-700 shrink-0" />
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#5b21b6")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
+                            >
+                              <Mail size={15} className="text-violet-700 shrink-0" />
                               {c.companyEmail}
                             </a>
                           </td>
@@ -322,8 +437,8 @@ const CompanyInquiries = () => {
                               target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
                               style={{ color: "#374151" }}
-                              onMouseEnter={(e) => e.currentTarget.style.color = "#16a34a"}
-                              onMouseLeave={(e) => e.currentTarget.style.color = "#374151"}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#16a34a")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
                             >
                               <span className="text-green-500"><WaIcon /></span>
                               {c.countryCode} {c.companyMobile}
@@ -343,10 +458,10 @@ const CompanyInquiries = () => {
                               target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
                               style={{ color: "#374151" }}
-                              onMouseEnter={(e) => e.currentTarget.style.color = "#5b21b6"}
-                              onMouseLeave={(e) => e.currentTarget.style.color = "#374151"}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#5b21b6")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
                             >
-                              <Mail size={15}  className="shrink-0 text-violet-700" />
+                              <Mail size={15} className="shrink-0 text-violet-700" />
                               {c.personalEmail}
                             </a>
                           </td>
@@ -359,8 +474,8 @@ const CompanyInquiries = () => {
                               target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
                               style={{ color: "#374151" }}
-                              onMouseEnter={(e) => e.currentTarget.style.color = "#16a34a"}
-                              onMouseLeave={(e) => e.currentTarget.style.color = "#374151"}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#16a34a")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
                             >
                               <span className="text-green-500"><WaIcon /></span>
                               {c.personalCountryCode} {c.personalMobile}
