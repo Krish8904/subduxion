@@ -5,93 +5,112 @@ import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react";
 const Footer = () => {
   const navigate = useNavigate();
 
-  return (
-    <footer className="bg-gray-900 text-white ">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+  const links = [
+    { label: "Services", path: "/services" },
+    { label: "Use Cases", path: "/usecases" },
+    { label: "Careers", path: "/careers" },
+    { label: "Contact", path: "/contact" },
+    { label: "Inquire", path: "/contact" },
+    { label: "Book a Call", path: "/call" },
+    { label: "Apply for Jobs", path: "/career/applyforjobs" },
+  ];
 
-          {/* About */}
+  return (
+    <footer className="bg-[#1a1a1a] text-[#f5f3ef]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+
+      {/* ── TOP STRIP ── */}
+      <div className="max-w-[1280px] mx-auto px-12 pt-16 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-[1.4fr_1fr_1fr_0.8fr] gap-12 items-start">
+
+          {/* Brand */}
           <div>
-            <h3 className="text-xl font-bold mb-4">Subduxion</h3>
-            <p className="text-gray-400">
-              Subduxion is a consulting company that design, build, and operate intelligent systems for organizations all over the world, delivering innovative solutions with efficiency and reliability.
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 rounded-lg bg-[#4a7c59] flex items-center justify-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+                </svg>
+              </div>
+              <span className="text-white font-light text-lg tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+                Sub<em>Duxion</em>
+              </span>
+            </div>
+            <p className="text-[0.85rem] text-white/40 leading-[1.75] font-light max-w-[260px] m-0">
+              We design, build, and operate intelligent systems for organizations worldwide — with efficiency and reliability.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-center mb-6">Quick Links</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => navigate("/services")}
-                className="text-gray-400 cursor-pointer hover:text-white transition-colors"
-              >
-                Services
-              </button>
-              <button
-                onClick={() => navigate("/contact")}
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Inquire
-              </button>
-              <button
-                onClick={() => navigate("/usecases")}
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Use Cases
-              </button>
-              <button
-                onClick={() => navigate("/call")}
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Book a Call
-              </button>
-
-              <button
-                onClick={() => navigate("/careers")}
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Careers
-              </button>
-              <button
-                onClick={() => navigate("/career/applyforjobs")}
-
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Apply for Jobs
-              </button>
-              <button
-                onClick={() => navigate("/contact")}
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
-              >
-                Contact
-              </button>
-              <div></div> {/* empty div to complete the 2x4 grid if needed */}
-            </div>
+            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Quick Links</p>
+            <ul className="list-none m-0 p-0 space-y-2">
+              {links.map((l) => (
+                <li key={l.label}>
+                  <button
+                    onClick={() => navigate(l.path)}
+                    className="text-[0.875rem] text-white/50 hover:text-white font-light cursor-pointer bg-transparent border-none p-0 transition-colors duration-150 text-left"
+                  >
+                    {l.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Contact Info */}
-          <div className="ml-15">
-            <h4 className="font-semibold mb-4">Contact</h4>
-            <div className="space-y-2 text-gray-400">
-              <p className="flex items-center gap-2"><Mail size={16} /> info@example.com</p>
-              <p className="flex items-center gap-2"><Phone size={16} /> 99999 99999</p>
-              <p className="flex items-center gap-2"><MapPin size={16} /> High Tech Campus</p>
-            </div>
+          {/* Contact */}
+          <div>
+            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Contact</p>
+            <ul className="list-none m-0 p-0 space-y-3">
+              {[
+                { icon: Mail, text: "info@example.com" },
+                { icon: Phone, text: "99999 99999" },
+                { icon: MapPin, text: "High Tech Campus" },
+              ].map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-2.5 text-[0.875rem] text-white/50 font-light">
+                  <Icon size={14} className="text-[#4a7c59] shrink-0" />
+                  {text}
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Socials */}
-          <div className="ml-10">
-            <h4 className="font-semibold mb-4">Follow Us</h4>
-            <div className="flex gap-4">
-              <Linkedin className="cursor-pointer hover:text-blue-400 transition-colors" />
-              <Twitter className="cursor-pointer hover:text-blue-400 transition-colors" />
-              <Facebook className="cursor-pointer hover:text-blue-400 transition-colors" />
+          <div>
+            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Follow Us</p>
+            <div className="flex flex-col gap-3">
+              {[
+                { icon: Linkedin, label: "LinkedIn" },
+                { icon: Twitter, label: "Twitter" },
+                { icon: Facebook, label: "Facebook" },
+              ].map(({ icon: Icon, label }) => (
+                <button
+                  key={label}
+                  className="flex items-center gap-2.5 text-[0.875rem] text-white/50 hover:text-white font-light cursor-pointer bg-transparent border-none p-0 transition-colors duration-150 group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#4a7c59] group-hover:border-[#4a7c59] transition-all duration-150">
+                    <Icon size={13} />
+                  </div>
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
-
         </div>
       </div>
+
+      {/* ── BOTTOM BAR ── */}
+      <div className="max-w-[1280px] mx-auto px-12 py-5 flex items-center justify-between">
+        <p className="text-[0.78rem] text-white/25 font-light m-0">
+          © {new Date().getFullYear()} SubDuxion. All rights reserved.
+        </p>
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#4a7c59]" />
+          <span className="text-[0.78rem] text-white/25 font-light">Designed with purpose</span>
+        </div>
+      </div>
+
     </footer>
   );
 };

@@ -24,150 +24,88 @@ const Company = () => {
 
   const s = page.sections;
 
-  // Get alignment class for sections
   const getAlignmentClass = (align) => {
-    const alignLower = (align || "center").toLowerCase();
-    if (alignLower === "center") return "text-center";
-    if (alignLower === "right") return "text-right";
+    const a = (align || "center").toLowerCase();
+    if (a === "center") return "text-center";
+    if (a === "right") return "text-right";
     return "text-left";
   };
 
-  // Render custom section
-  const renderCustomSection = (sectionId) => {
-    const section = s[sectionId];
-    if (!section) return null;
-
-    const alignClass = getAlignmentClass(section.alignment);
-
-    return (
-      <section key={sectionId} className="py-20">
-        <div className={`max-w-7xl mx-auto px-6 ${alignClass}`}>
-          <h2 className="text-4xl font-bold mb-6 text-gray-900">{section.mainText}</h2>
-          {section.secondaryText && (
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {section.secondaryText}
-            </p>
-          )}
-        </div>
-      </section>
-    );
-  };
-
-  // Get all sections sorted by position
   const getSortedSections = () => {
     const allSections = [];
-
-    // Add hero
-    if (s.hero) {
-      allSections.push({
-        id: 'hero',
-        position: s.hero.position || 1,
-        type: 'hero',
-        data: s.hero
-      });
-    }
-
-    // Add section1 (Why We Exist)
-    if (s.section1) {
-      allSections.push({
-        id: 'section1',
-        position: s.section1.position || 2,
-        type: 'section1',
-        data: s.section1
-      });
-    }
-
-    // Add section2 (What Makes Us Different)
-    if (s.section2) {
-      allSections.push({
-        id: 'section2',
-        position: s.section2.position || 3,
-        type: 'section2',
-        data: s.section2
-      });
-    }
-
-    // Add section3 (How We Operate)
-    if (s.section3) {
-      allSections.push({
-        id: 'section3',
-        position: s.section3.position || 4,
-        type: 'section3',
-        data: s.section3
-      });
-    }
-
-    // Add section4 (Momentum & CTA)
-    if (s.section4) {
-      allSections.push({
-        id: 'section4',
-        position: s.section4.position || 5,
-        type: 'section4',
-        data: s.section4
-      });
-    }
-
-    // Add custom sections
+    if (s.hero)     allSections.push({ id: "hero",     position: s.hero.position     || 1,   type: "hero",     data: s.hero });
+    if (s.section1) allSections.push({ id: "section1", position: s.section1.position || 2,   type: "section1", data: s.section1 });
+    if (s.section2) allSections.push({ id: "section2", position: s.section2.position || 3,   type: "section2", data: s.section2 });
+    if (s.section3) allSections.push({ id: "section3", position: s.section3.position || 4,   type: "section3", data: s.section3 });
+    if (s.section4) allSections.push({ id: "section4", position: s.section4.position || 5,   type: "section4", data: s.section4 });
     Object.keys(s).forEach(key => {
-      if (!['hero', 'section1', 'section2', 'section3', 'section4'].includes(key)) {
+      if (!["hero","section1","section2","section3","section4"].includes(key)) {
         const section = s[key];
-        if (section && section.type === "custom") {
-          allSections.push({
-            id: key,
-            position: section.position || 999,
-            type: 'custom',
-            data: section
-          });
-        }
+        if (section?.type === "custom") allSections.push({ id: key, position: section.position || 999, type: "custom", data: section });
       }
     });
-
     return allSections.sort((a, b) => a.position - b.position);
   };
 
   const sortedSections = getSortedSections();
 
   return (
-    <div className="w-full mt-15">
-      {sortedSections.map((section) => {
-        const { id, type, data } = section;
+    <div className="w-full mt-20 bg-[#f5f3ef] text-[#1a1a1a]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      {sortedSections.map(({ id, type, data }) => {
 
-        // Render Hero
-        if (type === 'hero') {
+        // ── HERO ──
+        if (type === "hero") {
           return (
-            <section key={id} className="bg-linear-to-r  from-gray-600 to-gray-500 text-white py-24">
-              <div className="max-w-7xl mx-auto px-6 text-center">
-                <h1 className="text-5xl font-bold mb-6">
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="grid grid-cols-[1.2fr_0.8fr] gap-10 items-end mb-12">
+                <h1
+                  className="text-[clamp(3rem,5.5vw,5rem)] font-light leading-[1.05] tracking-[-0.03em] text-[#1a1a1a] m-0"
+                  style={{ fontFamily: "'poppins', serif" }}
+                >
                   {data.mainText || "About SubDuxion"}
                 </h1>
-                <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-                  {data.secondaryText || "We empower businesses through applied AI and strategic consulting."}
-                </p>
+                <div className="flex flex-col items-end gap-5 pb-1.5">
+                  <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-[280px] m-0">
+                    {data.secondaryText}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#4a7c59] animate-pulse" />
+                    <span className="text-xs text-[#4a7c59] font-medium tracking-[0.1em] uppercase">Who We Are</span>
+                  </div>
+                </div>
               </div>
             </section>
           );
         }
 
-        // Render Section1 (Why We Exist + What We Believe)
-        if (type === 'section1') {
+        // ── SECTION 1 — Why We Exist ──
+        if (type === "section1") {
           return (
-            <section key={id} className="py-20">
-              <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12">
-                <div>
-                  <h2 className="text-3xl font-bold mb-4">
-                    {data.left?.heading || "Why we exist"}
-                  </h2>
-                  <p className="text-gray-600">
-                    {data.left?.text || ""}
-                  </p>
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="grid grid-cols-2 border border-[#d4d0c8] rounded-[20px] overflow-hidden">
+                {/* left */}
+                <div className="p-[52px_48px] border-r border-[#d4d0c8]">
+                  <p className="text-xs text-[#4a7c59] font-medium tracking-[0.1em] uppercase mb-4">Our Purpose</p>
+                  <h2
+                    className="text-[clamp(1.8rem,3vw,2.4rem)] font-light tracking-[-0.02em] text-[#1a1a1a] m-0 mb-5 leading-[1.15]"
+                    style={{ fontFamily: "'poppins', serif" }}
+                    dangerouslySetInnerHTML={{ __html: data.left?.heading || "Why we <em>exist</em>" }}
+                  />
+                  <p className="text-sm text-[#888] leading-[1.75] font-light m-0">{data.left?.text}</p>
                 </div>
-                <div className="bg-gray-100 rounded-2xl p-8">
-                  <h3 className="font-semibold mb-4">
+                {/* right */}
+                <div className="p-[52px_48px] bg-[#eceae4]">
+                  <p className="text-xs text-[#aaa] font-medium tracking-[0.1em] uppercase mb-6">
                     {data.right?.heading || "What we believe"}
-                  </h3>
-                  <ul className="space-y-3 text-gray-700">
+                  </p>
+                  <ul className="list-none m-0 p-0">
                     {data.right?.points?.map((point, i) => (
-                      <li key={i}>• {point}</li>
+                      <li key={i} className="flex items-start gap-4 py-4 border-b border-[#d4d0c8] first:border-t first:border-[#d4d0c8] text-sm text-[#555] leading-[1.6] font-light">
+                        <span className="text-[0.75rem] text-[#bbb] shrink-0 pt-0.5" style={{ fontFamily: "'poppins', serif" }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {point}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -176,83 +114,146 @@ const Company = () => {
           );
         }
 
-        // Render Section2 (What Makes Us Different)
-        if (type === 'section2') {
+        // ── SECTION 2 — What Makes Us Different ──
+        if (type === "section2") {
           return (
-            <section key={id} className="bg-gray-50 py-20">
-              <div className="max-w-7xl mx-auto px-6">
-                <h2 className="text-3xl font-bold text-center mb-12">
-                  {data.mainText || "What makes us different"}
-                </h2>
-                <div className="grid md:grid-cols-3 gap-8">
-                  {data.cards?.map((card, i) => (
-                    <div key={i} className="bg-white p-6 rounded-xl shadow">
-                      <h3 className="text-xl font-semibold mb-3">{card.heading}</h3>
-                      <p className="text-gray-600">{card.description}</p>
-                    </div>
-                  ))}
-                </div>
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="flex items-end justify-between mb-12 pb-6 border-b border-[#d4d0c8]">
+                <h2
+                  className="text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-[-0.02em] text-[#1a1a1a] m-0 leading-[1.1]"
+                  style={{ fontFamily: "'poppins', serif" }}
+                  dangerouslySetInnerHTML={{ __html: data.mainText || "What makes us <em style='font-style:italic;color:#4a7c59'>different</em>" }}
+                />
+                <span className="text-[0.8rem] text-[#aaa] tracking-[0.08em] uppercase font-medium pb-1">
+                  {String(data.cards?.length || 0).padStart(2, "0")} Pillars
+                </span>
+              </div>
+              <div className="grid grid-cols-3 border border-[#d4d0c8] rounded-[20px] overflow-hidden">
+                {data.cards?.map((card, i) => (
+                  <div
+                    key={i}
+                    className={`p-10 hover:bg-[#eceae4] transition-colors duration-200 ${i < (data.cards.length - 1) ? "border-r border-[#d4d0c8]" : ""}`}
+                  >
+                    <span className="block text-[0.75rem] text-[#bbb] tracking-[0.05em] mb-4" style={{ fontFamily: "'poppins', serif" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="text-[1.15rem] font-normal text-[#1a1a1a] mb-3 tracking-[-0.01em] leading-[1.3]" style={{ fontFamily: "'poppins', serif" }}>
+                      {card.heading}
+                    </h3>
+                    <p className="text-[0.875rem] text-[#888] leading-[1.7] font-light m-0">{card.description}</p>
+                  </div>
+                ))}
               </div>
             </section>
           );
         }
 
-        // Render Section3 (How We Operate)
-        if (type === 'section3') {
+        // ── SECTION 3 — How We Operate ──
+        if (type === "section3") {
           return (
-            <section key={id} className="py-20">
-              <div className="max-w-6xl mx-auto px-6">
-                <h2 className="text-3xl font-bold mb-12 text-center">
-                  {data.mainText || "How we operate"}
-                </h2>
-                <div className="grid md:grid-cols-4 gap-6 text-center">
-                  {data.steps?.map((step, i) => (
-                    <div key={i} className="bg-gray-100 rounded-2xl p-6">
-                      <h4 className="font-semibold mb-2">{step.heading}</h4>
-                      <p className="text-gray-600">{step.description}</p>
-                    </div>
-                  ))}
-                </div>
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="flex items-end justify-between mb-12 pb-6 border-b border-[#d4d0c8]">
+                <h2
+                  className="text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-[-0.02em] text-[#1a1a1a] m-0 leading-[1.1]"
+                  style={{ fontFamily: "'poppins', serif" }}
+                  dangerouslySetInnerHTML={{ __html: data.mainText || "How we <em style='font-style:italic;color:#4a7c59'>operate</em>" }}
+                />
+                <span className="text-[0.8rem] text-[#aaa] tracking-[0.08em] uppercase font-medium pb-1">
+                  {String(data.steps?.length || 0).padStart(2, "0")} Steps
+                </span>
               </div>
+              <ul className="list-none m-0 p-0">
+                {data.steps?.map((step, i) => (
+                  <li
+                    key={i}
+                    className="grid items-center gap-7 px-4 py-5.5 border-b border-[#d4d0c8] rounded-xl transition-all duration-200 hover:bg-[#eceae4] hover:pl-6 first:border-t first:border-[#d4d0c8] group"
+                    style={{ gridTemplateColumns: "60px 1fr 1fr" }}
+                  >
+                    <span
+                      className="text-[0.8rem] text-[#c0bbb0] font-light text-right transition-colors duration-200 group-hover:text-[#4a7c59]"
+                      style={{ fontFamily: "'poppins', serif" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className="text-[clamp(1rem,1.8vw,1.3rem)] font-normal text-[#1a1a1a] tracking-[-0.01em] transition-colors duration-200 group-hover:text-[#4a7c59]"
+                      style={{ fontFamily: "'poppins', serif" }}
+                    >
+                      {step.heading}
+                    </span>
+                    <span className="text-[0.875rem] text-[#999] leading-[1.65] font-light">
+                      {step.description}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </section>
           );
         }
 
-        // Render Section4 (Momentum & CTA)
-        if (type === 'section4') {
+        // ── SECTION 4 — CTA strip ──
+        if (type === "section4") {
           return (
-            <section key={id} className="bg-gray-900 text-white py-20 text-center">
-              <div className="max-w-6xl mx-auto px-6">
-                <h2 className="text-3xl text-blue-500 font-bold mb-4">
-                  {data.above?.mainText || "Built for momentum"}
-                </h2>
-                <p className="mb-12">
-                  {data.above?.secondaryText || ""}
-                </p>
-
-                <hr className="mb-10 opacity-20" />
-
-                <h2 className="text-3xl text-blue-500 font-bold mb-4">
-                  {data.below?.mainText || "Let's talk"}
-                </h2>
-                <p className="mb-6">
-                  {data.below?.secondaryText || ""}
-                </p>
-
+            <div
+              key={id}
+              className="max-w-7xl mx-auto px-12 pt-16 pb-20 grid gap-6 items-stretch"
+              style={{ gridTemplateColumns: "auto 1fr" }}
+            >
+              <button className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] border-none px-8 rounded-2xl text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-200">
+                Our Story ↗
+              </button>
+              <div className="bg-[#1a1a1a] rounded-2xl px-12 py-10 flex items-center justify-between gap-8 relative overflow-hidden">
+                <div
+                  className="absolute top-[-40px] right-[-40px] w-44 h-44 rounded-full pointer-events-none"
+                  style={{ background: "radial-gradient(circle, rgba(74,124,89,0.35) 0%, transparent 70%)" }}
+                />
+                <div className="relative z-10">
+                  <h2
+                    className="text-[clamp(1.1rem,2vw,1.6rem)] font-light text-[#7ab98a] tracking-[-0.02em] leading-[1.2] m-0 mb-1 italic"
+                    style={{ fontFamily: "'poppins', serif" }}
+                  >
+                    {data.above?.mainText || "Built for momentum"}
+                  </h2>
+                  <p className="text-[rgba(245,243,239,0.4)] text-sm leading-[1.7] m-0 mb-5 font-light">
+                    {data.above?.secondaryText}
+                  </p>
+                  <div className="w-10 h-px bg-white/15 mb-5" />
+                  <h2
+                    className="text-[clamp(1.3rem,2.5vw,2rem)] font-light text-[#f5f3ef] tracking-[-0.02em] leading-[1.2] m-0 mb-2"
+                    style={{ fontFamily: "'poppins', serif" }}
+                    dangerouslySetInnerHTML={{ __html: data.below?.mainText || "Let's <em style='font-style:italic;color:#7ab98a'>talk</em>" }}
+                  />
+                  <p className="text-[rgba(245,243,239,0.45)] text-sm leading-[1.7] m-0 font-light max-w-sm">
+                    {data.below?.secondaryText}
+                  </p>
+                </div>
                 <a
                   href={data.button?.link || "/contact"}
-                  className="inline-flex items-center justify-center bg-white text-black px-8 py-4 rounded-xl cursor-pointer font-semibold hover:bg-gray-100 transition"
+                  className="flex items-center gap-2.5 bg-[#f5f3ef] hover:bg-[#7ab98a] text-[#1a1a1a] px-7 py-3.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:scale-105 relative z-10 no-underline shrink-0"
                 >
+                  <span className="w-2 h-2 rounded-full bg-[#4a7c59] shrink-0" />
                   {data.button?.label || "Contact Us"}
                 </a>
               </div>
-            </section>
+            </div>
           );
         }
 
-        // Render Custom Section
-        if (type === 'custom') {
-          return renderCustomSection(id);
+        // ── CUSTOM ──
+        if (type === "custom") {
+          return (
+            <section key={id} className={`max-w-7xl mx-auto px-12 py-16 ${getAlignmentClass(data.alignment)}`}>
+              <h2
+                className="text-[2.2rem] font-light text-[#1a1a1a] m-0 mb-5 tracking-[-0.02em]"
+                style={{ fontFamily: "'poppins', serif" }}
+              >
+                {data.mainText}
+              </h2>
+              {data.secondaryText && (
+                <p className="text-[0.95rem] text-[#888] leading-[1.75] font-light whitespace-pre-wrap">{data.secondaryText}</p>
+              )}
+            </section>
+          );
         }
 
         return null;

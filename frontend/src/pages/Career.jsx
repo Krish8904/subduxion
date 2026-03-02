@@ -2,15 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Clock } from "lucide-react";
-import Apply from "./Apply";
-
 
 const Career = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showApplication, setShowApplication] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [hoveredJob, setHoveredJob] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,239 +28,207 @@ const Career = () => {
 
   const s = page.sections;
 
-  // Get alignment class for sections
   const getAlignmentClass = (align) => {
-    const alignLower = (align || "center").toLowerCase();
-    if (alignLower === "center") return "text-center";
-    if (alignLower === "right") return "text-right";
+    const a = (align || "center").toLowerCase();
+    if (a === "center") return "text-center";
+    if (a === "right") return "text-right";
     return "text-left";
   };
 
-  // Render custom section
-  const renderCustomSection = (sectionId) => {
-    const section = s[sectionId];
-    if (!section) return null;
-
-    const alignClass = getAlignmentClass(section.alignment);
-
-    return (
-      <div key={sectionId} className={`bg-linear-to-r from-blue-50 to-white p-10 rounded-xl space-y-4 shadow-md ${alignClass}`}>
-        <h2 className="text-3xl font-bold mb-2 text-gray-900">{section.mainText}</h2>
-        {section.secondaryText && (
-          <p className="text-gray-700 max-w-2xl mx-auto">{section.secondaryText}</p>
-        )}
-      </div>
-    );
-  };
-
-  // Get all sections sorted by position
   const getSortedSections = () => {
     const allSections = [];
-
-    // Add hero
-    if (s.hero) {
-      allSections.push({
-        id: 'hero',
-        position: s.hero.position || 1,
-        type: 'hero',
-        data: s.hero
-      });
-    }
-
-    // Add whyWorkWithUs
-    if (s.whyWorkWithUs) {
-      allSections.push({
-        id: 'whyWorkWithUs',
-        position: s.whyWorkWithUs.position || 2,
-        type: 'whyWorkWithUs',
-        data: s.whyWorkWithUs
-      });
-    }
-
-    if (s.jobCategoriesSection) {
-      allSections.push({
-        id: 'jobCategories',
-        position: s.jobCategoriesSection.position || 3,
-        type: 'jobCategories',
-        data: s.jobCategoriesSection.jobCategories
-      });
-    }
-
-
-    // Add benefits
-    if (s.benefits) {
-      allSections.push({
-        id: 'benefits',
-        position: s.benefits.position || 4,
-        type: 'benefits',
-        data: s.benefits
-      });
-    }
-
-    // Add contactCTA
-    if (s.contactCTA) {
-      allSections.push({
-        id: 'contactCTA',
-        position: s.contactCTA.position || 5,
-        type: 'contactCTA',
-        data: s.contactCTA
-      });
-    }
-
-    // Add custom sections
+    if (s.hero) allSections.push({ id: "hero", position: s.hero.position || 1, type: "hero", data: s.hero });
+    if (s.whyWorkWithUs) allSections.push({ id: "whyWorkWithUs", position: s.whyWorkWithUs.position || 2, type: "whyWorkWithUs", data: s.whyWorkWithUs });
+    if (s.jobCategoriesSection) allSections.push({ id: "jobCategories", position: s.jobCategoriesSection.position || 3, type: "jobCategories", data: s.jobCategoriesSection.jobCategories });
+    if (s.benefits) allSections.push({ id: "benefits", position: s.benefits.position || 4, type: "benefits", data: s.benefits });
+    if (s.contactCTA) allSections.push({ id: "contactCTA", position: s.contactCTA.position || 5, type: "contactCTA", data: s.contactCTA });
     Object.keys(s).forEach(key => {
-      if (!['hero', 'whyWorkWithUs', 'jobCategories', 'benefits', 'contactCTA'].includes(key)) {
+      if (!["hero", "whyWorkWithUs", "jobCategories", "benefits", "contactCTA"].includes(key)) {
         const section = s[key];
-        if (section && section.type === "custom") {
-          allSections.push({
-            id: key,
-            position: section.position || 999,
-            type: 'custom',
-            data: section
-          });
-        }
+        if (section?.type === "custom") allSections.push({ id: key, position: section.position || 999, type: "custom", data: section });
       }
     });
-
     return allSections.sort((a, b) => a.position - b.position);
   };
 
   const sortedSections = getSortedSections();
 
   return (
-    <div className="max-w-7xl mt-20 mx-auto px-6 py-16 font-satoshi space-y-20">
-      {sortedSections.map((section) => {
-        const { id, type, data } = section;
+    <div className="font-dm-sans font-normal antialiased bg-[#f5f3ef] text-[#1a1a1a]">
+      {sortedSections.map(({ id, type, data }) => {
 
-        // Render Hero
-        if (type === 'hero') {
+        // ── HERO ──
+        if (type === "hero") {
           return (
-            <div key={id} className="text-center">
-              <h1 className="text-5xl font-bold mb-4 text-gray-900">
-                {data.mainText || "Join Our Team at SubDuxion"}
-              </h1>
-              <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-                {data.secondaryText || "At SubDuxion, we empower businesses with applied AI, strategy, and engineering expertise."}
-              </p>
-            </div>
-          );
-        }
-
-        // Render Why Work With Us
-        if (type === 'whyWorkWithUs') {
-          return (
-            <div key={id} className="bg-linear-to-r from-blue-50 to-white p-10 rounded-xl space-y-4 text-center shadow-md">
-              <h2 className="text-3xl font-bold mb-2 text-gray-900">{data.title}</h2>
-              <p className="text-gray-700 max-w-2xl mx-auto">{data.text}</p>
-              <ul className="list-disc list-inside text-gray-700 mt-4 max-w-2xl mx-auto space-y-2">
-                {data.bullets?.map((b, i) => (
-                  <li key={i}>{b}</li>
-                ))}
-              </ul>
-            </div>
-          );
-        }
-
-        // Render Job Categories
-        if (type === 'jobCategories') {
-          return data.map((cat, catIndex) => (
-            <div key={`${id}-${catIndex}`} className="space-y-6">
-              <h2 className="text-4xl font-bold border-b-2 border-gray-300 pb-2 text-gray-900">
-                {cat.category}
-              </h2>
-              <div className="grid gap-8 md:grid-cols-2">
-                {cat.jobs.map((job, j) => (
-                  <div
-                    key={j}
-                    className="group relative rounded-3xl p-[1px] bg-gradient-to-br from-blue-500/40 via-purple-500/30 to-blue-400/40 hover:from-blue-500 hover:via-purple-500 hover:to-blue-400 transition-all duration-500"
-                  >
-                    <div className="relative bg-white rounded-3xl p-8 overflow-hidden">
-
-                      {/* floating glow */}
-                      <div className="absolute -top-16 -right-16 w-56 h-56 bg-blue-100 rounded-full blur-3xl opacity-30 group-hover:opacity-30 transition" />
-
-                      {/* header */}
-                      <div className="flex justify-between items-start mb-6">
-                        <div>
-                          <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
-                            {job.title}
-                          </h3>
-
-                          <div className="flex items-center gap-3 mt-4">
-                            <span className="flex items-center gap-2 text-xs font-semibold bg-slate-100 text-slate-700 px-4 py-1.5 rounded-full shadow-inner">
-                              <MapPin size={13} />
-                              {job.location}
-                            </span>
-
-                            <span className="flex items-center gap-2 text-xs font-semibold bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full shadow-inner">
-                              <Clock size={13} />
-                              {job.type}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* arrow indicator */}
-                        <div className="translate-x-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
-                        </div>
-                      </div>
-
-                      {/* separator */}
-                      <div className="h-px bg-linear-to-r from-transparent via-slate-200 to-transparent mb-6" />
-
-                      {/* description */}
-                      <p className="text-slate-600 leading-relaxed line-clamp-4 mb-8">
-                        {job.description}
-                      </p>
-
-                      {/* CTA */}
-                      <button
-                        onClick={() => navigate(`/career/applyforjobs?job=${encodeURIComponent(job.title)}`)}
-                        className="relative text-sm cursor-pointer font-semibold text-blue-700 group/btn"
-                      >
-                        Apply
-                        <span className="ml-2 inline-block transition-transform group-hover/btn:translate-x-1">→</span>
-                        <div className="absolute -bottom-1 left-0 w-0 h-[2px] bg-blue-600 group-hover/btn:w-full transition-all duration-300" />
-                      </button>
-
-                    </div>
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-10 items-end mb-5 lg:mb-10">
+                <h1 className="font-fraunces text-[clamp(3rem,5.5vw,5rem)] font-light leading-tight tracking-tight text-[#1a1a1a] mb-0">
+                  {data.mainText || "Join Our Team"}
+                </h1>
+                <div className="flex flex-col items-start lg:items-end gap-6 pb-1.5">
+                  <p className="font-light text-sm text-[#888] leading-relaxed text-left lg:text-right max-w-70 mb-0">
+                    {data.secondaryText}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-[#aaa] tracking-wider uppercase font-medium">We're Hiring</span>
+                    <button 
+                      className="group inline-flex items-center gap-2.5 bg-[#1a1a1a] text-[#f5f3ef] px-6.5 py-3.25 rounded-full font-dm-sans text-xs font-medium no-underline tracking-tight border-none cursor-pointer transition-all duration-300 hover:bg-[#4a7c59] hover:scale-[1.03]"
+                      onClick={() => navigate("/career/applyforjobs")}
+                    >
+                      See Openings
+                      <span className="w-5.5 h-5.5 rounded-full bg-[#f5f3ef] text-[#1a1a1a] flex items-center justify-center text-xs">↗</span>
+                    </button>
                   </div>
+                </div>
+              </div>
+            </section>
+          );
+        }
+
+        // ── WHY WORK WITH US ──
+        if (type === "whyWorkWithUs") {
+          return (
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                <div>
+                  <p className="text-xs text-[#4a7c59] font-medium tracking-wider uppercase mb-4">Why Us</p>
+                  <h2 className="font-fraunces text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-tight text-[#1a1a1a] mb-5 leading-tight">
+                    {data.title}
+                  </h2>
+                  <p className="font-light text-sm text-[#888] leading-relaxed mb-0">{data.text}</p>
+                </div>
+                <ul className="list-none m-0 p-0">
+                  {data.bullets?.map((b, i) => (
+                    <li key={i} className="flex items-start gap-4 py-4.5 border-b border-[#d4d0c8] text-sm text-[#555] leading-relaxed font-light first:border-t border-[#d4d0c8]">
+                      <span className="font-fraunces text-xs text-[#bbb] shrink-0 pt-0.5">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          );
+        }
+        
+        if (type === "jobCategories") {
+          return (
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 pb-6 border-b border-[#d4d0c8]">
+                <h2 className="font-fraunces text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-tight text-[#1a1a1a] mb-0 leading-tight lg:mb-0">
+                  Open <em className="italic text-[#4a7c59]">Positions</em>
+                </h2>
+                <span className="text-xs text-[#aaa] tracking-widest uppercase font-medium mt-4 lg:mt-0 pb-1">
+                  {data?.reduce((acc, cat) => acc + (cat.jobs?.length || 0), 0)} Roles
+                </span>
+              </div>
+              {data?.map((cat, ci) => (
+                <div key={ci} className="mb-14">
+                  <p className="font-fraunces text-base font-normal text-[#4a7c59] tracking-tight uppercase mb-5 flex items-center gap-3 after:flex-1 after:h-px after:bg-[#d4d0c8]">
+                    {cat.category}
+                  </p>
+                  <ul className="list-none m-0 p-0">
+                    {cat.jobs?.map((job, ji) => (
+                      <li
+                        key={ji}
+                        className="grid grid-cols-[1fr_auto_auto_auto] lg:grid-cols-[1fr_auto_auto_auto] items-center gap-6 py-5 px-4 border-b border-[#d4d0c8] rounded-xl transition-all duration-200 first:border-t border-[#d4d0c8] hover:bg-[#eceae4] hover:pl-6"
+                        onMouseEnter={() => setHoveredJob(`${ci}-${ji}`)}
+                        onMouseLeave={() => setHoveredJob(null)}
+                      >
+                        <span className="font-fraunces text-[clamp(1.05rem,1.8vw,1.35rem)] font-normal text-[#1a1a1a] tracking-tight transition-colors duration-200 hover:text-[#4a7c59]">
+                          {job.title}
+                        </span>
+                        <span className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap font-dm-sans bg-[#e8e6e0] text-[#666]">
+                          <MapPin size={11} /> {job.location}
+                        </span>
+                        <span className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap font-dm-sans bg-[#dceede] text-[#3a6b48]">
+                          <Clock size={11} /> {job.type}
+                        </span>
+                        <button
+                          className="w-10 h-10 rounded-full border-1.5 border-[#c8c4bc] bg-transparent text-[#aaa] flex items-center justify-center text-sm shrink-0 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] -rotate-45 scale-[0.9] cursor-pointer font-dm-sans hover:bg-[#4a7c59] hover:text-[#f5f3ef] hover:border-[#4a7c59] hover:rotate-0 hover:scale-100"
+                          onClick={() => navigate(`/career/applyforjobs?job=${encodeURIComponent(job.title)}`)}
+                          aria-label={`Apply for ${job.title}`}
+                        >
+                          →
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+          );
+        }
+
+        // ── BENEFITS ──
+        if (type === "benefits") {
+          return (
+            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+              <div>
+                <p className="text-xs text-[#4a7c59] font-medium tracking-wider uppercase mb-4">Perks & Benefits</p>
+                <h2 className="font-fraunces text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-tight text-[#1a1a1a] leading-tight mb-0">
+                  <em className="italic text-[#4a7c59]">{data.title}</em>
+                </h2>
+              </div>
+              <ul className="list-none m-0 p-0">
+                {data.bullets?.map((b, i) => (
+                  <li key={i} className="flex items-start gap-4 py-4.5 border-b border-[#d4d0c8] text-sm text-[#555] leading-relaxed font-light first:border-t border-[#d4d0c8]">
+                    <span className="w-7 h-7 mt-0.5 rounded-full bg-[#dceede] text-[#4a7c59] flex items-center justify-center text-xs shrink-0">✦</span>
+                    {b}
+                  </li>
                 ))}
-              </div>
-            </div>
-          ));
-        }
-
-        // Render Benefits
-        if (type === 'benefits') {
-          return (
-            <div key={id} className="bg-linear-to-r from-blue-50 to-white p-10 rounded-xl text-center space-y-4 shadow-md">
-              <h2 className="text-3xl font-bold mb-2 pb-5 text-gray-900">{data.title}</h2>
-              <ul className="list-disc list-inside text-gray-700 mt-4 max-w-2xl mx-auto space-y-2 text-left">
-                {data.bullets?.map((b, i) => <li key={i}>{b}</li>)}
               </ul>
-            </div>
+            </section>
           );
         }
 
-        // Render Contact CTA
-        if (type === 'contactCTA') {
+        // ── CONTACT CTA ──
+        if (type === "contactCTA") {
           return (
-            <div key={id} className="flex flex-col md:flex-row items-center justify-between pt-4 mt-14">
-              <div className="flex flex-col text-left max-w-2xl ml-15">
-                <h2 className="text-xl font-bold mb-2 text-gray-900">{data.title}</h2>
-                <p className="text-gray-700">{data.text}</p>
-              </div>
-              <button
-                onClick={() => navigate(`/career/applyforjobs`)}
-                className="bg-linear-to-r mr-10 from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition cursor-pointer whitespace-nowrap">
-                {data.buttonText}
+            <div key={id} className="max-w-7xl mx-auto px-12 pt-15 pb-20 grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-stretch">
+              <button 
+                className="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-[#f5f3ef] border-none px-8 py-0 rounded-xl font-dm-sans text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-300 hover:bg-[#4a7c59] lg:py-4 lg:px-7"
+                onClick={() => navigate("/career/applyforjobs")}
+              >
+                Apply Now ↗
               </button>
+              <div className="bg-[#1a1a1a] rounded-xl p-10 lg:px-12 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative overflow-hidden">
+                <div className="relative z-10">
+                  <h2 className="font-light text-[clamp(1.3rem,2.5vw,2rem)] text-[#f5f3ef] tracking-tight leading-tight mb-2 ">
+                    {data.title}
+                  </h2>
+                  <p className="text-[rgba(245,243,239,0.45)] text-xs leading-relaxed font-light max-w-90 mb-0">
+                    {data.text}
+                  </p>
+                </div>
+                <button 
+                  className="inline-flex items-center gap-2.5 bg-[#f5f3ef] text-[#1a1a1a] px-7 py-3.5 rounded-full font-dm-sans font-medium text-sm border-none cursor-pointer whitespace-nowrap transition-all duration-300 relative z-10 shrink-0 hover:bg-[#7ab98a] hover:scale-[1.04]"
+                  onClick={() => navigate("/career/applyforjobs")}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#4a7c59] shrink-0" />
+                  {data.buttonText}
+                </button>
+                <div className="absolute -top-10 -right-10 w-[180px] h-[180px] rounded-full bg-[radial-gradient(circle,rgba(74,124,89,0.35)_0%,transparent_70%)] pointer-events-none" />
+              </div>
             </div>
           );
         }
 
-        if (type === 'custom') {
-          return renderCustomSection(id);
+        // ── CUSTOM ──
+        if (type === "custom") {
+          return (
+            <section key={id} className={`max-w-7xl mx-auto px-12 py-16 ${getAlignmentClass(data.alignment)}`}>
+              <h2 className="font-fraunces text-[2.2rem] font-light text-[#1a1a1a] mb-5 tracking-tight">
+                {data.mainText}
+              </h2>
+              {data.secondaryText && (
+                <p className="text-sm text-[#888] leading-relaxed font-light">
+                  {data.secondaryText}
+                </p>
+              )}
+            </section>
+          );
         }
 
         return null;

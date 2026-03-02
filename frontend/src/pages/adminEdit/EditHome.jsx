@@ -265,9 +265,9 @@ const EditHome = ({ pageTitle }) => {
         </h2>
         <div className="flex justify-end gap-2">
           <button>
-            <ExportButton  data={currentRows} fileName="HomePage" />
+            <ExportButton data={currentRows} fileName="HomePage" />
           </button>
-          
+
           <button
             onClick={() => setShowFullPreview(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
@@ -286,7 +286,7 @@ const EditHome = ({ pageTitle }) => {
             onClick={() => setShowAddSection(true)}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
           >
-            Create Home 
+            Create Home
           </button>
         </div>
       </div>
@@ -591,119 +591,11 @@ const EditHome = ({ pageTitle }) => {
               <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl leading-none cursor-pointer">&times;</button>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-white py-16">
-              <div className="max-w-7xl mx-auto px-4 space-y-32 font-satoshi">
-
-                {getSortedSections().map((section) => {
-                  const { id, data, isCustom } = section;
-
-                  // Render custom sections
-                  if (isCustom) {
-                    return (
-                      <div key={id}>
-                        {renderCustomSection(id)}
-                      </div>
-                    );
-                  }
-
-                  // Render built-in sections based on their ID
-                  if (id === 'hero') {
-                    return (
-                      <div key={id} className="flex flex-col md:flex-row items-center gap-8">
-                        <div>
-                          <h1 className="text-5xl font-bold leading-tight ml-10 mb-6 text-gray-900 whitespace-pre-wrap">
-                            {(data?.mainText || "").split("\\n").map((line, i) => (
-                              <span key={i}>{line.includes("hidden value") ? <span className="text-blue-600">{line}</span> : line}<br /></span>
-                            ))}
-                          </h1>
-                          <p className="text-gray-700 ml-10 max-w-xl mb-6">{data?.secondaryText}</p>
-                          <div className="flex ml-10 gap-6">
-                            {Array.isArray(data?.buttons) && data.buttons.map((btn, i) => (
-                              <button key={i} className={`px-6 py-3 rounded-lg ${i === 0 ? "bg-blue-600 text-white" : "border border-blue-600 text-blue-600"}`}>{btn.label}</button>
-                            ))}
-                          </div>
-                        </div>
-                        <img  alt="Main" className="h-70 w-250 rounded-xl shadow-lg object-cover" />
-                      </div>
-                    );
-                  }
-
-                  if (id === 'intro') {
-                    return (
-                      <div key={id} className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="md:w-1/2">
-                          <img alt="Secondary" className="ml-15 h-80 rounded-xl shadow-lg object-cover" />
-                        </div>
-                        <div className="md:w-1/2">
-                          <h3 className="text-xl font-medium leading-relaxed text-gray-700">
-                            {data?.secondaryText || "Applied AI built on data sovereignty..."}
-                          </h3>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (id === 'stats') {
-                    return (
-                      <div key={id} className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center items-center">
-                        {stats.map((stat, i) => (
-                          <div key={i} className={`pr-6 ${i !== stats.length - 1 ? "border-r border-gray-500" : ""}`}>
-                            <h3 className={`text-4xl font-bold ${colorMap[stat.color] || "text-black"}`}>{stat.value}</h3>
-                            <p className="text-gray-700 mt-2">{stat.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  }
-
-                  if (id === 'whatWeDo') {
-                    return (
-                      <div key={id} className="space-y-12 ml-10">
-                        <h2 className="text-4xl font-bold text-gray-900">{data?.title || "What We Do ↴"}</h2>
-                        <div className="grid md:grid-cols-3 gap-8">
-                          {whatWeDo.map((item, i) => (
-                            <div key={i} className="p-6 border-l-4 border-blue-600 rounded-xl bg-white shadow-sm">
-                              <h3 className="text-xl font-semibold mb-2 text-gray-900">{item.heading}</h3>
-                              <p className="text-gray-700">{item.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (id === 'howWeWork') {
-                    return (
-                      <div key={id} className="space-y-12">
-                        <h2 className="text-4xl font-bold pl-10 text-gray-900">{data?.title || "How We Work ↴"}</h2>
-                        <div className="grid md:grid-cols-4 gap-8 text-center">
-                          {howWeWork.map((step, i) => (
-                            <div key={i} className="p-4 bg-white rounded-xl shadow border border-gray-50">
-                              <h3 className="font-semibold mb-2 text-gray-900">{step.title}</h3>
-                              <p className="text-gray-700">{step.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (id === 'cta') {
-                    return (
-                      <div key={id} className="text-center space-y-6 p-10 bg-linear-to-r from-blue-50 to-white rounded-xl border border-blue-50">
-                        <h2 className="text-4xl font-bold text-gray-900">{data?.mainText || cta.mainText}</h2>
-                        <p className="max-w-xl mx-auto text-gray-700">{data?.secondaryText || cta.secondaryText}</p>
-                        <button className="bg-blue-600 text-white px-8 py-4 rounded-lg">
-                          {data?.button?.label || "Plan a Free Quick Scan"}
-                        </button>
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })}
-              </div>
-            </div>
+            <iframe
+              src="/"
+              className="flex-1 w-full border-none"
+              title="Home Preview"
+            />
             <div className="p-4 border-t flex justify-end bg-gray-50 px-10">
               <button onClick={() => setShowFullPreview(false)} className="bg-slate-900 text-white px-10 py-2 rounded-xl font-bold cursor-pointer">Close Preview</button>
             </div>

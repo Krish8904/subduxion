@@ -503,8 +503,6 @@ const EditService = ({ pageTitle }) => {
         </div>
       )}
 
-
-
       {/* FULL PREVIEW MODAL */}
       {showFullPreview && (
         <div className="fixed inset-0 bg-black/60 z-600 flex items-center justify-center p-6 backdrop-blur-md">
@@ -513,73 +511,11 @@ const EditService = ({ pageTitle }) => {
               <span className="font-bold uppercase tracking-widest text-[10px] bg-blue-600 text-white px-3 py-1 rounded-full">Live Services Preview</span>
               <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl leading-none cursor-pointer">&times;</button>
             </div>
-            <div className="flex-1 overflow-y-auto bg-white py-16 px-10">
-              <div className="max-w-7xl mx-auto space-y-24 font-poppins text-left">
-                {Object.keys(serviceData.sections || {})
-                  .sort((a, b) => getPos(a, serviceData.sections[a]) - getPos(b, serviceData.sections[b]))
-                  .map((key) => {
-                    const s = serviceData.sections[key];
-
-                    if (key === "hero") {
-                      return (
-                        <div key={key} className="flex flex-col md:flex-row items-start gap-12">
-                          <div className="md:w-1/2">
-                            <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 text-gray-900">{s.mainText}</h1>
-                          </div>
-                          <div className="md:w-1/2">
-                            <p className="text-gray-700 text-lg mt-0 md:mt-15 mb-6 leading-relaxed">{s.secondaryText}</p>
-                            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold">{s.buttonText}</button>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    if (key === "services") {
-                      return (
-                        <div key={key} className="text-center">
-                          <h1 className="text-5xl text-blue-600 font-semibold mb-16">Our Services</h1>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-14 justify-items-center">
-                            {(s.items || s).map((card, idx) => (
-                              <div key={idx} className={`flex flex-col items-center w-full max-w-xl bg-white shadow-md rounded-xl border-l-4 ${card.color}`}>
-                                <div className="p-8 text-center">
-                                  <h3 className="text-2xl font-bold mb-3">{card.title}</h3>
-                                  <p className="text-gray-700">{card.desc}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    if (key === "cta") {
-                      return (
-                        <div key={key} className="text-center py-16 bg-blue-50 rounded-2xl">
-                          <h2 className="text-4xl font-bold mb-4">{s.title}</h2>
-                          <p className="text-gray-600 text-lg mb-6">{s.text}</p>
-                          <a
-                            href={s.link}
-                            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold inline-block"
-                          >
-                            {s.buttonText}
-                          </a>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={key}
-                        className="py-10"
-                        style={{ textAlign: s.alignment || 'left' }}
-                      >
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4">{s.mainText}</h2>
-                        <p className="text-gray-600 text-lg whitespace-pre-wrap">{s.secondaryText}</p>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
+            <iframe
+              src="/services"
+              className="flex-1 w-full border-none"
+              title="Services Preview"
+            />
             <div className="p-4 border-t flex justify-end bg-gray-50 px-10">
               <button onClick={() => setShowFullPreview(false)} className="bg-slate-900 text-white px-10 py-2 rounded-xl font-bold uppercase text-xs cursor-pointer shadow-lg">Close Preview</button>
             </div>
