@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Receipt, X, ChevronLeft, ChevronRight, LayoutGrid, Table,
   FilePlus, Search, ArrowUpDown, ChevronDown, Check,
   TrendingUp, TrendingDown, Minus,
+  ReceiptIcon,
 } from "lucide-react";
 import ExpenseForm from "../pages/adminEdit/ExpenseForm";
 import { ExpenseCard } from "./ExpenseCards";
@@ -210,8 +212,21 @@ function SortBar({ search, onSearch, sortValue, onSort }) {
 }
 
 /* ─── Filter ─────────────────────────────────────────────────── */
-const DEFAULT_FILTERS = { type: [], country: [], currency: [], sign: "", date: "", dateFrom: "", dateTo: "" };
-
+const DEFAULT_FILTERS = {
+  transactionId: [],
+  company: [],
+  department: [],
+  counterparty: [],
+  account: [],
+  type: [],
+  country: [],
+  currency: [],
+  sign: "",
+  fx: [],
+  date: "",
+  dateFrom: "",
+  dateTo: "",
+};
 function FilterBar({ filters, onChange, expenses }) {
   const [open, setOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState("type");
@@ -226,28 +241,50 @@ function FilterBar({ filters, onChange, expenses }) {
   function uniqueValsFromNested(key) {
     return [
       ...new Set(
-        expenses.map((e) => {
-          if (key === "type") return e.typeLabel;
-          if (key === "country") return e.countryLabel;
-          if (key === "currency") return e.currencyLabel;
-          return null;
-        }).filter(Boolean)
+        expenses
+          .map((e) => {
+            switch (key) {
+              case "transactionId": return e.transactionId;
+              case "company": return e.company;
+              case "department": return e.department;
+              case "counterparty": return e.counterparty;
+              case "account": return e.account;
+              case "type": return e.typeLabel;
+              case "country": return e.countryLabel;
+              case "currency": return e.currencyLabel;
+              case "fx": return e.fx;
+              default: return null;
+            }
+          })
+          .filter(Boolean)
       )
     ];
   }
 
   const OPTIONS = {
+    transactionId: uniqueValsFromNested("transactionId"),
+    company: uniqueValsFromNested("company"),
+    department: uniqueValsFromNested("department"),
+    counterparty: uniqueValsFromNested("counterparty"),
+    account: uniqueValsFromNested("account"),
     type: uniqueValsFromNested("type"),
     country: uniqueValsFromNested("country"),
     currency: uniqueValsFromNested("currency"),
+    fx: uniqueValsFromNested("fx"),
     sign: ["Income / Credit", "Expense / Debit"],
   };
 
   const GROUPS = [
+    { key: "transactionId", label: "Transaction ID" },
+    { key: "company", label: "Company" },
+    { key: "department", label: "Department" },
+    { key: "counterparty", label: "Counterparty" },
+    { key: "account", label: "Account" },
     { key: "type", label: "Type" },
     { key: "country", label: "Country" },
     { key: "currency", label: "Currency" },
     { key: "sign", label: "Direction" },
+    { key: "fx", label: "FX Rate" },
     { key: "date", label: "Date" },
   ];
 
@@ -398,7 +435,7 @@ function FilterBar({ filters, onChange, expenses }) {
 
 /* ─── Main page ──────────────────────────────────────────────── */
 const ExpenseInquiries = () => {
-
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("table");
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -467,6 +504,23 @@ const ExpenseInquiries = () => {
     if (filters.currency.length) list = list.filter((e) => filters.currency.includes(e.currencyLabel));
     if (filters.sign === "Income / Credit") list = list.filter((e) => e.amount > 0);
     if (filters.sign === "Expense / Debit") list = list.filter((e) => e.amount < 0);
+    if (filters.transactionId.length)
+      list = list.filter((e) => filters.transactionId.includes(e.transactionId));
+
+    if (filters.company.length)
+      list = list.filter((e) => filters.company.includes(e.company));
+
+    if (filters.department.length)
+      list = list.filter((e) => filters.department.includes(e.department));
+
+    if (filters.counterparty.length)
+      list = list.filter((e) => filters.counterparty.includes(e.counterparty));
+
+    if (filters.account.length)
+      list = list.filter((e) => filters.account.includes(e.account));
+
+    if (filters.fx.length)
+      list = list.filter((e) => filters.fx.includes(e.fx));
 
     if (filters.date) {
       list = list.filter((e) => {
@@ -507,6 +561,23 @@ const ExpenseInquiries = () => {
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const showingFrom = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1;
   const showingTo = Math.min(page * pageSize, filtered.length);
+
+  const { totalExpense, totalCredit } = useMemo(() => {
+    let expense = 0;
+    let credit = 0;
+
+    filtered.forEach((e) => {
+      const amt = e.inrAmount ?? 0;
+
+      if (amt < 0) expense += Math.abs(amt);
+      if (amt > 0) credit += amt;
+    });
+
+    return {
+      totalExpense: expense,
+      totalCredit: credit,
+    };
+  }, [filtered]);
 
   const handleSearch = (v) => { setSearch(v); setPage(1); };
   const handleFilterChange = (f) => { setFilters(f); setPage(1); };
@@ -578,61 +649,140 @@ const ExpenseInquiries = () => {
       )}
 
       {/* ── Sticky header ── */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30"
-        style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.07)" }}>
-        <div className="w-full mx-auto px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div
+        className="bg-white border-b border-gray-200 sticky top-0 z-30"
+        style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.07)" }}
+      >
+        <div className="w-full mx-auto px-5 py-3">
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center justify-center rounded-xl bg-violet-600 shrink-0"
-              style={{ width: 42, height: 42 }}>
-              <Receipt size={21} className="text-white" />
+          <div className="flex items-start justify-between mb-3">
+
+            {/* LEFT SIDE */}
+            <div className="flex items-center gap-3 shrink-0">
+              <div
+                className="flex items-center justify-center rounded-xl bg-violet-600 shrink-0"
+                style={{ width: 42, height: 42 }}
+              >
+                <Receipt size={21} className="text-white" />
+              </div>
+
+              <div>
+                <h1
+                  className="text-2xl font-bold text-gray-900 leading-tight whitespace-nowrap"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Expenses
+                </h1>
+
+                <p
+                  className="text-xs text-gray-400 font-medium whitespace-nowrap mt-0.5"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {viewMode === "table"
+                    ? `Showing ${showingFrom}–${showingTo} of ${filtered.length} transactions`
+                    : `${filtered.length} transactions`}
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight whitespace-nowrap"
-              style={{ fontFamily: "'Poppins', sans-serif" }}>
-              Expenses
-            </h1>
-            <p className="text-xs text-gray-400 font-medium whitespace-nowrap mt-0.5"
-              style={{ fontFamily: "'Poppins', sans-serif" }}>
-              {viewMode === "table"
-                ? `Showing ${showingFrom}–${showingTo} of ${filtered.length} transactions`
-                : `${filtered.length} transactions`}
-            </p>
+
+            <div className="flex flex-row items-end gap-2">
+
+
+              <div className="flex items-center gap-2">
+                <h1
+                  className={`text-sm underline  font-semibold ${totalCredit - totalExpense >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                    }`}
+                >
+                  Net {totalCredit - totalExpense >= 0 ? "Credit" : "Spend"}: ₹
+                  {fmt(Math.abs(totalCredit - totalExpense))}
+                </h1>
+                <div className="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-lg">
+                  <TrendingDown size={16} className="text-red-600" />
+                  <span className="text-sm font-semibold text-red-600">
+                    ₹{fmt(totalExpense)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-lg">
+                  <TrendingUp size={16} className="text-green-600" />
+                  <span className="text-sm font-semibold text-green-600">
+                    ₹{fmt(totalCredit)}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
+          {/* SECOND ROW */}
           <div className="flex items-center flex-wrap gap-3">
-            <SortBar search={search} onSearch={handleSearch} sortValue={sortValue}
-              onSort={(v) => { setSortValue(v); setPage(1); }} />
 
-            <FilterBar filters={filters} onChange={handleFilterChange} expenses={expenses} />
+            <SortBar
+              search={search}
+              onSearch={handleSearch}
+              sortValue={sortValue}
+              onSort={(v) => {
+                setSortValue(v);
+                setPage(1);
+              }}
+            />
+
+            <FilterBar
+              filters={filters}
+              onChange={handleFilterChange}
+              expenses={expenses}
+            />
 
             <div className="flex items-center ml-1.5 mr-1.5 bg-gray-100 rounded-lg p-1 shrink-0">
-              <button onClick={() => setViewMode("table")}
+              <button
+                onClick={() => setViewMode("table")}
                 className="inline-flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
                 style={{
                   fontFamily: "'Poppins', sans-serif",
                   background: viewMode === "table" ? "white" : "transparent",
                   color: viewMode === "table" ? "#1e3a8a" : "#9ca3af",
-                  boxShadow: viewMode === "table" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                }}>
+                  boxShadow:
+                    viewMode === "table"
+                      ? "0 1px 3px rgba(0,0,0,0.1)"
+                      : "none",
+                }}
+              >
                 <Table size={14} /> Table
               </button>
-              <button onClick={() => setViewMode("card")}
+
+              <button
+                onClick={() => setViewMode("card")}
                 className="inline-flex cursor-pointer items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all"
                 style={{
                   fontFamily: "'Poppins', sans-serif",
                   background: viewMode === "card" ? "white" : "transparent",
                   color: viewMode === "card" ? "#5b21b6" : "#9ca3af",
-                  boxShadow: viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                }}>
+                  boxShadow:
+                    viewMode === "card"
+                      ? "0 1px 3px rgba(0,0,0,0.1)"
+                      : "none",
+                }}
+              >
                 <LayoutGrid size={14} /> Cards
               </button>
             </div>
 
-            <button onClick={openImport}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg border border-blue-600 hover:bg-white hover:text-blue-600 transition-all shrink-0 whitespace-nowrap cursor-pointer">
+            <button
+              onClick={openImport}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg border border-blue-600 hover:bg-white hover:text-blue-600 transition-all shrink-0 whitespace-nowrap cursor-pointer"
+            >
               <FilePlus size={16} /> Import
             </button>
+
             <ExpenseExport data={filtered} fileName="Expenses_Report" />
+
+            <button
+              onClick={() => navigate("/admin/manageexpense")}
+              className="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg border border-blue-600 hover:bg-white hover:text-blue-600 transition-all shrink-0 whitespace-nowrap cursor-pointer"
+            >
+              <Receipt size={18} /> Create
+            </button>
           </div>
         </div>
       </div>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Receipt, Building2, DollarSign, X, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader } from "lucide-react";
+import { Receipt, Building2, DollarSign, X, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader, Search, ChevronDown } from "lucide-react";
 import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs";
 
 const MASTERS_API = "http://localhost:5000/api/expense-masters/all";
+const COMPANIES_API = "http://localhost:5000/api/companies";
 
 const COL_MAP = {
   "date": "date", "m": "month", "month": "month", "country": "country",
@@ -46,6 +47,184 @@ function MasterSelect({ name, value, onChange, options, placeholder, disabled })
   );
 }
 
+/* ─── Company Search Dropdown ──────────────────────────────────── */
+function CompanySearchDropdown({ value, onChange, disabled }) {
+  const [companies, setCompanies] = useState([]);
+  const [search, setSearch] = useState(value || "");
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const ref = useRef(null);
+  const inputRef = useRef(null);
+
+  // fetch companies once
+  useEffect(() => {
+    setLoading(true);
+    axios.get(COMPANIES_API)
+      .then((res) => {
+        if (res.data.success) setCompanies(res.data.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  // sync external value → search text (e.g. when editing an existing expense)
+  useEffect(() => {
+    setSearch(value || "");
+  }, [value]);
+
+  // close on outside click
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const filtered = companies.filter((c) =>
+    c.companyName?.toLowerCase().includes(search.toLowerCase().trim())
+  );
+
+  const handleSelect = (name) => {
+    setSearch(name);
+    onChange(name);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const v = e.target.value;
+    setSearch(v);
+    onChange(v);          // allow free-type too
+    setOpen(true);
+  };
+
+  const handleClear = () => {
+    setSearch("");
+    onChange("");
+    setOpen(false);
+    inputRef.current?.focus();
+  };
+
+  const showDropdown = open && !disabled && (filtered.length > 0 || search.length > 0);
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* Input */}
+      <div className="relative">
+        <Search
+          size={14}
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+        />
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Search or type company name…"
+          value={search}
+          onChange={handleInputChange}
+          onFocus={() => setOpen(true)}
+          disabled={disabled}
+          className="w-full border border-slate-300 rounded-lg pl-9 pr-9 py-3 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
+                     bg-white disabled:bg-slate-100 disabled:cursor-not-allowed
+                     transition placeholder-slate-400"
+        />
+        {/* Right icon: spinner / clear / chevron */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {loading ? (
+            <Loader size={13} className="animate-spin text-slate-400" />
+          ) : search ? (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-slate-400 hover:text-slate-600 transition"
+            >
+              <X size={13} />
+            </button>
+          ) : (
+            <ChevronDown
+              size={14}
+              className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Dropdown */}
+      {showDropdown && (
+        <div
+          className="absolute z-50 left-0 right-0 mt-1.5 bg-white border border-slate-200
+                     rounded-xl shadow-xl overflow-hidden"
+          style={{ maxHeight: 240 }}
+        >
+          <div className="overflow-y-auto" style={{ maxHeight: 240 }}>
+            {filtered.length === 0 ? (
+              <div className="px-4 py-4 text-sm text-slate-400 text-center">
+                No registered companies match "<span className="font-medium text-slate-600">{search}</span>"
+              </div>
+            ) : (
+              filtered.map((c) => {
+                const fullName = [c.firstName, c.lastName].filter(Boolean).join(" ");
+                const isSelected = search === c.companyName;
+                return (
+                  <button
+                    key={c._id}
+                    type="button"
+                    onClick={() => handleSelect(c.companyName)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors
+                                hover:bg-blue-50 border-b border-slate-50 last:border-b-0
+                                ${isSelected ? "bg-blue-50" : ""}`}
+                  >
+                    {/* Avatar */}
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center
+                                 text-xs font-bold shrink-0"
+                      style={{
+                        background: `hsl(${(c.companyName?.charCodeAt(0) ?? 0) * 47 % 360},60%,88%)`,
+                        color: `hsl(${(c.companyName?.charCodeAt(0) ?? 0) * 47 % 360},55%,32%)`,
+                      }}
+                    >
+                      {c.companyName?.slice(0, 2).toUpperCase()}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold truncate ${isSelected ? "text-blue-700" : "text-slate-800"}`}>
+                        {c.companyName}
+                      </p>
+                      {(c.category || fullName) && (
+                        <p className="text-xs text-slate-400 truncate">
+                          {[c.category, fullName].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                    </div>
+
+                    {isSelected && (
+                      <span className="shrink-0 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
+                        <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                          <path d="M1 3l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer hint */}
+          {filtered.length > 0 && (
+            <div className="px-4 py-2 border-t border-slate-100 bg-slate-50">
+              <p className="text-[10px] text-slate-400">
+                {filtered.length} of {companies.length} registered companies
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   EXCEL IMPORT PANEL (unchanged)
+───────────────────────────────────────────────────────────────── */
 function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], currency: [] } }) {
   const [rows, setRows] = useState([]);
   const [errors, setErrors] = useState([]);
@@ -109,7 +288,6 @@ function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], curren
     reader.readAsArrayBuffer(file);
   };
 
-  // Helper: find _id by matching label, value, or code (case-insensitive)
   const resolveId = (list, rawVal) => {
     if (!rawVal) return undefined;
     const v = String(rawVal).trim().toLowerCase();
@@ -240,13 +418,8 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
   useEffect(() => {
     axios.get(MASTERS_API).then((res) => {
       const { types, countries, currencies } = res.data.data;
-      setMasters({
-        type: types || [],
-        country: countries || [],
-        currency: currencies || [],
-      });
+      setMasters({ type: types || [], country: countries || [], currency: currencies || [] });
     }).catch(() => {
-      // Fallback if API is down
       setMasters({
         type: [
           { value: "Purchase", label: "Purchase" }, { value: "Spend", label: "Spend" },
@@ -272,18 +445,8 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
   const emptyForm = {
     date: new Date().toISOString().split("T")[0],
     month: new Date().getMonth() + 1,
-    country: "",
-    company: "",
-    type: "",
-    department: "",
-    counterparty: "",
-    description: "",
-    account: "",
-    amount: "",
-    currency: "",
-    fx: 1,
-    inrAmount: "",
-    sign: 1,
+    country: "", company: "", type: "", department: "", counterparty: "",
+    description: "", account: "", amount: "", currency: "", fx: 1, inrAmount: "", sign: 1,
   };
 
   const [formData, setFormData] = useState(emptyForm);
@@ -292,24 +455,16 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
 
   useEffect(() => {
     if (editData) {
-      // Helper to extract _id string from either a populated object or raw string
       const getId = (val) => {
         if (!val) return "";
         if (typeof val === "object" && val._id) return String(val._id);
         return String(val);
       };
-
-      // Fix date format: strip time portion
       const rawDate = editData.date ? String(editData.date).split("T")[0] : emptyForm.date;
-
       setFormData({
-        ...emptyForm,
-        ...editData,
-        date: rawDate,
-        type: getId(editData.type),
-        country: getId(editData.country),
-        currency: getId(editData.currency),
-        sign: editData.amount < 0 ? -1 : 1,
+        ...emptyForm, ...editData, date: rawDate,
+        type: getId(editData.type), country: getId(editData.country),
+        currency: getId(editData.currency), sign: editData.amount < 0 ? -1 : 1,
         amount: Math.abs(editData.amount ?? 0),
       });
     }
@@ -331,17 +486,9 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
   const handleChange = (e) => { const { name, value } = e.target; setFormData((p) => ({ ...p, [name]: value })); };
   const handleCurrencyChange = (e) => {
     const currencyId = e.target.value;
-
     const selected = masters.currency.find(c => c._id === currencyId);
-
     const currencyCode = selected?.value || selected?.code;
-    // depends on how your master is structured
-
-    setFormData((p) => ({
-      ...p,
-      currency: currencyId,
-      fx: FX_DEFAULTS[currencyCode] ?? 1
-    }));
+    setFormData((p) => ({ ...p, currency: currencyId, fx: FX_DEFAULTS[currencyCode] ?? 1 }));
   };
   const setSign = (s) => setFormData((p) => ({ ...p, sign: s }));
 
@@ -437,10 +584,19 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
         <div>
           <SectionHeader icon={Building2} title="Company & Details" iconBg="bg-green-50" iconColor="text-green-600" iconBorder="border-green-200" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1 font-medium text-slate-700">Company *</label>
-              <input name="company" type="text" placeholder="e.g. Maha Bazar GJRT" value={formData.company} onChange={handleChange} className={inputCls} required disabled={isSubmitting} />
+
+            {/* ── Company search dropdown ── */}
+            <div className="md:col-span-2">
+              <label className="block mb-1 font-medium text-slate-700">
+                Company *
+              </label>
+              <CompanySearchDropdown
+                value={formData.company}
+                onChange={(v) => setFormData((p) => ({ ...p, company: v }))}
+                disabled={isSubmitting}
+              />
             </div>
+
             <div>
               <label className="block mb-1 font-medium text-slate-700">Country</label>
               <MasterSelect name="country" value={formData.country} onChange={handleChange} options={masters.country} placeholder="Select country…" disabled={isSubmitting || mastersLoading} />
@@ -521,11 +677,9 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
     <div className={`fixed top-6 right-6 z-[300] max-w-md p-4 rounded-lg shadow-2xl animate-slide-in ${notification.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
       <div className="flex items-start gap-3">
         <div className="shrink-0">
-          {notification.type === "success" ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-          )}
+          {notification.type === "success"
+            ? <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            : <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>}
         </div>
         <div className="flex-1">
           <p className="font-semibold text-sm">{notification.type === "success" ? "Success!" : "Error"}</p>
@@ -566,10 +720,7 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
               {isEditMode && manualFormBody}
               {!isEditMode && activeTab === "manual" && defaultTab !== "import" && manualFormBody}
               {!isEditMode && (activeTab === "import" || defaultTab === "import") && (
-                <ExcelImportPanel
-                  masters={masters}
-                  onSuccess={() => { if (onSuccess) onSuccess(); }}
-                />
+                <ExcelImportPanel masters={masters} onSuccess={() => { if (onSuccess) onSuccess(); }} />
               )}
             </div>
           </div>

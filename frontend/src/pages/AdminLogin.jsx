@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
+import { ShieldCheck, Zap, FileText } from "lucide-react";
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -54,10 +55,10 @@ const AdminLogin = () => {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[#4a7c59] flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white"/>
-              <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
-              <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
-              <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+              <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" />
+              <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)" />
+              <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)" />
+              <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.15)" />
             </svg>
           </div>
           <span className="text-white font-light text-lg tracking-tight" style={{ fontFamily: "'poppins', serif" }}>
@@ -78,17 +79,22 @@ const AdminLogin = () => {
           {/* feature list */}
           <div className="mt-10 space-y-4">
             {[
-              { icon: "🛡️", label: "Secure Dashboard" },
-              { icon: "⚡", label: "Real-time Control" },
-              { icon: "📊", label: "Full Audit Logs" },
-            ].map((f) => (
-              <div key={f.label} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-sm shrink-0">
-                  {f.icon}
+              { icon: ShieldCheck, label: "Secure Dashboard" },
+              { icon: Zap, label: "Real-time Control" },
+              { icon: FileText, label: "Full Audit Logs" },
+            ].map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.label} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4  text-[#7ab98a]" />
+                  </div>
+                  <span className="text-white/60 text-sm font-light">
+                    {f.label}
+                  </span>
                 </div>
-                <span className="text-white/60 text-sm font-light">{f.label}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

@@ -444,7 +444,7 @@ const EditHome = ({ pageTitle }) => {
         </tbody>
       </table>
 
-      {/* --- MINIMALIST PAGINATION NAVBAR --- */}
+      
       <div className="flex items-center justify-between mt-4 py-2 px-4 border-t border-gray-100">
         <span className="text-[13px] text-gray-400">
           {filteredData.length > 0 ? 1 : 0}-{showAllRows ? filteredData.length : Math.min(rowsPerPage, filteredData.length)} of {filteredData.length}

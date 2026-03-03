@@ -303,7 +303,7 @@ const Touch = () => {
                 className="text-[clamp(1.3rem,2.5vw,2rem)] font-light text-[#f5f3ef] tracking-[-0.02em] leading-[1.2] m-0 mb-2"
                 style={{ fontFamily: "'poppins', serif" }}
               >
-                Ready to <em className="not-italic italic text-[#7ab98a]">start</em> a conversation?
+                Ready to <em className="italic text-[#7ab98a]">start</em> a conversation?
               </h2>
               <p className="text-[rgba(245,243,239,0.45)] text-sm leading-[1.7] m-0 font-light max-w-sm">
                 We partner with teams that want to move with purpose — balancing speed, quality, and long-term thinking.

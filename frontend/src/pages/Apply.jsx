@@ -90,16 +90,16 @@ const Apply = () => {
       <div className="w-full mt-20 bg-[#f5f3ef]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
         {/* ── HERO ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pt-20 pb-0">
+        <div className="max-w-7xl mx-auto px-12 pt-20 pb-0">
           <div className="grid grid-cols-[1.2fr_0.8fr] gap-10 items-end mb-12">
             <h1
               className="text-[clamp(3rem,5.5vw,5rem)] font-light leading-[1.05] tracking-[-0.03em] text-[#1a1a1a] m-0"
               style={{ fontFamily: "'poppins', serif" }}
             >
-              Join Our <em className="not-italic italic text-[#4a7c59]">Team</em>
+              Join Our <em className="not-italic  text-[#4a7c59]">Team</em>
             </h1>
             <div className="flex flex-col items-end gap-4 pb-1.5">
-              <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-[280px] m-0">
+              <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-70 m-0">
                 We're excited to learn more about you. Fill out the form and submit your resume to apply for a role at SubDuxion.
               </p>
               <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ const Apply = () => {
         </div>
 
         {/* ── BODY ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pb-0">
+        <div className="max-w-7xl mx-auto px-12 pb-0">
           <div className="grid grid-cols-[1fr_1fr] gap-16 items-start">
 
             {/* LEFT — form */}
@@ -122,7 +122,7 @@ const Apply = () => {
                   className="text-2xl font-light tracking-[-0.02em] text-[#1a1a1a] m-0"
                   style={{ fontFamily: "'poppins', serif" }}
                 >
-                  Tell us about <em className="not-italic italic text-[#4a7c59]">yourself</em>
+                  Tell us about <em className="not-italic  text-[#4a7c59]">yourself</em>
                 </h2>
               </div>
 
@@ -210,12 +210,12 @@ const Apply = () => {
 
             {/* RIGHT — info */}
             <div className="pt-2">
-              <p className="text-xs text-[#4a7c59] font-medium tracking-[0.1em] uppercase mb-4">Why SubDuxion?</p>
+              <p className="text-xs text-[#4a7c59] font-medium tracking-widest uppercase mb-4">Why SubDuxion?</p>
               <p
                 className="text-[clamp(1.4rem,2.5vw,2rem)] font-light leading-[1.45] tracking-[-0.02em] text-[#1a1a1a] mb-10"
                 style={{ fontFamily: "'poppins', serif" }}
               >
-                Build things that <em className="not-italic italic text-[#4a7c59]">matter.</em>
+                Build things that <em className="not-italic  text-[#4a7c59]">matter.</em>
               </p>
 
               {/* Steps */}
@@ -249,7 +249,7 @@ const Apply = () => {
         </div>
 
         {/* ── CTA STRIP ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pt-16 pb-20 grid gap-6 items-stretch" style={{ gridTemplateColumns: "auto 1fr" }}>
+        <div className="max-w-7xl mx-auto px-12 pt-16 pb-20 grid gap-6 items-stretch" style={{ gridTemplateColumns: "auto 1fr" }}>
           <a
             href="/career"
             className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] border-none px-8 rounded-2xl text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-200 no-underline"
@@ -257,10 +257,10 @@ const Apply = () => {
             ← View Open Roles
           </a>
           <div className="bg-[#1a1a1a] rounded-2xl px-12 py-10 flex items-center justify-between gap-8 relative overflow-hidden">
-            <div className="absolute top-[-40px] right-[-40px] w-44 h-44 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(74,124,89,0.35) 0%, transparent 70%)" }} />
+            <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(74,124,89,0.35) 0%, transparent 70%)" }} />
             <div className="relative z-10">
               <h2 className="text-[clamp(1.3rem,2.5vw,2rem)] font-light text-[#f5f3ef] tracking-[-0.02em] leading-[1.2] m-0 mb-2" style={{ fontFamily: "'poppins', serif" }}>
-                Questions before <em className="not-italic italic text-[#7ab98a]">applying?</em>
+                Questions before <em className="not-italic  text-[#7ab98a]">applying?</em>
               </h2>
               <p className="text-[rgba(245,243,239,0.45)] text-sm leading-[1.7] m-0 font-light max-w-sm">
                 Reach out to our team and we'll be happy to answer anything about the role or culture.

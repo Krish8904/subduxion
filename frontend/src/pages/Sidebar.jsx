@@ -231,13 +231,7 @@ const Sidebar = ({
           collapsed={sidebarCollapsed}
           onClick={() => navigate('/admin/analytics')}
         />
-        <NavItem
-          icon={<DollarSign size={20} />}
-          label="Manage Expenses"
-          active={activeSection === 'manageexpense'}
-          collapsed={sidebarCollapsed}
-          onClick={() => navigate('/admin/manageexpense')}
-        />
+        
         <NavItem
           icon={<Briefcase size={20} />}
           label="Career Openings"

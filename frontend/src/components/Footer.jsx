@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook , Instagram} from "lucide-react";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -8,6 +8,7 @@ const Footer = () => {
   const links = [
     { label: "Services", path: "/services" },
     { label: "Use Cases", path: "/usecases" },
+    { label: "About Us", path: "/company" },
     { label: "Careers", path: "/careers" },
     { label: "Contact", path: "/contact" },
     { label: "Inquire", path: "/contact" },
@@ -19,33 +20,33 @@ const Footer = () => {
     <footer className="bg-[#1a1a1a] text-[#f5f3ef]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
       {/* ── TOP STRIP ── */}
-      <div className="max-w-[1280px] mx-auto px-12 pt-16 pb-12 border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-12 pt-10 pb-8 border-b border-white/10">
         <div className="grid grid-cols-[1.4fr_1fr_1fr_0.8fr] gap-12 items-start">
 
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-lg bg-[#4a7c59] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-[#4a7c59] flex items-center justify-center shrink-0">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white"/>
-                  <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
-                  <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)"/>
-                  <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+                  <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" />
+                  <rect x="9" y="1" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)" />
+                  <rect x="1" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.35)" />
+                  <rect x="9" y="9" width="6" height="6" rx="1.5" fill="rgba(255,255,255,0.15)" />
                 </svg>
               </div>
-              <span className="text-white font-light text-lg tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
+              <span className="text-white font-light text-2xl tracking-tight" style={{ fontFamily: "'Georgia', serif" }}>
                 Sub<em>Duxion</em>
               </span>
             </div>
-            <p className="text-[0.85rem] text-white/40 leading-[1.75] font-light max-w-[260px] m-0">
-              We design, build, and operate intelligent systems for organizations worldwide — with efficiency and reliability.
+            <p className="text-[0.85rem] text-white/40 leading-[1.75] font-light max-w-65 m-0">
+              We design, build, and operate intelligent systems for organizations worldwide — combining advanced technology, operational precision, and dependable performance to drive sustained competitive advantage.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Quick Links</p>
-            <ul className="list-none m-0 p-0 space-y-2">
+            <p className="text-xs text-[#4a7c59] font-medium tracking-widest uppercase mb-5">Quick Links</p>
+            <ul className="list-none m-0 p-0 grid grid-cols-2 gap-y-3 gap-x-6">
               {links.map((l) => (
                 <li key={l.label}>
                   <button
@@ -57,11 +58,12 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
+
           </div>
 
           {/* Contact */}
           <div>
-            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Contact</p>
+            <p className="text-xs text-[#4a7c59] font-medium tracking-widest uppercase mb-5">Contact</p>
             <ul className="list-none m-0 p-0 space-y-3">
               {[
                 { icon: Mail, text: "info@example.com" },
@@ -78,11 +80,12 @@ const Footer = () => {
 
           {/* Socials */}
           <div>
-            <p className="text-xs text-white/30 font-medium tracking-[0.1em] uppercase mb-5">Follow Us</p>
+            <p className="text-xs text-[#4a7c59] font-medium tracking-widest uppercase mb-5">Follow Us</p>
             <div className="flex flex-col gap-3">
               {[
                 { icon: Linkedin, label: "LinkedIn" },
                 { icon: Twitter, label: "Twitter" },
+                { icon: Instagram, label: "Instagram" },
                 { icon: Facebook, label: "Facebook" },
               ].map(({ icon: Icon, label }) => (
                 <button
@@ -99,18 +102,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
-      {/* ── BOTTOM BAR ── */}
-      <div className="max-w-[1280px] mx-auto px-12 py-5 flex items-center justify-between">
-        <p className="text-[0.78rem] text-white/25 font-light m-0">
-          © {new Date().getFullYear()} SubDuxion. All rights reserved.
-        </p>
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4a7c59]" />
-          <span className="text-[0.78rem] text-white/25 font-light">Designed with purpose</span>
-        </div>
-      </div>
-
     </footer>
   );
 };

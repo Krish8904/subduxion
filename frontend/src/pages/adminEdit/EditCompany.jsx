@@ -730,106 +730,12 @@ const EditCompany = ({ pageTitle }) => {
               <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl leading-none cursor-pointer">&times;</button>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-white">
-              <div className="w-full">
-                {getSortedSections().map((section) => {
-                  const { id, data, isCustom } = section;
-
-                  // Render custom sections
-                  if (isCustom) {
-                    return renderCustomSection(id);
-                  }
-
-                  // Render built-in sections
-                  if (id === 'hero') {
-                    return (
-                      <section key={id} className="bg-gray-900 text-white py-24 text-center">
-                        <div className="max-w-7xl mx-auto px-6">
-                          <h1 className="text-5xl md:text-6xl font-bold mb-6">{data.mainText}</h1>
-                          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">{data.secondaryText}</p>
-                        </div>
-                      </section>
-                    );
-                  }
-
-                  if (id === 'section1') {
-                    return (
-                      <section key={id} className="py-24 text-left">
-                        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16">
-                          <div>
-                            <h2 className="text-4xl font-bold mb-6 text-gray-900">{data.left?.heading}</h2>
-                            <p className="text-gray-600 text-lg leading-relaxed">{data.left?.text}</p>
-                          </div>
-                          <div className="bg-gray-100 rounded-32px p-12">
-                            <h3 className="font-bold text-2xl mb-6 text-gray-800">{data.right?.heading}</h3>
-                            <ul className="space-y-4 text-gray-700 text-lg">
-                              {data.right?.points?.map((p, i) => (
-                                <li key={i} className="flex gap-3 items-start"><span className="text-blue-600 font-black">•</span> {p}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </section>
-                    );
-                  }
-
-                  if (id === 'section2') {
-                    return (
-                      <section key={id} className="bg-gray-50 py-24 text-center">
-                        <div className="max-w-7xl mx-auto px-6">
-                          <h2 className="text-4xl font-bold mb-16 text-gray-900">{data.mainText}</h2>
-                          <div className="grid md:grid-cols-3 gap-8">
-                            {data.cards?.map((card, i) => (
-                              <div key={i} className="bg-white p-10 rounded-3xl shadow-sm text-left border border-gray-100">
-                                <h3 className="text-2xl font-bold mb-4 text-gray-900">{card.heading}</h3>
-                                <p className="text-gray-600 leading-relaxed">{card.description}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </section>
-                    );
-                  }
-
-                  if (id === 'section3') {
-                    return (
-                      <section key={id} className="py-24 text-center">
-                        <div className="max-w-6xl mx-auto px-6">
-                          <h2 className="text-4xl font-bold mb-16 text-gray-900">{data.mainText}</h2>
-                          <div className="grid md:grid-cols-4 gap-8">
-                            {data.steps?.map((step, i) => (
-                              <div key={i} className="bg-gray-100 rounded-[40px] p-8 border border-white shadow-sm">
-                                <h4 className="font-bold text-xl text-gray-900 mb-2">{step.heading}</h4>
-                                <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </section>
-                    );
-                  }
-
-                  if (id === 'section4') {
-                    return (
-                      <section key={id} className="bg-gray-900 text-white py-24 text-center">
-                        <div className="max-w-6xl mx-auto px-6">
-                          <h2 className="text-4xl text-blue-600 font-bold mb-6">{data.above?.mainText}</h2>
-                          <p className="text-gray-300 text-lg mb-16 max-w-3xl mx-auto">{data.above?.secondaryText}</p>
-                          <hr className="mb-16 opacity-20" />
-                          <h2 className="text-4xl text-blue-600 font-bold mb-6">{data.below?.mainText}</h2>
-                          <p className="text-gray-300 text-lg mb-10">{data.below?.secondaryText}</p>
-                          <button className="bg-white text-black px-12 py-5 rounded-2xl font-black shadow-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-sm">
-                            {data.button?.label}
-                          </button>
-                        </div>
-                      </section>
-                    );
-                  }
-
-                  return null;
-                })}
-              </div>
-            </div>
+            <iframe
+              src="/company"
+              className="flex-1 w-full border-none"
+              title="Company Preview"
+            />
+            
             <div className="p-4 border-t flex justify-end bg-gray-50 px-10">
               <button onClick={() => setShowFullPreview(false)} className="bg-slate-900 text-white px-10 py-2 rounded-xl font-bold uppercase text-xs cursor-pointer shadow-lg hover:bg-black">Close Preview</button>
             </div>

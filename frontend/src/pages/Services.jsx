@@ -43,7 +43,7 @@ const Services = () => {
           // ── HERO ──
           if (key === "hero") {
             return (
-              <section key={key} className="max-w-[1280px] mx-auto px-12 pt-20 pb-0">
+              <section key={key} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
                 <div className="grid grid-cols-[1.2fr_0.8fr] gap-10 items-end mb-12">
                   <h1
                     className="text-[clamp(3rem,5.5vw,5rem)] font-light leading-[1.05] tracking-[-0.03em] text-[#1a1a1a] m-0"
@@ -52,11 +52,11 @@ const Services = () => {
                     {section.mainText}
                   </h1>
                   <div className="flex flex-col items-end gap-6 pb-1.5">
-                    <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-[280px] m-0">
+                    <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-70 m-0">
                       {section.secondaryText}
                     </p>
                     <div className="flex items-center gap-4">
-                      <span className="text-xs text-[#aaa] tracking-[0.1em] uppercase font-medium">Since 2015</span>
+                      <span className="text-xs text-[#aaa] tracking-widest uppercase font-medium">Since 2015</span>
                       <Link
                         to="/contact"
                         className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] px-6 py-3.5 rounded-full text-sm font-medium no-underline transition-all duration-200 tracking-[0.02em]"
@@ -75,13 +75,13 @@ const Services = () => {
           if (key === "services") {
             const services = section.items || [];
             return (
-              <section key={key} className="max-w-[1280px] mx-auto px-12 pt-4 pb-10">
+              <section key={key} className="max-w-7xl mx-auto px-12 pt-4 pb-10">
                 <div className="flex items-end justify-between mb-12 pb-6 border-b border-[#d4d0c8]">
                   <h2
                     className="text-[clamp(1.8rem,3vw,2.8rem)] font-light tracking-[-0.02em] text-[#1a1a1a] m-0 leading-[1.1]"
                     style={{ fontFamily: "'poppins', serif" }}
                   >
-                    Our Services <em className="not-italic italic text-[#4a7c59]">&amp;</em> Works
+                    Our Services <em className="not-italic  text-[#4a7c59]">&amp;</em> Works
                   </h2>
                   <span className="text-[0.8rem] text-[#aaa] tracking-[0.08em] uppercase font-medium pb-1">
                     {String(services.length).padStart(2, "0")} Services
@@ -91,7 +91,7 @@ const Services = () => {
                   {services.map((item, i) => (
                     <li
                       key={i}
-                      className="grid items-center gap-7 px-4 py-5 border-b border-[#d4d0c8] rounded-xl cursor-pointer transition-all duration-200 hover:bg-[#eceae4] hover:pl-6 first:border-t first:border-[#d4d0c8] group"
+                      className="grid items-center gap-7 px-4 py-5 border-b border-[#d4d0c8] rounded-xl  transition-all duration-200 hover:bg-[#eceae4] hover:pl-6 first:border-t first:border-[#d4d0c8] group"
                       style={{ gridTemplateColumns: "60px 1fr 1fr auto auto" }}
                       onMouseEnter={() => setHoveredService(i)}
                       onMouseLeave={() => setHoveredService(null)}
@@ -108,7 +108,7 @@ const Services = () => {
                       >
                         {item.title}
                       </span>
-                      <span className="text-[0.875rem] text-[#999] leading-[1.65] font-light max-w-[340px]">
+                      <span className="text-[0.875rem] text-[#999] leading-[1.65] font-light max-w-85">
                         {item.desc}
                       </span>
                       <img
@@ -118,12 +118,12 @@ const Services = () => {
                             : "/placeholder.png"
                         }
                         alt={item.title}
-                        className="w-[100px] h-[68px] rounded-lg object-cover bg-[#ddd] shrink-0 opacity-0 scale-95 translate-y-1 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0"
+                        className="w-25 h-17 rounded-lg object-cover bg-[#ddd] shrink-0 opacity-0 scale-95 translate-y-1 transition-all duration-350 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0"
                       />
                       <Link
                         to="/contact"
                         aria-label={`Go to ${item.title}`}
-                        className="w-11 h-11 rounded-full border border-[#c8c4bc] bg-transparent text-[#999] flex items-center justify-center text-base shrink-0 no-underline transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] -rotate-45 scale-90 group-hover:bg-[#4a7c59] group-hover:text-[#f5f3ef] group-hover:border-[#4a7c59] group-hover:rotate-0 group-hover:scale-100"
+                        className="w-11 h-11 rounded-full border border-[#c8c4bc] bg-transparent text-[#999] flex items-center justify-center text-base shrink-0 no-underline transition-all duration-250 ease-[cubic-bezier(0.34,1.56,0.64,1)] -rotate-45 scale-90 group-hover:bg-[#4a7c59] group-hover:text-[#f5f3ef] group-hover:border-[#4a7c59] group-hover:rotate-0 group-hover:scale-100"
                       >
                         →
                       </Link>
@@ -139,18 +139,18 @@ const Services = () => {
             return (
               <div
                 key={key}
-                className="max-w-[1280px] mx-auto px-12 pt-6 pb-20 grid gap-6 items-stretch"
+                className="max-w-7xl mx-auto px-12 pt-6 pb-20 grid gap-6 items-stretch"
                 style={{ gridTemplateColumns: "auto 1fr" }}
               >
                 <button
-                  onClick={() => navigate("/services/servicesform")}
+                  onClick={() => navigate("/contact")}
                   className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] border-none px-8 rounded-2xl text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-200"
                 >
                   Book a Service ↗
                 </button>
                 <div className="bg-[#1a1a1a] rounded-2xl px-12 py-10 flex items-center justify-between gap-8 relative overflow-hidden">
                   <div
-                    className="absolute top-[-40px] right-[-40px] w-44 h-44 rounded-full pointer-events-none"
+                    className="absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none"
                     style={{ background: "radial-gradient(circle, rgba(74,124,89,0.35) 0%, transparent 70%)" }}
                   />
                   <div className="relative z-10">
@@ -180,7 +180,7 @@ const Services = () => {
           return (
             <section
               key={key}
-              className="max-w-[1280px] mx-auto px-12 py-16"
+              className="max-w-7xl mx-auto px-12 py-16"
               style={{ textAlign: section.alignment || "left" }}
             >
               <h2

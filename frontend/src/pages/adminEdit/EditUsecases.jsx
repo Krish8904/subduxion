@@ -246,7 +246,7 @@ const EditUsecases = () => {
         ...currentPage,
         sections: updatedSections
       });
-      
+
       await fetchData();
       setEditingSection(null);
       alert("✅ Section deleted successfully!");
@@ -542,78 +542,11 @@ const EditUsecases = () => {
               </div>
               <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl">&times;</button>
             </div>
-            <div className="flex-1 overflow-y-auto bg-white">
-              {getSortedSections().map((section, index) => {
-                const { id, data, isCustom } = section;
-
-                // Render custom sections
-                if (isCustom) {
-                  return renderCustomSection(id, index);
-                }
-
-                // Render built-in sections
-                if (id === 'hero') {
-                  return (
-                    <section key={id} className="bg-gray-900 text-white py-24">
-                      <div className="max-w-7xl mx-auto px-6 text-center">
-                        <h1 className="text-5xl font-bold mb-6">{data?.mainText}</h1>
-                        <p className="text-lg text-gray-300 max-w-3xl mx-auto">{data?.secondaryText}</p>
-                      </div>
-                    </section>
-                  );
-                }
-
-                if (id === 'usecases') {
-                  return s.usecases?.items?.map((uc, i) => (
-                    <section key={`usecase-${i}`} className={`py-20 ${i % 2 !== 0 ? "bg-gray-50" : "bg-white"}`}>
-                      <div className={`max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center ${i % 2 !== 0 ? "md:flex-row-reverse" : ""}`}>
-                        <div className={i % 2 !== 0 ? "order-1 md:order-2" : ""}>
-                          <span className="text-blue-600 text-xl font-semibold">{uc.category}</span>
-                          <h2 className="text-3xl font-bold mt-2 mb-4 text-black">{uc.title}</h2>
-                          <p className="text-gray-600 mb-4">{uc.description}</p>
-                          <ul className="space-y-2 text-gray-700">
-                            {uc.highlights?.map((h, hIdx) => (
-                              <li key={hIdx}>• {h}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className={`bg-gray-100 rounded-2xl p-8 shadow-sm ${i % 2 !== 0 ? "order-2 md:order-1" : ""}`}>
-                          <h4 className="font-semibold mb-4 text-black">Outcome</h4>
-                          <div className="flex flex-col gap-3">
-                            {uc.outcome?.map((o, oIdx) => (
-                              <div key={oIdx} className="flex items-start gap-3">
-                                <span className="mt-1 text-blue-600">▶</span>
-                                <p className="text-gray-600">{o}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </section>
-                  ));
-                }
-
-                if (id === 'cta') {
-                  return (
-                    <section key={id} className="bg-linear-to-b from-gray-900 to-black py-20 text-white">
-                      <div className="max-w-6xl mx-auto px-6 text-center">
-                        <h2 className="text-4xl font-bold mb-6">{data?.mainText}</h2>
-                        <p className="text-gray-300 max-w-3xl pb-3 mx-auto text-lg mb-8">{data?.secondaryText}</p>
-                        <hr className="pb-10 opacity-20" />
-                        <h2 className="text-4xl font-bold mb-4">{data?.contactText}</h2>
-                        <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-6">{data?.contactDescription}</p>
-                        <div className="flex justify-center gap-6">
-                          <button className="bg-white text-black px-8 py-4 rounded-xl font-semibold">Contact Us</button>
-                          <button className="border-white px-8 py-4 font-bold border rounded-xl">About Us</button>
-                        </div>
-                      </div>
-                    </section>
-                  );
-                }
-
-                return null;
-              })}
-            </div>
+            <iframe
+              src="/usecases"
+              className="flex-1 w-full border-none"
+              title="Company Preview"
+            />
           </div>
         </div>
       )}

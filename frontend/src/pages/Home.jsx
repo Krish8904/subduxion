@@ -78,11 +78,11 @@ export default function Home() {
                   </p>
                   <div className="flex items-center gap-3">
                     {Array.isArray(section.buttons) && section.buttons.map((btn, i) => (
-                      <a href={btn.link || "/services"} key={i} className="no-underline">
+                      <a href={btn.link || "/call"} key={i} className="no-underline">
                         {i === 0 ? (
                           <button className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] px-6 py-3.5 rounded-full text-[0.85rem] font-medium border-none cursor-pointer transition-all duration-200 tracking-[0.02em]">
                             {btn.label}
-                            <span className="w-[22px] h-[22px] rounded-full bg-[#f5f3ef] text-[#1a1a1a] flex items-center justify-center text-[0.75rem]">↗</span>
+                            <span className="w-5.5 h-5.5 rounded-full bg-[#f5f3ef] text-[#1a1a1a] flex items-center justify-center text-[0.75rem]">↗</span>
                           </button>
                         ) : (
                           <button className="inline-flex items-center bg-transparent text-[#888] hover:text-[#1a1a1a] px-5 py-3.5 rounded-full text-[0.85rem] font-light border border-[#d4d0c8] hover:border-[#888] cursor-pointer transition-all duration-200">
@@ -109,9 +109,9 @@ export default function Home() {
                   {section.image && <img src={`${import.meta.env.VITE_API_URL}${section.image}`} alt="Intro" className="w-full h-full object-cover" />}
                 </div>
                 <div>
-                  <p className="text-xs text-[#4a7c59] font-medium tracking-widest uppercase mb-4">Who We Are</p>
+                  <p className="text-sm text-[#4a7c59] font-medium tracking-widest uppercase mb-4">Who We Are <span className="text-[#4a7c59] text-2xl">↴</span></p>
                   <p
-                    className="text-[clamp(1.4rem,2.5vw,2rem)] font-light leading-[1.45] tracking-[-0.02em] text-[#1a1a1a] m-0"
+                    className="text-3xl font-light leading-[1.45] tracking-[-0.02em] text-[#1a1a1a] m-0"
                     style={{ fontFamily: "'poppins', serif" }}
                   >
                     {section.secondaryText || "Applied AI built on data sovereignty."}

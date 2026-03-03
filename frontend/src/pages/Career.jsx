@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Clock } from "lucide-react";
 
 const Career = () => {
   const navigate = useNavigate();
+  const openingsRef = useRef(null);
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hoveredJob, setHoveredJob] = useState(null);
@@ -61,19 +62,28 @@ const Career = () => {
         if (type === "hero") {
           return (
             <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-10 items-end mb-5 lg:mb-10">
+              <div className="grid grid-cols-1 mt-20 lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-10 items-end mb-5 lg:mb-10">
                 <h1 className="font-fraunces text-[clamp(3rem,5.5vw,5rem)] font-light leading-tight tracking-tight text-[#1a1a1a] mb-0">
                   {data.mainText || "Join Our Team"}
                 </h1>
-                <div className="flex flex-col items-start lg:items-end gap-6 pb-1.5">
+                <div className="flex flex-col items-start lg:items-end mr-10 gap-6 pb-1.5">
                   <p className="font-light text-sm text-[#888] leading-relaxed text-left lg:text-right max-w-70 mb-0">
                     {data.secondaryText}
                   </p>
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-[#aaa] tracking-wider uppercase font-medium">We're Hiring</span>
-                    <button 
+                    <button
                       className="group inline-flex items-center gap-2.5 bg-[#1a1a1a] text-[#f5f3ef] px-6.5 py-3.25 rounded-full font-dm-sans text-xs font-medium no-underline tracking-tight border-none cursor-pointer transition-all duration-300 hover:bg-[#4a7c59] hover:scale-[1.03]"
-                      onClick={() => navigate("/career/applyforjobs")}
+                      onClick={() => {
+                        openingsRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+
+                        setTimeout(() => {
+                          window.scrollBy({ top: -100, behavior: "smooth" });
+                        }, 300);
+                      }}
                     >
                       See Openings
                       <span className="w-5.5 h-5.5 rounded-full bg-[#f5f3ef] text-[#1a1a1a] flex items-center justify-center text-xs">↗</span>
@@ -111,10 +121,14 @@ const Career = () => {
             </section>
           );
         }
-        
+
         if (type === "jobCategories") {
           return (
-            <section key={id} className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+            <section
+              key={id}
+              ref={openingsRef}
+              className="max-w-7xl mx-auto px-12 pt-20 pb-0"
+            >
               <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 pb-6 border-b border-[#d4d0c8]">
                 <h2 className="font-fraunces text-[clamp(1.8rem,3vw,2.6rem)] font-light tracking-tight text-[#1a1a1a] mb-0 leading-tight lg:mb-0">
                   Open <em className="italic text-[#4a7c59]">Positions</em>
@@ -187,7 +201,7 @@ const Career = () => {
         if (type === "contactCTA") {
           return (
             <div key={id} className="max-w-7xl mx-auto px-12 pt-15 pb-20 grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-stretch">
-              <button 
+              <button
                 className="inline-flex items-center gap-2.5 bg-[#1a1a1a] text-[#f5f3ef] border-none px-8 py-0 rounded-xl font-dm-sans text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-300 hover:bg-[#4a7c59] lg:py-4 lg:px-7"
                 onClick={() => navigate("/career/applyforjobs")}
               >
@@ -202,14 +216,14 @@ const Career = () => {
                     {data.text}
                   </p>
                 </div>
-                <button 
+                <button
                   className="inline-flex items-center gap-2.5 bg-[#f5f3ef] text-[#1a1a1a] px-7 py-3.5 rounded-full font-dm-sans font-medium text-sm border-none cursor-pointer whitespace-nowrap transition-all duration-300 relative z-10 shrink-0 hover:bg-[#7ab98a] hover:scale-[1.04]"
                   onClick={() => navigate("/career/applyforjobs")}
                 >
                   <span className="w-2 h-2 rounded-full bg-[#4a7c59] shrink-0" />
                   {data.buttonText}
                 </button>
-                <div className="absolute -top-10 -right-10 w-[180px] h-[180px] rounded-full bg-[radial-gradient(circle,rgba(74,124,89,0.35)_0%,transparent_70%)] pointer-events-none" />
+                <div className="absolute -top-10 -right-10 w-45 h-45 rounded-full bg-[radial-gradient(circle,rgba(74,124,89,0.35)_0%,transparent_70%)] pointer-events-none" />
               </div>
             </div>
           );

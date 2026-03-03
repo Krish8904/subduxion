@@ -55,16 +55,16 @@ const Call = () => {
       <div className="w-full mt-20 bg-[#f5f3ef]">
 
         {/* ── HERO ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pt-20 pb-0">
-          <div className="grid grid-cols-[1.2fr_0.8fr] gap-10 items-end mb-12">
+        <div className="max-w-7xl mx-auto px-12 pt-20 pb-0">
+          <div className="grid grid-cols-[1.2fr_0.8fr] gap-10 items-end mb-22">
             <h1
               className="text-[clamp(3rem,5.5vw,5rem)] font-light leading-[1.05] tracking-[-0.03em] text-[#1a1a1a] m-0"
               style={{ fontFamily: "'Georgia', serif" }}
             >
-              Book a <em className="not-italic italic text-[#4a7c59]">Consultation</em>
+              Book a <em className="not-italic  text-[#4a7c59]">Consultation</em>
             </h1>
             <div className="flex flex-col items-end gap-5 pb-1.5">
-              <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-[280px] m-0">
+              <p className="text-sm text-[#888] leading-[1.75] font-light text-right max-w-70 m-0">
                 Schedule a one-on-one session with our experts and get a clear path forward for your project.
               </p>
               <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ const Call = () => {
         </div>
 
         {/* ── BODY ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pt-16 pb-0">
+        <div className="max-w-7xl mx-auto px-12 pt-16 pb-0">
           <div className="grid grid-cols-[1fr_1fr] gap-16 items-start">
 
             {/* LEFT — what to expect */}
@@ -109,7 +109,7 @@ const Call = () => {
                   className="text-[clamp(1.8rem,3vw,2.4rem)] font-light tracking-[-0.02em] text-[#1a1a1a] m-0 leading-[1.1]"
                   style={{ fontFamily: "'Georgia', serif" }}
                 >
-                  What to <em className="not-italic italic text-[#4a7c59]">Expect</em>
+                  What to <em className="not-italic text-[#4a7c59]">Expect</em>
                 </h2>
                 <span className="text-xs text-[#aaa] tracking-[0.08em] uppercase font-medium pb-1">
                   {String(perks.length).padStart(2, "0")} Perks
@@ -151,7 +151,7 @@ const Call = () => {
                 className="text-2xl font-light tracking-[-0.02em] text-[#1a1a1a] mb-8"
                 style={{ fontFamily: "'Georgia', serif" }}
               >
-                Let's find a <em className="not-italic italic text-[#4a7c59]">time</em> that works
+                Let's find a <em className="not-italic  text-[#4a7c59]">time</em> that works
               </h3>
 
               <form onSubmit={handleBookCall} className="space-y-5">
@@ -230,7 +230,7 @@ const Call = () => {
         </div>
 
         {/* ── CTA STRIP ── */}
-        <div className="max-w-[1280px] mx-auto px-12 pt-16 pb-20 grid grid-cols-[auto_1fr] gap-6 items-stretch">
+        <div className="max-w-7xl mx-auto px-12 pt-16 pb-20 grid grid-cols-[auto_1fr] gap-6 items-stretch">
           <button
             onClick={() => window.history.back()}
             className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] border-none px-8 rounded-2xl text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-200"
@@ -239,15 +239,15 @@ const Call = () => {
           </button>
           <div className="bg-[#1a1a1a] rounded-2xl px-12 py-10 flex items-center justify-between gap-8 relative overflow-hidden">
             <div
-              className="absolute top-[-40px] right-[-40px] w-44 h-44 rounded-full pointer-events-none"
+              className="absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none"
               style={{ background: "radial-gradient(circle, rgba(74,124,89,0.35) 0%, transparent 70%)" }}
             />
             <div className="relative z-10">
               <h2
                 className="text-[clamp(1.3rem,2.5vw,2rem)] font-light text-[#f5f3ef] tracking-[-0.02em] leading-[1.2] m-0 mb-2"
-                style={{ fontFamily: "'Georgia', serif" }}
+                style={{ fontFamily: "'poppins', serif" }}
               >
-                Not ready to call? <em className="not-italic italic text-[#7ab98a]">Write to us.</em>
+                Not ready to call? <em className="not-italic text-[#7ab98a]">Write to us.</em>
               </h2>
               <p className="text-[rgba(245,243,239,0.45)] text-sm leading-[1.7] m-0 font-light max-w-sm">
                 Send a message and a real person from our team will get back to you within 24 hours.

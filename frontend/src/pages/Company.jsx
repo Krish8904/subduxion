@@ -196,12 +196,9 @@ const Company = () => {
           return (
             <div
               key={id}
-              className="max-w-7xl mx-auto px-12 pt-16 pb-20 grid gap-6 items-stretch"
+              className="max-w-7xl mx-auto px-12 pt-16 pb-20  items-stretch"
               style={{ gridTemplateColumns: "auto 1fr" }}
             >
-              <button className="inline-flex items-center gap-2.5 bg-[#1a1a1a] hover:bg-[#4a7c59] text-[#f5f3ef] border-none px-8 rounded-2xl text-sm font-medium cursor-pointer whitespace-nowrap transition-all duration-200">
-                Our Story ↗
-              </button>
               <div className="bg-[#1a1a1a] rounded-2xl px-12 py-10 flex items-center justify-between gap-8 relative overflow-hidden">
                 <div
                   className="absolute top-[-40px] right-[-40px] w-44 h-44 rounded-full pointer-events-none"
@@ -209,7 +206,7 @@ const Company = () => {
                 />
                 <div className="relative z-10">
                   <h2
-                    className="text-[clamp(1.1rem,2vw,1.6rem)] font-light text-[#7ab98a] tracking-[-0.02em] leading-[1.2] m-0 mb-1 italic"
+                    className="text-3xl font-light text-[#7ab98a] tracking-[-0.02em] leading-[1.] m-0 mb-1 italic"
                     style={{ fontFamily: "'poppins', serif" }}
                   >
                     {data.above?.mainText || "Built for momentum"}

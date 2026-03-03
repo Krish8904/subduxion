@@ -210,8 +210,15 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/pages');
-      const pages = await response.json();
+      const [pagesRes, companiesRes, jobAppsRes] = await Promise.all([
+        fetch('http://localhost:5000/api/pages'),
+        axios.get('http://localhost:5000/api/companies'),
+        axios.get('http://localhost:5000/api/career/applications'),
+      ]);
+
+      const pages = await pagesRes.json();
+      const companiesCount = companiesRes.data.success ? companiesRes.data.data.length : 0;
+      const jobAppsCount = jobAppsRes.data.length || 0;
 
       let servicesCount = 0;
       let useCasesCount = 0;
@@ -236,6 +243,8 @@ export default function AdminDashboard() {
         openRoles: openRolesCount,
         totalVisitors: 0,
         activeLeads: 0,
+        companiesCount,
+        jobAppsCount,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -441,7 +450,27 @@ export default function AdminDashboard() {
       } else if (activeSection === 'analytics') {
         crumbs.push({ label: 'Analytics', action: null });
       } else if (activeSection === 'manageexpense') {
-        crumbs.push({ label: 'Expense Management', action: null });
+
+        // Companies
+        crumbs.push({
+          label: 'Companies',
+          action: () => {
+            navigate('/admin');
+            setCompaniesExpanded(true);
+          }
+        });
+
+        // Expense Management (clickable)
+        crumbs.push({
+          label: 'Expense Management',
+          action: () => navigate('/admin/expense-inquiries')
+        });
+
+        // Create Expense (current page)
+        crumbs.push({
+          label: 'Create Expense',
+          action: null
+        });
       } else if (activeSection === 'settings') {
         crumbs.push({ label: 'Settings', action: null });
       } else if (activeSection === 'logs') {
@@ -547,11 +576,13 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
             <StatCard icon={<Briefcase size={24} />} value={stats.openRoles} label="Open Roles" color="from-blue-500 to-blue-600" delay={0} />
             <StatCard icon={<Wrench size={24} />} value={stats.services} label="Total Services" color="from-purple-500 to-purple-600" delay={100} />
             <StatCard icon={<Building2 size={24} />} value={stats.useCases} label="Total Use Cases" color="from-orange-500 to-orange-600" delay={200} />
             <StatCard icon={<LucidePhoneCall size={24} />} value={bookingCount} label="Call Bookings" color="from-green-500 to-green-600" delay={300} />
+            <StatCard icon={<Building2 size={24} />} value={stats.companiesCount ?? 0} label="Registered Companies" color="from-yellow-400 to-yellow-500" delay={300} />
+            <StatCard icon={<Users size={24} />} value={stats.jobAppsCount ?? 0} label="Job Applications" color="from-pink-500 to-pink-600" delay={400} />
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-fade-in-up" style={{ animationDelay: '400ms' }}>
