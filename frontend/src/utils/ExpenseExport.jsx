@@ -180,21 +180,21 @@ const ExpenseExport = ({ data, fileName = "ExpenseInquiries" }) => {
         >
           <div
             onClick={() => { handleExport("pdf"); setExportOpen(false); }}
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-800 transition cursor-pointer"
           >
             PDF (.pdf)
           </div>
           <div className="border-t border-gray-100" />
           <div
             onClick={() => { handleExport("xlsx"); setExportOpen(false); }}
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-800 transition cursor-pointer"
           >
             Excel (.xlsx)
           </div>
           <div className="border-t border-gray-100" />
           <div
             onClick={() => { handleExport("docx"); setExportOpen(false); }}
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-800 transition cursor-pointer"
           >
             Word (.docx)
           </div>

@@ -52,7 +52,7 @@ export const adminLogin = async (req, res) => {
       return res.status(400).json({ message: "Captcha failed"});
     }
 
-    if (email === "admin@example.com" && password === "admin123") {
+    if (email === "admin@subduxion.com" && password === "admin123") {
       console.log("LOGIN SUCCESS ✅\n");
       return res.status(200).json({ message: "Login success"});
     } else {

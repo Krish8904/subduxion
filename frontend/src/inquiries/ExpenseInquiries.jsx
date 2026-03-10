@@ -171,7 +171,7 @@ function SortBar({ search, onSearch, sortValue, onSort }) {
         <button onClick={() => setOpen((v) => !v)}
           className="inline-flex cursor-pointer items-center gap-1.5 px-3 py-2 text-sm font-semibold border rounded-lg transition-all whitespace-nowrap"
           style={{
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Poppins', sans-serif  ",
             background: sortValue ? "#ede9fe" : "white",
             color: sortValue ? "#3730a3" : "#374151",
             border: sortValue ? "1px solid #c4b5fd" : "1px solid #d1d5db",
@@ -532,7 +532,7 @@ const ExpenseInquiries = () => {
                         openImport();
                         setActionsOpen(false);
                       }}
-                      className="w-full flex cursor-pointer items-center gap-3 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition"
+                      className="w-full flex cursor-pointer items-center gap-3 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-800 transition"
                     >
                       <FilePlus size={16} />
                       Import
@@ -568,7 +568,6 @@ const ExpenseInquiries = () => {
                   </span>
                 )}
               </button>
-
             </div>
           </div>
         </div>
@@ -590,7 +589,7 @@ const ExpenseInquiries = () => {
           </div>
           <div className="px-3 pb-6">
             {paginated.length === 0 ? <EmptyState /> : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {paginated.map((e, idx) => (
                   <ExpenseCard key={e._id} tx={e} index={(page - 1) * pageSize + idx + 1}
                     onEdit={openEdit} typeColors={typeColors} />

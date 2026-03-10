@@ -74,7 +74,7 @@ export default function Header() {
             scrolled ? "max-h-0 opacity-0 py-0 px-12" : "max-h-20 opacity-100 py-2 px-12",
           ].join(" ")}
         >
-          <span className="w-1.25 h-1.25 rounded-full bg-[#4a7c59] shrink-0" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#37804d] " />
           <span>Applied AI solutions for modern businesses —</span>
           <a
             href="/services"
@@ -84,7 +84,7 @@ export default function Header() {
           </a>
         </div>
 
-        {/* ── Main nav ── */}
+        {/* ── Main nav ── */}  
         <div
           className={[
             "bg-[#f5f3ef] border-b border-[#d4d0c8] transition-all duration-300",

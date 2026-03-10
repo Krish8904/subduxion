@@ -33,7 +33,7 @@ import AllLogs from "./components/AllLogs";
 import CompanyInquiries from "./inquiries/CompanyInquiries";
 import Analytics from "./pages/adminEdit/Analytics";
 import ServicesForm from "./components/ServicesForm";
-{/*----------Masters-------- */}
+{/*----------Masters-------- */ }
 import AdminNatureOfBusiness from "./mastersPages/AdminNatureOfBusiness";
 import Channel from "./mastersPages/Channel";
 import Category from "./mastersPages/Category";
@@ -44,6 +44,7 @@ import ExpenseInquiries from "./inquiries/ExpenseInquiries";
 import Country from "./mastersPages/Country";
 import ExpenseCurrency from "./mastersPages/Currency";
 import MastersPage from "./mastersPages/MasterPage";
+import Settings from "./pages/Settings";
 
 
 function App() {
@@ -105,6 +106,7 @@ function App() {
           <Route path="inquiries/contact" element={<ContactInquiries />} />
           <Route path="inquiries/job" element={<JobInquiries />} />
           <Route path="expense-inquiries" element={<ExpenseInquiries />} />
+          <Route path="settings" element={<Settings />} />
 
           <Route path="logs" element={<Logs />} />
           <Route path="createcareer" element={<AddSection />} />
@@ -114,15 +116,16 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="manageexpense" element={<ExpenseForm />} />
 
-          {/*----------Masters-------- */}  
-          <Route path="mainmasters" element={<MastersPage/>} />          
-          <Route path="mainmasters/natureofbusiness" element={<AdminNatureOfBusiness />} />          
-          <Route path="mainmasters/channel" element={<Channel />} />          
-          <Route path="mainmasters/category" element={<Category />} />          
-          <Route path="mainmasters/subcategory" element={<Subcategory />} />          
-          <Route path="mainmasters/types" element={<Types />} />          
-          <Route path="mainmasters/country" element={<Country />} />          
-          <Route path="mainmasters/currency" element={<ExpenseCurrency />} />          
+          {/*----------Masters-------- */}
+          <Route path="mainmasters" element={<MastersPage />} />
+          <Route path="mainmasters/natureofbusiness" element={<AdminNatureOfBusiness />} />
+          <Route path="mainmasters/channel" element={<Channel />} />
+          <Route path="mainmasters/category" element={<Category />} />
+          <Route path="mainmasters/subcategory" element={<Subcategory />} />
+          <Route path="mainmasters/types" element={<Types />} />
+          <Route path="mainmasters/country" element={<Country />} />
+          <Route path="mainmasters/currency" element={<ExpenseCurrency />} />
+
 
         </Route>
 

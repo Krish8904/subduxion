@@ -143,12 +143,12 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
       <div
         ref={overlayRef}
         onClick={handleOverlay}
-        className="fixed inset-0 z-[1000] flex items-center justify-center p-5 bg-slate-900/50 backdrop-blur-sm"
+        className="fixed inset-0 z-1000 flex items-center justify-center p-5 bg-slate-900/50 backdrop-blur-sm"
       >
-        <div className="bg-white w-full max-w-[1200px] h-full max-h-[93vh] flex flex-col border shadow-2xl overflow-hidden rounded-sm">
+        <div className="bg-white w-full max-w-300 h-full max-h-[93vh] flex flex-col border shadow-2xl overflow-hidden rounded-sm">
 
           {/* ── HEADER ── */}
-          <div className="flex items-center justify-between px-6 border-b border-slate-700 bg-slate-700 flex-shrink-0" style={{ height: 52 }}>
+          <div className="flex items-center justify-between px-6 border-b border-slate-700 bg-slate-700 shrink-0" style={{ height: 52 }}>
             <div className="flex items-center text-center gap-3">
               <BookOpen size={15} className="text-slate-400" />
               <span className="text-slate-100 text-[17px] font-semibold tracking-wide">Account Ledger</span>
@@ -164,7 +164,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
             <div className="flex items-center gap-2">
               <button
                 onClick={handleDownloadInvoice}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition-colors cursor-pointer border-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-md transition-colors cursor-pointer border-none"
               >
                 <Download size={13} />
                 Download Invoice
@@ -179,7 +179,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
           </div>
 
           {/* ── SUMMARY CARDS ── */}
-          <div className="grid grid-cols-4 border-b border-slate-200 flex-shrink-0">
+          <div className="grid grid-cols-4 border-b border-slate-200 shrink-0">
             {cards.map((c, i) => (
               <div key={i} className={`px-5 py-4 border-b-2 ${cardAccents[i]} ${i < 3 ? "border-r border-r-slate-200" : "bg-slate-50"}`}>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{c.label}</p>
@@ -191,7 +191,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
           </div>
 
           {/* ── FILTER BAR ── */}
-          <div className="flex items-center gap-3 px-6 py-2.5 border-b border-slate-200 bg-slate-50 flex-shrink-0 flex-wrap">
+          <div className="flex items-center gap-3 px-6 py-2.5 border-b border-slate-200 bg-slate-50 shrink-0 flex-wrap">
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Period</span>
             {[
               { label: "From", val: fromDate, set: setFromDate, max: toDate, min: undefined },
@@ -207,7 +207,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
               </div>
             ))}
             <button onClick={handleSearch} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors cursor-pointer">
-              <Search size={11} /> Apply
+              <Search size={13} /> Apply
             </button>
             <button onClick={handleReset} className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-600 text-xs font-semibold rounded border border-slate-300 hover:bg-slate-100 transition-colors cursor-pointer">
               ↺ Reset
@@ -264,17 +264,16 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
                     const isSource = sourceExpense && row._id === sourceExpense._id;
                     return (
                       <tr key={row._id} className={isSource ? "ldg-src" : "ldg-row"} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                        <td className="px-4 py-3 text-xs text-slate-300 font-mono">{rowNum}</td>
+                        <td className="px-4 py-3 text-xs text-slate-600 font-mono">{rowNum}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <span className={`text-xs font-semibold font-mono ${isSource ? "text-blue-600" : "text-slate-800"}`}>
                               {row.transactionId || "—"}
                             </span>
-                          
                           </div>
                         </td>
                         <td className="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">{fmtDate(row.date)}</td>
-                        <td className="px-4 py-3 text-xs text-slate-500 max-w-[220px]">
+                        <td className="px-4 py-3 text-xs text-slate-500 max-w-55">
                           <span className="block truncate" title={row.description}>{row.description || "—"}</span>
                         </td>
                         <td className="px-4 py-3">
@@ -308,7 +307,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
 
           {/* ── FOOTER ── */}
           {ledgerRows.length > 0 && (
-            <div className="flex items-center justify-between flex-wrap gap-3 px-6 py-2.5 border-t border-slate-200 bg-slate-50 flex-shrink-0">
+            <div className="flex items-center justify-between flex-wrap gap-3 px-6 py-2.5 border-t border-slate-200 bg-slate-50 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500">Rows per page</span>
                 <select

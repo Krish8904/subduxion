@@ -3,10 +3,9 @@ import axios from "axios";
 import { useOutletContext } from "react-router-dom";
 import {
   Mail, ExternalLink, X, ChevronLeft, ChevronRight,
-  Users, Building2, LayoutGrid, Table, FilePlus,
+  Users, Building2, LayoutGrid, Table, SlidersHorizontal,
 } from "lucide-react";
 import CompanyCards from "./CompanyCards";
-import CompanyForm from "../pages/CompanyForm";
 import CompanyExport from "../utils/CompanyExport";
 import CompanyImport from "../utils/CompanyImport";
 import FilterCompanyInq, { DEFAULT_FILTERS } from "../utils/FilterCompanyInq";
@@ -28,7 +27,6 @@ const avatarStyle = (name = "") => {
 const gmailLink = (email) => `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(email)}`;
 const whatsappLink = (cc, num) => `https://wa.me/${`${cc ?? ""}${num ?? ""}`.replace(/\D/g, "")}`;
 
-/* ─── WaIcon ──────────────────────────────────────────────────── */
 function WaIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="shrink-0">
@@ -37,7 +35,6 @@ function WaIcon() {
   );
 }
 
-/* ─── Avatar ──────────────────────────────────────────────────── */
 function Avatar({ name = "" }) {
   const { bg, text } = avatarStyle(name);
   const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
@@ -51,7 +48,6 @@ function Avatar({ name = "" }) {
   );
 }
 
-/* ─── Pill ────────────────────────────────────────────────────── */
 function Pill({ label, color = "gray" }) {
   const palettes = {
     gray:   { bg: "#e9ebee", text: "#1a202c", border: "#c1c7d0" },
@@ -76,18 +72,17 @@ const genderColor = (g = "") =>
 
 /* ─── Main ────────────────────────────────────────────────────── */
 const CompanyInquiries = () => {
-
   const { sidebarCollapsed } = useOutletContext();
 
-  const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [viewMode, setViewMode] = useState("table");
-  const [showImportForm, setShowImportForm] = useState(false);
-  const [sortValue, setSortValue] = useState(null);
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [companies, setCompanies]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [search, setSearch]         = useState("");
+  const [page, setPage]             = useState(1);
+  const [pageSize, setPageSize]     = useState(10);
+  const [viewMode, setViewMode]     = useState("table");
+  const [sortValue, setSortValue]   = useState(null);
+  const [filters, setFilters]       = useState(DEFAULT_FILTERS);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     if (!document.getElementById("poppins-font")) {
@@ -111,19 +106,30 @@ const CompanyInquiries = () => {
     }
   };
 
+  const totalActive = Object.entries(filters).reduce((n, [, v]) => {
+    return n + (Array.isArray(v) ? v.length : v ? 1 : 0);
+  }, 0);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
 
-    // 1. text search
     let list = q
       ? companies.filter((c) =>
-        [c.companyName, c.companyEmail, c.personalEmail, c.category,
-        c.firstName, c.lastName, c.website, c.natureOfBusiness, c.channel, c.subcategory]
-          .some((v) => toStr(v).includes(q))
-      )
+          [c.companyName, c.companyEmail, c.personalEmail, c.category,
+           c.firstName, c.lastName, c.website, c.natureOfBusiness, c.channel, c.subcategory]
+            .some((v) => toStr(v).includes(q))
+        )
       : [...companies];
 
-    // 2. master filters
+    // companyName filter
+    if (filters.companyName)
+      list = list.filter((c) => toStr(c.companyName).includes(filters.companyName.toLowerCase()));
+
+    // gender filter
+    if (filters.gender?.length)
+      list = list.filter((c) => filters.gender.includes(c.gender));
+
+    // master filters
     if (filters.natureOfBusiness.length)
       list = list.filter((c) =>
         (Array.isArray(c.natureOfBusiness) ? c.natureOfBusiness : [c.natureOfBusiness])
@@ -142,50 +148,31 @@ const CompanyInquiries = () => {
           .some((v) => filters.subcategory.includes(v))
       );
 
-    // 2.5. exact date filter
+    // exact date
     if (filters.registeredDate) {
       list = list.filter((c) => {
         if (!c.createdAt) return false;
-        const d  = new Date(c.createdAt);
-        const sd = new Date(filters.registeredDate);
-        return (
-          d.getFullYear() === sd.getFullYear() &&
-          d.getMonth()    === sd.getMonth()    &&
-          d.getDate()     === sd.getDate()
-        );
+        const d = new Date(c.createdAt), sd = new Date(filters.registeredDate);
+        return d.getFullYear() === sd.getFullYear() && d.getMonth() === sd.getMonth() && d.getDate() === sd.getDate();
       });
     }
 
-    // 2.6. date range filter
+    // date range
     if (filters.dateFrom) {
-      const from = new Date(filters.dateFrom);
-      from.setHours(0, 0, 0, 0);
-      list = list.filter((c) => {
-        if (!c.createdAt) return false;
-        return new Date(c.createdAt) >= from;
-      });
+      const from = new Date(filters.dateFrom); from.setHours(0, 0, 0, 0);
+      list = list.filter((c) => c.createdAt && new Date(c.createdAt) >= from);
     }
     if (filters.dateTo) {
-      const to = new Date(filters.dateTo);
-      to.setHours(23, 59, 59, 999);
-      list = list.filter((c) => {
-        if (!c.createdAt) return false;
-        return new Date(c.createdAt) <= to;
-      });
+      const to = new Date(filters.dateTo); to.setHours(23, 59, 59, 999);
+      list = list.filter((c) => c.createdAt && new Date(c.createdAt) <= to);
     }
 
-    // 3. sort
-    if (sortValue === "createdAt_desc") {
-      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    } else if (sortValue === "createdAt_asc") {
-      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    } else if (sortValue === "az") {
-      list.sort((a, b) => (a.companyName || "").localeCompare(b.companyName || ""));
-    } else if (sortValue === "za") {
-      list.sort((a, b) => (b.companyName || "").localeCompare(a.companyName || ""));
-    } else {
-      list.reverse();
-    }
+    // sort
+    if (sortValue === "createdAt_desc") list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    else if (sortValue === "createdAt_asc") list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    else if (sortValue === "az") list.sort((a, b) => (a.companyName || "").localeCompare(b.companyName || ""));
+    else if (sortValue === "za") list.sort((a, b) => (b.companyName || "").localeCompare(a.companyName || ""));
+    else list.reverse();
 
     return list;
   }, [companies, search, filters, sortValue]);
@@ -197,6 +184,7 @@ const CompanyInquiries = () => {
 
   const handleSearch       = (v) => { setSearch(v);  setPage(1); };
   const handleFilterChange = (f) => { setFilters(f); setPage(1); };
+  const handleReset        = ()  => { setFilters(DEFAULT_FILTERS); setPage(1); };
 
   if (loading) {
     return (
@@ -212,36 +200,15 @@ const CompanyInquiries = () => {
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Poppins', sans-serif" }}>
 
-      {/* ── Import Form Modal ── */}
-      {showImportForm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)" }}
-          onClick={() => setShowImportForm(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl"
-            onClick={(e) => e.stopPropagation()}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900">Import Companies (Excel)</h2>
-              <button
-                onClick={() => setShowImportForm(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <div className="p-6">
-              <CompanyImport
-                variant="modal"
-                onSuccess={() => { setShowImportForm(false); fetchCompanies(); }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── Filter Sidebar ── */}
+      <FilterCompanyInq
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        filters={filters}
+        onChange={handleFilterChange}
+        companies={companies}
+        onReset={handleReset}
+      />
 
       {/* ── Sticky Header ── */}
       <div
@@ -250,32 +217,17 @@ const CompanyInquiries = () => {
       >
         <div className="w-full mx-auto px-5 py-3 flex flex-wrap items-center justify-between gap-4">
 
-          {/* Title Group */}
+          {/* Title */}
           <div className="flex items-center gap-3 shrink-0">
-            <div
-              className="flex items-center justify-center rounded-xl bg-blue-600 shrink-0"
-              style={{ width: 42, height: 42 }}
-            >
+            <div className="flex items-center justify-center rounded-xl bg-blue-600 shrink-0" style={{ width: 42, height: 42 }}>
               <Building2 size={21} className="text-white" />
             </div>
-            <div>
-              <h1
-                className="text-2xl font-bold text-gray-900 leading-tight whitespace-nowrap"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                Registered Companies
-              </h1>
-            </div>
-            <div className="flex">
-              <p
-                className="text-xs text-gray-400 text-end font-medium whitespace-nowrap mt-0.5"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                {viewMode === "table"
-                  ? `Showing ${showingFrom}–${showingTo} of ${filtered.length} companies`
-                  : `${filtered.length} companies`}
-              </p>
-            </div>
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight whitespace-nowrap" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              Registered Companies
+            </h1>
+            <p className="text-xs text-gray-400 font-medium whitespace-nowrap mt-0.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              {viewMode === "table" ? `Showing ${showingFrom}–${showingTo} of ${filtered.length} companies` : `${filtered.length} companies`}
+            </p>
           </div>
 
           <div className="flex items-center flex-wrap gap-2">
@@ -286,7 +238,28 @@ const CompanyInquiries = () => {
               onSort={(v) => { setSortValue(v); setPage(1); }}
             />
 
-            <FilterCompanyInq filters={filters} onChange={handleFilterChange} />
+            {/* Filter trigger button */}
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold border rounded-lg transition-all whitespace-nowrap cursor-pointer"
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                background: totalActive > 0 ? "#dbeafe" : "white",
+                color:      totalActive > 0 ? "#1e3a8a" : "#374151",
+                border:     totalActive > 0 ? "1px solid #93c5fd" : "1px solid #d1d5db",
+              }}
+            >
+              <SlidersHorizontal size={14} />
+              Filter
+              {totalActive > 0 && (
+                <span
+                  className="inline-flex items-center justify-center rounded-full text-xs font-bold"
+                  style={{ width: 18, height: 18, background: "#1e3a8a", color: "white", fontSize: 10 }}
+                >
+                  {totalActive}
+                </span>
+              )}
+            </button>
 
             {/* View Toggle */}
             <div className="flex items-center ml-1.5 mr-1.5 bg-gray-100 rounded-lg p-1 shrink-0">
@@ -296,11 +269,11 @@ const CompanyInquiries = () => {
                 style={{
                   fontFamily: "'Poppins', sans-serif",
                   background: viewMode === "table" ? "white" : "transparent",
-                  color: viewMode === "table" ? "#1e3a8a" : "#9ca3af",
-                  boxShadow: viewMode === "table" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  color:      viewMode === "table" ? "#1e3a8a" : "#9ca3af",
+                  boxShadow:  viewMode === "table" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                 }}
               >
-                <Table size={14} /> Table
+                <Table size={15} />
               </button>
               <button
                 onClick={() => setViewMode("card")}
@@ -308,11 +281,11 @@ const CompanyInquiries = () => {
                 style={{
                   fontFamily: "'Poppins', sans-serif",
                   background: viewMode === "card" ? "white" : "transparent",
-                  color: viewMode === "card" ? "#5b21b6" : "#9ca3af",
-                  boxShadow: viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  color:      viewMode === "card" ? "#5b21b6" : "#9ca3af",
+                  boxShadow:  viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                 }}
               >
-                <LayoutGrid size={14} /> Cards
+                <LayoutGrid size={15} />
               </button>
             </div>
 
@@ -330,32 +303,19 @@ const CompanyInquiries = () => {
 
       {/* ── Table View ── */}
       {viewMode === "table" && (
-        <div className="max-w-[1600px] mx-auto py-6 px-2">
-          <div
-            className="bg-white rounded border border-gray-300 overflow-hidden"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
-          >
+        <div className="max-w-400 mx-auto py-6 px-2">
+          <div className="bg-white rounded border border-gray-300 overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
             <div className="overflow-x-auto">
               <table className="min-w-max w-full">
-
                 <thead>
                   <tr style={{ background: "#f0f2f5", borderBottom: "2px solid #d1d5db" }}>
-                    {[
-                      "#", "Company", "Website", "Nature of Business", "Channel",
-                      "Company Email", "Category", "Subcategory", "Company Mobile",
-                      "Contact Person", "Personal Email", "Gender", "Personal Mobile",
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        className="px-8 py-3.5 text-left whitespace-nowrap"
-                        style={{ fontSize: 16, fontWeight: 700, color: "black", letterSpacing: "0.02em" }}
-                      >
+                    {["#", "Company", "Website", "Nature of Business", "Channel", "Company Email", "Category", "Subcategory", "Company Mobile", "Contact Person", "Personal Email", "Gender", "Personal Mobile"].map((h) => (
+                      <th key={h} className="px-8 py-3.5 text-left whitespace-nowrap" style={{ fontSize: 16, fontWeight: 700, color: "black", letterSpacing: "0.02em" }}>
                         {h}
                       </th>
                     ))}
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-200">
                   {paginated.length === 0 ? (
                     <tr>
@@ -365,14 +325,9 @@ const CompanyInquiries = () => {
                             <Users size={22} className="text-gray-400" />
                           </div>
                           <p className="text-sm font-semibold text-gray-800">No companies found</p>
-                          <p className="text-sm text-gray-500">
-                            {search ? `No results for "${search}".` : "No data available."}
-                          </p>
+                          <p className="text-sm text-gray-500">{search ? `No results for "${search}".` : "No data available."}</p>
                           {search && (
-                            <button
-                              onClick={() => handleSearch("")}
-                              className="text-sm font-semibold text-violet-700 hover:text-violet-900 transition"
-                            >
+                            <button onClick={() => handleSearch("")} className="text-sm font-semibold text-violet-700 hover:text-violet-900 transition">
                               Clear search
                             </button>
                           )}
@@ -390,98 +345,56 @@ const CompanyInquiries = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = "#f9fafb")}
                           onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                         >
-                          <td className="px-6 py-4 text-sm font-semibold tabular-nums" style={{ color: "#6b7280" }}>
-                            {rowNum}
-                          </td>
+                          <td className="px-6 py-4 text-sm font-semibold tabular-nums" style={{ color: "#6b7280" }}>{rowNum}</td>
+                          <td className="px-6 py-4"><span className="text-md text-gray-700 font-semibold whitespace-nowrap">{c.companyName}</span></td>
                           <td className="px-6 py-4">
-                            <span className="text-md text-gray-700 font-semibold whitespace-nowrap">
-                              {c.companyName}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <a
-                              href={c.website?.startsWith("http") ? c.website : `https://${c.website}`}
-                              target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline max-w-[160px] truncate transition-colors"
-                              style={{ color: "#5b21b6" }}
-                            >
+                            <a href={c.website?.startsWith("http") ? c.website : `https://${c.website}`} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline max-w-40 truncate transition-colors" style={{ color: "#5b21b6" }}>
                               <ExternalLink size={12} className="shrink-0" />
                               <span className="truncate">{c.website}</span>
                             </a>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>
-                            {c.natureOfBusiness?.join(", ")}
-                          </td>
-                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>
-                            {c.channel?.join(", ")}
-                          </td>
+                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>{c.natureOfBusiness?.join(", ")}</td>
+                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>{c.channel?.join(", ")}</td>
                           <td className="px-6 py-4">
-                            <a
-                              href={gmailLink(c.companyEmail)}
-                              target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
-                              style={{ color: "#374151" }}
+                            <a href={gmailLink(c.companyEmail)} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors" style={{ color: "#374151" }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "#5b21b6")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
-                            >
-                              <Mail size={15} className="text-violet-700 shrink-0" />
-                              {c.companyEmail}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}>
+                              <Mail size={15} className="text-violet-700 shrink-0" />{c.companyEmail}
                             </a>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <Pill label={c.category} color="violet" />
-                          </td>
-                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>
-                            {c.subcategory?.join(", ")}
-                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap"><Pill label={c.category} color="violet" /></td>
+                          <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>{c.subcategory?.join(", ")}</td>
                           <td className="px-6 py-4">
-                            <a
-                              href={whatsappLink(c.countryCode, c.companyMobile)}
-                              target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
-                              style={{ color: "#374151" }}
+                            <a href={whatsappLink(c.countryCode, c.companyMobile)} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors" style={{ color: "#374151" }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "#16a34a")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
-                            >
-                              <span className="text-green-500"><WaIcon /></span>
-                              {c.countryCode} {c.companyMobile}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}>
+                              <span className="text-green-500"><WaIcon /></span>{c.countryCode} {c.companyMobile}
                             </a>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2.5">
                               <Avatar name={fullName} />
-                              <span className="text-sm font-semibold whitespace-nowrap" style={{ color: "#111827" }}>
-                                {fullName}
-                              </span>
+                              <span className="text-sm font-semibold whitespace-nowrap" style={{ color: "#111827" }}>{fullName}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <a
-                              href={gmailLink(c.personalEmail)}
-                              target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
-                              style={{ color: "#374151" }}
+                            <a href={gmailLink(c.personalEmail)} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors" style={{ color: "#374151" }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "#5b21b6")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
-                            >
-                              <Mail size={15} className="shrink-0 text-violet-700" />
-                              {c.personalEmail}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}>
+                              <Mail size={15} className="shrink-0 text-violet-700" />{c.personalEmail}
                             </a>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {c.gender && <Pill label={c.gender} color={genderColor(c.gender)} />}
-                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{c.gender && <Pill label={c.gender} color={genderColor(c.gender)} />}</td>
                           <td className="px-6 py-4">
-                            <a
-                              href={whatsappLink(c.personalCountryCode, c.personalMobile)}
-                              target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors"
-                              style={{ color: "#374151" }}
+                            <a href={whatsappLink(c.personalCountryCode, c.personalMobile)} target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors" style={{ color: "#374151" }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = "#16a34a")}
-                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}
-                            >
-                              <span className="text-green-500"><WaIcon /></span>
-                              {c.personalCountryCode} {c.personalMobile}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#374151")}>
+                              <span className="text-green-500"><WaIcon /></span>{c.personalCountryCode} {c.personalMobile}
                             </a>
                           </td>
                         </tr>
@@ -508,22 +421,15 @@ const CompanyInquiries = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <p className="text-sm font-medium text-gray-700">
-                    Page <span className="font-bold text-gray-900">{page}</span> of{" "}
-                    <span className="font-bold text-gray-900">{totalPages}</span>
+                    Page <span className="font-bold text-gray-900">{page}</span> of <span className="font-bold text-gray-900">{totalPages}</span>
                   </p>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setPage((p) => p - 1)}
-                      disabled={page === 1}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                    >
+                    <button onClick={() => setPage((p) => p - 1)} disabled={page === 1}
+                      className="inline-flex items-center gap-1.5 px-2 py-1 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
                       <ChevronLeft size={15} /> Previous
                     </button>
-                    <button
-                      onClick={() => setPage((p) => p + 1)}
-                      disabled={page === totalPages}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                    >
+                    <button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages}
+                      className="inline-flex items-center gap-1.5 px-2 py-1 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
                       Next <ChevronRight size={15} />
                     </button>
                   </div>

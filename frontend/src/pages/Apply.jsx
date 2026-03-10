@@ -175,7 +175,7 @@ const Apply = () => {
                 >
                   {resume ? (
                     <div className="flex items-center justify-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#dceede] flex items-center justify-center text-[#4a7c59] text-sm">📄</div>
+                      <div className="w-8 h-8 rounded-lg bg-[#dceede] flex items-center justify-center text-[#4a7c59] text-sm">📜</div>
                       <span className="text-sm font-medium text-[#1a1a1a]">{resume.name}</span>
                     </div>
                   ) : (
@@ -188,7 +188,6 @@ const Apply = () => {
                   <input type="file" ref={inputRef} className="hidden" onChange={handleChange} accept=".pdf,.doc,.docx" disabled={isSubmitting} />
                 </div>
               </div>
-
               {/* Submit */}
               <button
                 type="submit" disabled={isSubmitting}

@@ -149,19 +149,16 @@ const ImageManager = () => {
     }
   };
 
-  // ── LOADING ──
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 rounded-full border-2 border-slate-200" />
-          <div className="absolute inset-0 rounded-full border-2 border-t-slate-800 animate-spin" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-13 w-13 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 pl-1">Loading...</p>
         </div>
-        <p className="text-slate-400 text-xs tracking-[0.3em] uppercase font-medium">Fetching media</p>
       </div>
     );
   }
-
   // ── ERROR ──
   if (error) {
     return (
@@ -216,18 +213,16 @@ const ImageManager = () => {
             <button
               key={page.pageName}
               onClick={() => setActiveTab(page.pageName)}
-              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                activeTab === page.pageName
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === page.pageName
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
-              }`}
+                }`}
             >
               <span className="capitalize">{page.pageName}</span>
-              <span className={`text-xs px-1.5 py-0.5 rounded-md font-bold ${
-                activeTab === page.pageName
+              <span className={`text-xs px-1.5 py-0.5 rounded-md font-bold ${activeTab === page.pageName
                   ? "bg-slate-900 text-white"
                   : "bg-slate-200 text-slate-500"
-              }`}>
+                }`}>
                 {count}
               </span>
             </button>

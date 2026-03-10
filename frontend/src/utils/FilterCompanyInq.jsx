@@ -1,286 +1,259 @@
-import React, { useState, useRef, useEffect } from "react";
-import { SlidersHorizontal, ChevronDown, Check, X } from "lucide-react";
-
-/* ─── Master data ─────────────────────────────────────────────── */
-export const MASTERS = {
-  natureOfBusiness: [
-    "Manufacturing", "Retail", "Wholesale", "E-commerce", "Services",
-    "Technology", "Healthcare", "Education", "Finance", "Real Estate",
-  ],
-  channel: [
-    "Direct Sales", "Online Store", "Distributors", "Retailers",
-    "Marketplace", "B2B Platform", "Franchise", "Agent Network",
-  ],
-  category: [
-    "Electronics", "Fashion & Apparel", "Food & Beverages", "Home & Garden",
-    "Beauty & Personal Care", "Sports & Outdoors", "Automotive",
-    "Books & Media", "Toys & Games", "Industrial Equipment",
-  ],
-  subcategory: [
-    "Mobile Phones", "Laptops & Computers", "Tablets", "Smart Watches",
-    "Headphones & Earbuds", "Cameras", "Gaming Consoles", "Home Appliances",
-    "Men's Clothing", "Women's Clothing", "Kids' Clothing", "Footwear",
-    "Accessories", "Jewelry", "Bags & Luggage", "Ethnic Wear",
-    "Organic Foods", "Beverages", "Snacks", "Dairy Products",
-    "Frozen Foods", "Bakery Items", "Health Foods", "Gourmet Foods",
-    "Furniture", "Home Decor", "Kitchen & Dining", "Bedding & Bath",
-    "Lighting", "Garden Tools", "Plants & Seeds", "Storage & Organization",
-    "Skincare", "Makeup", "Hair Care", "Fragrances", "Bath & Body",
-    "Nail Care", "Men's Grooming", "Beauty Tools",
-    "Fitness Equipment", "Camping Gear", "Cycling", "Yoga & Pilates",
-    "Team Sports", "Water Sports", "Winter Sports", "Outdoor Recreation",
-    "Car Accessories", "Motorcycle Parts", "Car Care", "Tires & Wheels",
-    "Tools & Equipment", "Audio & Electronics", "Interior Accessories", "Performance Parts",
-    "Fiction Books", "Non-Fiction Books", "Educational Books", "E-Books",
-    "Magazines", "Music CDs", "Movies & TV", "Video Games",
-    "Action Figures", "Board Games", "Educational Toys", "Dolls & Plush",
-    "Building Blocks", "Outdoor Toys", "Puzzles", "RC Toys",
-    "Manufacturing Machinery", "Construction Equipment", "Material Handling",
-    "Power Tools", "Safety Equipment", "Testing Equipment", "Packaging Equipment", "Electrical Equipment",
-  ],
-};
-
-export const FILTER_GROUPS = [
-  { key: "natureOfBusiness", label: "Nature of Business" },
-  { key: "channel",          label: "Channel" },
-  { key: "category",         label: "Category" },
-  { key: "subcategory",      label: "Subcategory" },
-];
+import React, { useState, useEffect, useRef } from "react";
+import { X, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 
 export const DEFAULT_FILTERS = {
+  companyName: "",
+  category: [],
   natureOfBusiness: [],
   channel: [],
-  category: [],
   subcategory: [],
-  registeredDate: null,
-  dateFrom: null,
-  dateTo: null,
+  gender: [],
+  registeredDate: "",
+  dateFrom: "",
+  dateTo: "",
 };
 
-export default function FilterCompanyInq({ filters, onChange }) {
-  const [open, setOpen]               = useState(false);
-  const [activeGroup, setActiveGroup] = useState("natureOfBusiness");
-  const ref = useRef(null);
+function FilterCompanyInq({ open, onClose, filters, onChange, companies, onReset }) {
+  const overlayRef = useRef(null);
+  const [expanded, setExpanded] = useState({});
+
+  const toggle = (key) => setExpanded((p) => ({ ...p, [key]: !p[key] }));
 
   useEffect(() => {
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
-  const totalActive = Object.entries(filters).reduce((count, [key, value]) => {
-    if (Array.isArray(value)) return count + value.length;
-    if (value) return count + 1;
-    return count;
-  }, 0);
+  function uniqueVals(key) {
+    const vals = [];
+    (companies || []).forEach((c) => {
+      const v = c[key];
+      if (Array.isArray(v)) v.forEach((i) => { if (i && !vals.includes(i)) vals.push(i); });
+      else if (v && !vals.includes(v)) vals.push(v);
+    });
+    return vals.sort();
+  }
 
-  const toggle = (groupKey, value) => {
-    const current = filters[groupKey] || [];
-    const updated = current.includes(value)
-      ? current.filter((v) => v !== value)
-      : [...current, value];
-    onChange({ ...filters, [groupKey]: updated });
+  const toggleMulti = (key, val) => {
+    const cur = filters[key] || [];
+    onChange({ ...filters, [key]: cur.includes(val) ? cur.filter((v) => v !== val) : [...cur, val] });
   };
 
-  const clearAll = () => onChange({ ...DEFAULT_FILTERS });
+  const totalActive = Object.entries(filters).reduce((n, [, v]) => {
+    return n + (Array.isArray(v) ? v.length : v ? 1 : 0);
+  }, 0);
 
-  const clearDates = () => onChange({ ...filters, registeredDate: null, dateFrom: null, dateTo: null });
-  const hasAnyDate = filters.registeredDate || filters.dateFrom || filters.dateTo;
+  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 transition placeholder-gray-400";
+  const labelCls = "block text-xs font-semibold text-gray-800 uppercase tracking-wider mb-2";
 
-  return (
-    <div className="relative shrink-0" ref={ref}>
-
-      {/* ── Trigger button ── */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold border rounded-lg transition-all whitespace-nowrap"
-        style={{
-          fontFamily: "'Poppins', sans-serif",
-          background: totalActive > 0 ? "#dbeafe" : "white",
-          color:      totalActive > 0 ? "#1e3a8a" : "#374151",
-          border:     totalActive > 0 ? "1px solid #93c5fd" : "1px solid #d1d5db",
-        }}
-      >
-        <SlidersHorizontal size={14} />
-        Filter
-        {totalActive > 0 && (
-          <span
-            className="inline-flex items-center justify-center rounded-full text-xs font-bold"
-            style={{ width: 18, height: 18, background: "#1e3a8a", color: "white", fontSize: 10 }}
-          >
-            {totalActive}
-          </span>
-        )}
-        <ChevronDown size={13} style={{ opacity: 0.6 }} />
-      </button>
-
-      {/* ── Panel ── */}
-      {open && (
-        <div
-          className="absolute left-0 mt-1 bg-white rounded-xl border border-gray-200 z-30 flex overflow-hidden"
-          style={{ minWidth: 480, maxHeight: 440, boxShadow: "0 4px 16px rgba(0,0,0,0.10)" }}
+  const CollapsibleMulti = ({ label, optionKey }) => {
+    const opts = uniqueVals(optionKey);
+    const selected = filters[optionKey] || [];
+    const isOpen = expanded[optionKey];
+    if (!opts.length) return null;
+    return (
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggle(optionKey)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
         >
-
-          {/* Left: group tabs */}
-          <div className="border-r border-gray-100 py-2 flex flex-col" style={{ minWidth: 165 }}>
-
-            {totalActive > 0 && (
-              <button
-                onClick={clearAll}
-                className="mx-2 mb-1 flex items-center gap-1.5 px-2 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 rounded-lg transition"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
-                <X size={12} /> Clear all filters
-              </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-700">{label}</span>
+            {selected.length > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">
+                {selected.length}
+              </span>
             )}
-
-            {FILTER_GROUPS.map((g) => {
-              const count    = (filters[g.key] || []).length;
-              const isActive = activeGroup === g.key;
-              return (
-                <button
-                  key={g.key}
-                  onClick={() => setActiveGroup(g.key)}
-                  className="flex items-center justify-between px-3 py-2 text-sm font-medium transition-all text-left"
-                  style={{
-                    fontFamily:  "'Poppins', sans-serif",
-                    background:  isActive ? "#ede9fe" : "transparent",
-                    color:       isActive ? "#3730a3" : "#374151",
-                    borderRight: isActive ? "2px solid #7c3aed" : "2px solid transparent",
-                  }}
-                >
-                  <span>{g.label}</span>
-                  {count > 0 && (
-                    <span
-                      className="inline-flex items-center justify-center rounded-full text-xs font-bold"
-                      style={{ width: 18, height: 18, background: "#7c3aed", color: "white", fontSize: 10 }}
-                    >
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-
-            {/* ── Date filters ── */}
-            <div className="px-3 py-2 mt-1 border-t border-gray-100 space-y-3">
-
-              {/* Header row */}
-              <div className="flex items-center justify-between">
-                <label
-                  className="block text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  Registered On
-                </label>
-                {hasAnyDate && (
-                  <button
-                    onClick={clearDates}
-                    className="text-xs font-semibold text-red-500 hover:text-red-700 transition"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Single date */}
-              <div>
-                <p className="text-xs text-gray-400 mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  Exact date
-                </p>
-                <input
-                  type="date"
-                  value={filters.registeredDate || ""}
-                  onChange={(e) =>
-                    onChange({ ...filters, registeredDate: e.target.value || null })
-                  }
-                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-gray-50 transition"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                />
-              </div>
-
-              {/* Divider */}
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-px bg-gray-100" />
-                <span className="text-xs text-gray-300 font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>or range</span>
-                <div className="flex-1 h-px bg-gray-100" />
-              </div>
-
-              {/* From */}
-              <div>
-                <p className="text-xs text-gray-400 mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  From
-                </p>
-                <input
-                  type="date"
-                  value={filters.dateFrom || ""}
-                  max={filters.dateTo || undefined}
-                  onChange={(e) =>
-                    onChange({ ...filters, dateFrom: e.target.value || null })
-                  }
-                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-gray-50 transition"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                />
-              </div>
-
-              {/* To */}
-              <div>
-                <p className="text-xs text-gray-400 mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  To
-                </p>
-                <input
-                  type="date"
-                  value={filters.dateTo || ""}
-                  min={filters.dateFrom || undefined}
-                  onChange={(e) =>
-                    onChange({ ...filters, dateTo: e.target.value || null })
-                  }
-                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-gray-50 transition"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                />
-              </div>
-
-            </div>
-
           </div>
-
-          {/* Right: options list */}
-          <div className="flex-1 overflow-y-auto py-2 px-2">
-            {MASTERS[activeGroup]?.map((opt) => {
-              const checked = (filters[activeGroup] || []).includes(opt);
-              return (
-                <button
-                  key={opt}
-                  onClick={() => toggle(activeGroup, opt)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg transition-all text-left"
-                  style={{
-                    fontFamily: "'Poppins', sans-serif",
-                    background: checked ? "#ede9fe" : "transparent",
-                    color:      checked ? "#3730a3" : "#374151",
-                    fontWeight: checked ? 600 : 400,
-                  }}
-                >
-                  <span
-                    className="inline-flex items-center justify-center rounded shrink-0"
+          <ChevronDown size={15} className={`text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+        {isOpen && (
+          <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
+            <div className="flex flex-wrap gap-1.5">
+              {opts.map((opt) => {
+                const active = selected.includes(opt);
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => toggleMulti(optionKey, opt)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer"
                     style={{
-                      width: 16, height: 16,
-                      background: checked ? "#7c3aed" : "white",
-                      border:     checked ? "1.5px solid #7c3aed" : "1.5px solid #d1d5db",
+                      fontFamily: "'Poppins', sans-serif",
+                      background: active ? "#4F46E5" : "#ffffff",
+                      color:      active ? "white"   : "#374151",
+                      border:     active ? "1px solid #4F46E5" : "1px solid #e5e7eb",
                     }}
                   >
-                    {checked && <Check size={10} color="white" strokeWidth={3} />}
-                  </span>
-                  {opt}
-                </button>
-              );
-            })}
+                    {active && <Check size={10} />}
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+            {selected.length > 0 && (
+              <button
+                onClick={() => onChange({ ...filters, [optionKey]: [] })}
+                className="mt-2.5 text-[11px] text-red-400 hover:text-red-600 font-semibold cursor-pointer transition-colors"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                Clear {label}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {open && (
+        <div ref={overlayRef} onClick={onClose} className="fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-[2px]" />
+      )}
+      <div
+        className="fixed top-0 right-0 h-full z-50 flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out"
+        style={{ width: 400, transform: open ? "translateX(0)" : "translateX(100%)", fontFamily: "'Poppins', sans-serif" }}
+      >
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0"
+          style={{ background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <SlidersHorizontal size={16} className="text-white" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white m-0 leading-tight">Filter</h2>
+              {totalActive > 0 && (
+                <p className="text-[11px] text-white/70 m-0 font-medium">
+                  {totalActive} filter{totalActive > 1 ? "s" : ""} active
+                </p>
+              )}
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white/15 hover:bg-white/25 border-none flex items-center justify-center cursor-pointer transition-colors">
+            <X size={17} className="text-white" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+
+          {/* Company Name */}
+          <div>
+            <label className={labelCls}>Company Name</label>
+            <input
+              type="text"
+              placeholder="Search company..."
+              value={filters.companyName}
+              onChange={(e) => onChange({ ...filters, companyName: e.target.value })}
+              className={inputCls}
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            />
           </div>
 
+          {/* Registered On */}
+          <div>
+            <label className={labelCls}>Registered On</label>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-400 mb-1.5 font-medium">Exact date</p>
+                <input
+                  type="date"
+                  value={filters.registeredDate}
+                  onChange={(e) => onChange({ ...filters, registeredDate: e.target.value })}
+                  className={inputCls}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-px bg-gray-100" />
+                <span className="text-xs text-gray-300 font-medium">or range</span>
+                <div className="flex-1 h-px bg-gray-100" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-gray-400 mb-1.5 font-medium">From</p>
+                  <input
+                    type="date"
+                    value={filters.dateFrom}
+                    max={filters.dateTo || undefined}
+                    onChange={(e) => onChange({ ...filters, dateFrom: e.target.value })}
+                    className={inputCls}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1.5 font-medium">To</p>
+                  <input
+                    type="date"
+                    value={filters.dateTo}
+                    min={filters.dateFrom || undefined}
+                    onChange={(e) => onChange({ ...filters, dateTo: e.target.value })}
+                    className={inputCls}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div>
+            <label className={labelCls}>Gender</label>
+            <div className="flex gap-2">
+              {["Male", "Female", "Other"].map((g) => {
+                const active = (filters.gender || []).includes(g);
+                return (
+                  <button
+                    key={g}
+                    onClick={() => toggleMulti("gender", g)}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer"
+                    style={{
+                      fontFamily: "'Poppins', sans-serif",
+                      background: active ? "#ede9fe" : "#f9fafb",
+                      color:      active ? "#4F46E5" : "#374151",
+                      border:     active ? "1.5px solid #a5b4fc" : "1px solid #e5e7eb",
+                    }}
+                  >
+                    {active && <Check size={11} />}{g}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="h-px bg-gray-100" />
+
+          <CollapsibleMulti label="Category"           optionKey="category" />
+          <CollapsibleMulti label="Nature of Business" optionKey="natureOfBusiness" />
+          <CollapsibleMulti label="Channel"            optionKey="channel" />
+          <CollapsibleMulti label="Subcategory"        optionKey="subcategory" />
+
         </div>
-      )}
-    </div>
+
+        {/* Footer */}
+        <div className="shrink-0 border-t border-gray-200 px-6 py-4 flex items-center gap-3 bg-gray-50">
+          <button
+            onClick={onReset}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold transition-colors cursor-pointer border-none"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            ↺ Reset
+          </button>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition-colors cursor-pointer"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <X size={14} /> Close
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
+
+export default FilterCompanyInq;

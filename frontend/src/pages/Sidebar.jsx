@@ -251,7 +251,7 @@ const Sidebar = ({
           label="Settings"
           active={activeSection === 'settings'}
           collapsed={sidebarCollapsed}
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate('/admin/settings')}
         />
       </nav>
 
@@ -264,7 +264,7 @@ const Sidebar = ({
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">Admin User</p>
-              <p className="text-xs text-slate-400 truncate">admin@example.com</p>
+              <p className="text-xs text-slate-400 truncate">admin@subduxion.com</p>
             </div>
           </div>
         ) : (

@@ -142,19 +142,13 @@ const Touch = () => {
                   style={{ background: "radial-gradient(circle, rgba(74,124,89,0.08) 0%, transparent 70%)", transform: "translate(40%,-40%)" }}
                 />
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-xl bg-[#eceae4] border border-[#d4d0c8] flex items-center justify-center text-[#4a7c59] transition-all duration-200 group-hover:bg-[#4a7c59] group-hover:text-white">
-                    <c.icon size={20} />
+                  <div className="w-14 h-14 rounded-xl bg-[#eceae4] border border-[#d4d0c8] flex items-center justify-center text-[#4a7c59] transition-all duration-200 group-hover:bg-[#4a7c59] group-hover:text-white">
+                    <c.icon size={25} />
                   </div>
-                  <span
-                    className="text-xs text-[#c0bbb0] font-light transition-colors duration-200 group-hover:text-[#4a7c59]"
-                    style={{ fontFamily: "'poppins', serif" }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
                 </div>
                 <div className="flex-1">
                   <h3
-                    className="text-lg font-normal text-[#1a1a1a] tracking-[-0.01em] mb-2 transition-colors duration-200 group-hover:text-[#4a7c59]"
+                   className="text-lg font-normal text-[#1a1a1a] tracking-[-0.01em] mb-2 transition-colors duration-200 group-hover:text-[#4a7c59]"
                     style={{ fontFamily: "'poppins', serif" }}
                   >
                     {c.label}
@@ -279,7 +273,7 @@ const Touch = () => {
                       <p className="text-xs text-[#999] font-light leading-[1.6]">{step.desc}</p>
                     </div>
                   </li>
-                ))}
+                ))} 
               </ul>
             </div>
           </div>
