@@ -275,8 +275,8 @@ const Sidebar = ({
             </div>
           </div>
         ) : (
-          <div className="flex justify-center">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold shadow-lg cursor-pointer hover:scale-110 transition-transform">
+          <div className="flex justify-center p-1">
+            <div className="w-10 h-10 bg-linear-to-br  from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-semibold shadow-lg cursor-pointer hover:scale-110 transition-transform">
               A
             </div>
           </div>

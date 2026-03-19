@@ -46,30 +46,24 @@ const pct = (v, t) => t > 0 ? ((v / t) * 100).toFixed(1) + "%" : "0%";
 /* ═══════════════════════════════════════════════════
    TOOLTIP COMPONENTS
 ═══════════════════════════════════════════════════ */
-const TT = ({ children, style }) => (
-  <div style={{
-    background: "white", border: "1px solid #e5e7eb", borderRadius: 12,
-    padding: "12px 16px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-    fontFamily: "'Poppins',sans-serif", minWidth: 180, ...style,
-  }}>
+const TT = ({ children }) => (
+  <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-xl min-w-[180px]"
+    style={{ fontFamily: "'Poppins',sans-serif" }}>
     {children}
   </div>
 );
 
 const TTLabel = ({ children }) => (
-  <p style={{
-    fontSize: 11, color: "#9ca3af", fontWeight: 700,
-    textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 10px",
-  }}>{children}</p>
+  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-2.5 mt-0">{children}</p>
 );
 
 const TTRow = ({ color, name, value, sub }) => (
-  <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-    {color && <span style={{ width: 10, height: 10, borderRadius: 2, background: color, flexShrink: 0, marginTop: 2 }} />}
-    <div style={{ flex: 1 }}>
-      <span style={{ fontSize: 12, color: "#6b7280" }}>{name}: </span>
-      <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{value}</span>
-      {sub && <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 1 }}>{sub}</div>}
+  <div className="flex items-start gap-2 mb-1.5">
+    {color && <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0 mt-0.5" style={{ background: color }} />}
+    <div className="flex-1">
+      <span className="text-xs text-gray-500">{name}: </span>
+      <span className="text-xs font-bold text-gray-900">{value}</span>
+      {sub && <div className="text-[10px] text-gray-400 mt-0.5">{sub}</div>}
     </div>
   </div>
 );
@@ -84,7 +78,7 @@ const CashFlowTT = ({ active, payload, label }) => {
       <TTLabel>{label}</TTLabel>
       <TTRow color={GREEN} name="Credit" value={fmtFull(credit)} />
       <TTRow color={RED} name="Spend" value={fmtFull(spend)} />
-      <div style={{ borderTop: "1px solid #f0f0f0", marginTop: 8, paddingTop: 8 }}>
+      <div className="border-t border-gray-100 mt-2 pt-2">
         <TTRow color={ACCENT} name="Net" value={fmtFull(net)}
           sub={net >= 0 ? "Surplus this month" : "Deficit this month"} />
       </div>
@@ -155,8 +149,7 @@ const ActivePieShape = (props) => {
 };
 
 /* ═══════════════════════════════════════════════════
-   TABLE ROW — hover state isolated in its own component
-   so hooks are never called inside a .map()
+   TABLE ROW
 ═══════════════════════════════════════════════════ */
 const CPRow = ({ cp, i, total }) => {
   const [hov, setHov] = useState(false);
@@ -166,56 +159,49 @@ const CPRow = ({ cp, i, total }) => {
     <tr
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{
-        borderBottom: "1px solid #f9f9f9",
-        background: hov ? "#f8f7ff" : "transparent",
-        transition: "background 0.15s", cursor: "default",
-      }}
+      className={`border-b border-gray-50 transition-colors duration-150 cursor-default ${hov ? "bg-violet-50" : "bg-transparent"}`}
     >
-      <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 12, color: "#9ca3af", fontWeight: 600 }}>{i + 1}</td>
-      <td style={{ padding: "12px 14px", fontSize: 13, fontWeight: 600, color: "#111827" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: COLORS[i % COLORS.length] + (hov ? "44" : "22"),
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 11, fontWeight: 700, color: COLORS[i % COLORS.length], flexShrink: 0,
-            transition: "background 0.15s",
-          }}>
+      <td className="py-3 px-3.5 text-center text-xs text-gray-400 font-semibold">{i + 1}</td>
+      <td className="py-3 px-3.5 text-sm font-semibold text-gray-900">
+        <div className="flex items-center gap-2">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-colors duration-150"
+            style={{
+              background: COLORS[i % COLORS.length] + (hov ? "44" : "22"),
+              color: COLORS[i % COLORS.length],
+            }}
+          >
             {cp.name.slice(0, 2).toUpperCase()}
           </div>
           {cp.name}
         </div>
       </td>
-      <td style={{ padding: "12px 14px", textAlign: "center" }}>
-        <span style={{
-          display: "inline-block", padding: "2px 10px", borderRadius: 20,
-          background: "#f3f4f6", fontSize: 12, fontWeight: 600, color: "#374151",
-        }}>{cp.count}</span>
+      <td className="py-3 px-3.5 text-center">
+        <span className="inline-block px-2.5 py-0.5 rounded-full bg-gray-100 text-xs font-semibold text-gray-700">{cp.count}</span>
       </td>
-      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: RED }}>₹{fmt(cp.spend)}</div>
-        {hov && <div style={{ fontSize: 10, color: "#9ca3af" }}>{fmtFull(cp.spend)}</div>}
+      <td className="py-3 px-3.5 text-right">
+        <div className="text-xs font-bold" style={{ color: RED }}>₹{fmt(cp.spend)}</div>
+        {hov && <div className="text-[10px] text-gray-400">{fmtFull(cp.spend)}</div>}
       </td>
-      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: GREEN }}>₹{fmt(cp.credit)}</div>
-        {hov && <div style={{ fontSize: 10, color: "#9ca3af" }}>{fmtFull(cp.credit)}</div>}
+      <td className="py-3 px-3.5 text-right">
+        <div className="text-xs font-bold" style={{ color: GREEN }}>₹{fmt(cp.credit)}</div>
+        {hov && <div className="text-[10px] text-gray-400">{fmtFull(cp.credit)}</div>}
       </td>
-      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: net >= 0 ? GREEN : RED }}>
+      <td className="py-3 px-3.5 text-right">
+        <div className="text-xs font-bold" style={{ color: net >= 0 ? GREEN : RED }}>
           {net >= 0 ? "+" : "-"}₹{fmt(Math.abs(net))}
         </div>
-        {hov && <div style={{ fontSize: 10, color: "#9ca3af" }}>{net >= 0 ? "Surplus" : "Deficit"}</div>}
+        {hov && <div className="text-[10px] text-gray-400">{net >= 0 ? "Surplus" : "Deficit"}</div>}
       </td>
-      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end" }}>
-          <div style={{ width: 60, height: 6, borderRadius: 3, background: "#f0f0f0", overflow: "hidden" }}>
-            <div style={{
-              width: share, height: "100%", borderRadius: 3,
-              background: COLORS[i % COLORS.length], transition: "width 0.3s",
-            }} />
+      <td className="py-3 px-3.5 text-right">
+        <div className="flex items-center gap-1.5 justify-end">
+          <div className="w-15 h-1.5 rounded-full bg-gray-100 overflow-hidden" style={{ width: 60 }}>
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: share, background: COLORS[i % COLORS.length] }}
+            />
           </div>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "#374151", minWidth: 36, textAlign: "right" }}>{share}</span>
+          <span className="text-[11px] font-semibold text-gray-700 min-w-[36px] text-right">{share}</span>
         </div>
       </td>
     </tr>
@@ -231,45 +217,45 @@ const StatCard = ({ label, value, sub, color, icon: Icon }) => {
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      className="bg-white rounded-2xl p-5 flex-1 min-w-[160px] transition-all duration-200 cursor-default"
       style={{
-        background: "white", borderRadius: 14,
         border: `1px solid ${hov ? color + "44" : "#f0f0f0"}`,
-        padding: "18px 20px",
         boxShadow: hov ? `0 8px 24px ${color}22` : "0 2px 10px rgba(0,0,0,0.04)",
-        fontFamily: "'Poppins',sans-serif", flex: 1, minWidth: 160,
-        transition: "all 0.2s", cursor: "default",
+        fontFamily: "'Poppins',sans-serif",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
-        <div style={{
-          width: 32, height: 32, borderRadius: 8, background: color + "18",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transform: hov ? "scale(1.15)" : "scale(1)", transition: "transform 0.2s",
-        }}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide">{label}</span>
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-200"
+          style={{
+            background: color + "18",
+            transform: hov ? "scale(1.15)" : "scale(1)",
+          }}
+        >
           <Icon size={15} style={{ color }} />
         </div>
       </div>
-      <p style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: 0, lineHeight: 1 }}>₹{fmt(value)}</p>
-      {sub && <p style={{ fontSize: 11, color: "#9ca3af", marginTop: 6 }}>{sub}</p>}
+      <p className="text-[22px] font-bold text-gray-900 m-0 leading-none">₹{fmt(value)}</p>
+      {sub && <p className="text-[11px] text-gray-400 mt-1.5">{sub}</p>}
     </div>
   );
 };
 
 const SectionHeader = ({ icon: Icon, title, sub }) => (
-  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-    <div style={{ width: 34, height: 34, borderRadius: 9, background: ACCENT + "18", display: "flex", alignItems: "center", justifyContent: "center" }}>
+  <div className="flex items-center gap-2.5 mb-4">
+    <div className="w-[34px] h-[34px] rounded-[9px] flex items-center justify-center" style={{ background: ACCENT + "18" }}>
       <Icon size={16} style={{ color: ACCENT }} />
     </div>
     <div>
-      <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#111827", fontFamily: "'Poppins',sans-serif" }}>{title}</h2>
-      {sub && <p style={{ margin: 0, fontSize: 11, color: "#9ca3af", fontFamily: "'Poppins',sans-serif" }}>{sub}</p>}
+      <h2 className="m-0 text-[15px] font-bold text-gray-900" style={{ fontFamily: "'Poppins',sans-serif" }}>{title}</h2>
+      {sub && <p className="m-0 text-[11px] text-gray-400" style={{ fontFamily: "'Poppins',sans-serif" }}>{sub}</p>}
     </div>
   </div>
 );
 
 /* ═══════════════════════════════════════════════════
-   LEGAL ENTITY SELECTOR (Replaces CompanySelector)
+   LEGAL ENTITY SELECTOR
 ═══════════════════════════════════════════════════ */
 const LegalEntitySelector = ({ entities, value, onChange }) => {
   const [open, setOpen] = useState(false);
@@ -281,7 +267,6 @@ const LegalEntitySelector = ({ entities, value, onChange }) => {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  // Format entities for display
   const entityOptions = [
     { key: "__all__", label: "All Legal Entities", entity: null },
     ...entities.map(e => ({
@@ -291,59 +276,47 @@ const LegalEntitySelector = ({ entities, value, onChange }) => {
     }))
   ];
 
-  // Find selected entity display
   const selectedLabel = value === "__all__"
     ? "All Legal Entities"
     : entities.find(e => e._id === value)?.companyName || "Select Legal Entity";
 
   return (
-    <div style={{ position: "relative" }} ref={ref}>
-      <button onClick={() => setOpen(v => !v)} style={{
-        display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px",
-        background: value !== "__all__" ? "#ede9fe" : "white",
-        color: value !== "__all__" ? "#3730a3" : "#374151",
-        border: value !== "__all__" ? "1px solid #c4b5fd" : "1px solid #d1d5db",
-        borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
-        fontFamily: "'Poppins',sans-serif", whiteSpace: "nowrap",
-      }}>
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="inline-flex items-center gap-1.5 px-3.5 py-[7px] rounded-lg text-[13px] font-semibold cursor-pointer whitespace-nowrap transition-all"
+        style={{
+          background: value !== "__all__" ? "#ede9fe" : "white",
+          color: value !== "__all__" ? "#3730a3" : "#374151",
+          border: value !== "__all__" ? "1px solid #c4b5fd" : "1px solid #d1d5db",
+          fontFamily: "'Poppins',sans-serif",
+        }}
+      >
         <Building2 size={14} />
         {selectedLabel}
-        <ChevronDown size={12} style={{ opacity: 0.6 }} />
+        <ChevronDown size={12} className="opacity-60" />
       </button>
       {open && (
-        <div style={{
-          position: "absolute", left: 0, top: "calc(100% + 4px)", background: "white",
-          border: "1px solid #e5e7eb", borderRadius: 10, zIndex: 50, minWidth: 220,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.12)", maxHeight: 280, overflowY: "auto",
-        }}>
+        <div className="absolute left-0 top-[calc(100%+4px)] bg-white border border-gray-200 rounded-xl z-50 min-w-[220px] shadow-xl max-h-[280px] overflow-y-auto">
           {entityOptions.map(opt => (
             <button
               key={opt.key}
-              onClick={() => {
-                onChange(opt.key);
-                setOpen(false);
-              }}
+              onClick={() => { onChange(opt.key); setOpen(false); }}
+              className="w-full text-left px-4 py-[9px] text-[13px] font-medium cursor-pointer border-none border-b border-gray-50 flex items-center gap-2 transition-colors"
               style={{
-                width: "100%", textAlign: "left", padding: "9px 16px", fontSize: 13, fontWeight: 500,
-                cursor: "pointer", background: value === opt.key ? "#ede9fe" : "transparent",
-                color: value === opt.key ? "#3730a3" : "#374151", border: "none",
-                fontFamily: "'Poppins',sans-serif", borderBottom: "1px solid #f5f5f5",
-                display: "flex", alignItems: "center", gap: 8,
+                background: value === opt.key ? "#ede9fe" : "transparent",
+                color: value === opt.key ? "#3730a3" : "#374151",
+                fontFamily: "'Poppins',sans-serif",
               }}
             >
               {opt.entity && (
-                <div style={{
-                  width: 24, height: 24, borderRadius: 6,
-                  background: opt.entity.country ? "#f0f0f0" : "#f9f9f9",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 10, fontWeight: 600, color: "#6b7280",
-                }}>
+                <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-[10px] font-semibold text-gray-500">
                   {opt.entity.companyName?.slice(0, 2).toUpperCase()}
                 </div>
               )}
-              <span style={{ flex: 1 }}>{opt.label}</span>
+              <span className="flex-1">{opt.label}</span>
               {opt.entity?.localCurrencyCode && (
-                <span style={{ fontSize: 10, color: "#9ca3af" }}>{opt.entity.localCurrencyCode}</span>
+                <span className="text-[10px] text-gray-400">{opt.entity.localCurrencyCode}</span>
               )}
             </button>
           ))}
@@ -365,7 +338,6 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const [activePieType, setActivePieType] = useState(0);
   const [activePieRatio, setActivePieRatio] = useState(0);
 
-  // API endpoints
   const LEGAL_ENTITIES_API = "http://localhost:5000/api/legal-entities";
   const COMPANIES_API = "http://localhost:5000/api/companies";
 
@@ -380,9 +352,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
       l.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap";
       document.head.appendChild(l);
     }
-    if (!propExpenses) {
-      fetchExpenses();
-    }
+    if (!propExpenses) fetchExpenses();
     fetchLegalEntities();
     fetchCompanies();
   }, []);
@@ -402,9 +372,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const fetchLegalEntities = async () => {
     try {
       const r = await axios.get(LEGAL_ENTITIES_API);
-      if (r.data.success) {
-        setLegalEntities(r.data.data);
-      }
+      if (r.data.success) setLegalEntities(r.data.data);
     } catch (error) {
       console.error("Failed to fetch legal entities:", error);
     }
@@ -413,27 +381,18 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const fetchCompanies = async () => {
     try {
       const r = await axios.get(COMPANIES_API);
-      if (r.data.success) {
-        setCompanies(r.data.data);
-      }
+      if (r.data.success) setCompanies(r.data.data);
     } catch (error) {
       console.error("Failed to fetch companies:", error);
     }
   };
 
-  // Filter expenses by selected legal entity
   const filteredExpenses = useMemo(() => {
     if (selectedEntity === "__all__") return expenses;
-
-    // Get all companies under this legal entity
     const entityCompanies = companies
       .filter(c => String(c.legalEntityId) === String(selectedEntity))
       .map(c => c.companyName);
-
-    // If no companies found for this entity, return empty array
     if (entityCompanies.length === 0) return [];
-
-    // Filter expenses by those companies
     return expenses.filter(e => entityCompanies.includes(e.company));
   }, [expenses, selectedEntity, companies]);
 
@@ -446,24 +405,13 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
       if (a < 0) spend += Math.abs(a);
       else if (a > 0) credit += a;
     });
-    return {
-      totalSpend: spend,
-      totalCredit: credit,
-      netFlow: credit - spend,
-      txCount: filteredExpenses.length
-    };
+    return { totalSpend: spend, totalCredit: credit, netFlow: credit - spend, txCount: filteredExpenses.length };
   }, [filteredExpenses]);
 
-  // Monthly data with all months including zeros
   const monthlyData = useMemo(() => {
     if (filteredExpenses.length === 0) return [];
-
-    console.log("Generating monthly data for", filteredExpenses.length, "expenses");
-
-    // Get date range from expenses
     let minDate = new Date();
     let maxDate = new Date(0);
-
     filteredExpenses.forEach(e => {
       const dt = new Date(e.date);
       if (!isNaN(dt)) {
@@ -471,66 +419,39 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
         if (dt > maxDate) maxDate = dt;
       }
     });
-
-    // If no valid dates, return empty
+    
     if (minDate > maxDate) return [];
-
-    // Add padding months to show context (show 3 months before and after)
     const paddingMonths = 3;
     minDate.setMonth(minDate.getMonth() - paddingMonths);
     maxDate.setMonth(maxDate.getMonth() + paddingMonths);
-
-    // Create array of all months in range
     const months = [];
-    const current = new Date(minDate);
-    current.setDate(1); // Start from first day of month
-
+    const current = new Date(minDate);``
+    current.setDate(1);
     while (current <= maxDate) {
       const year = current.getFullYear();
       const month = current.getMonth();
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const key = monthNames[month] + " " + String(year).slice(-2);
       const sortVal = year * 12 + month;
-
-      months.push({
-        month: key,
-        sortVal,
-        spend: 0,
-        credit: 0,
-        net: 0,
-        hasTransactions: false,
-        transactionCount: 0,
-        isPaddingMonth: true // Initially mark all as padding
-      });
-
+      months.push({ month: key, sortVal, spend: 0, credit: 0, net: 0, hasTransactions: false, transactionCount: 0, isPaddingMonth: true });
       current.setMonth(current.getMonth() + 1);
     }
-
-    // Mark actual months in our range
     const actualMinDate = new Date(Math.min(...filteredExpenses.map(e => new Date(e.date))));
     const actualMaxDate = new Date(Math.max(...filteredExpenses.map(e => new Date(e.date))));
-
     months.forEach(m => {
       const [monthName, yearStr] = m.month.split(' ');
       const year = 2000 + parseInt(yearStr);
       const monthIndex = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(monthName);
       const monthDate = new Date(year, monthIndex, 1);
-
-      if (monthDate >= actualMinDate && monthDate <= actualMaxDate) {
-        m.isPaddingMonth = false;
-      }
+      if (monthDate >= actualMinDate && monthDate <= actualMaxDate) m.isPaddingMonth = false;
     });
-
-    // Aggregate actual expense data
     filteredExpenses.forEach(e => {
       const dt = new Date(e.date);
       if (isNaN(dt)) return;
-
       const year = dt.getFullYear();
       const month = dt.getMonth();
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const key = monthNames[month] + " " + String(year).slice(-2);
-
       const monthData = months.find(m => m.month === key);
       if (monthData) {
         const a = e.inrAmount ?? 0;
@@ -542,23 +463,17 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
         monthData.isPaddingMonth = false;
       }
     });
-
-    const sorted = months.sort((a, b) => a.sortVal - b.sortVal);
-    console.log("Generated months:", sorted.map(m => ({
-      month: m.month,
-      hasTransactions: m.hasTransactions,
-      transactionCount: m.transactionCount,
-      isPadding: m.isPaddingMonth
-    })));
-
-    return sorted;
+    return months.sort((a, b) => a.sortVal - b.sortVal);
   }, [filteredExpenses]);
 
   const companyData = useMemo(() => {
     const map = {};
     filteredExpenses.forEach(e => {
-      const c = e.company || "Unknown"; if (!map[c]) map[c] = { company: c, spend: 0, credit: 0, net: 0 };
-      const a = e.inrAmount ?? 0; if (a < 0) map[c].spend += Math.abs(a); else map[c].credit += a;
+      const c = e.company || "Unknown";
+      if (!map[c]) map[c] = { company: c, spend: 0, credit: 0, net: 0 };
+      const a = e.inrAmount ?? 0;
+      if (a < 0) map[c].spend += Math.abs(a);
+      else map[c].credit += a;
       map[c].net = map[c].credit - map[c].spend;
     });
     return Object.values(map).sort((a, b) => (b.spend + b.credit) - (a.spend + a.credit));
@@ -567,8 +482,10 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const typeData = useMemo(() => {
     const map = {};
     filteredExpenses.forEach(e => {
-      const t = e.typeLabel || e.type || "Other"; if (!map[t]) map[t] = { name: t, value: 0, count: 0 };
-      map[t].value += Math.abs(e.inrAmount ?? 0); map[t].count++;
+      const t = e.typeLabel || e.type || "Other";
+      if (!map[t]) map[t] = { name: t, value: 0, count: 0 };
+      map[t].value += Math.abs(e.inrAmount ?? 0);
+      map[t].count++;
     });
     return Object.values(map).sort((a, b) => b.value - a.value);
   }, [filteredExpenses]);
@@ -576,8 +493,11 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const countryData = useMemo(() => {
     const map = {};
     filteredExpenses.forEach(e => {
-      const c = e.countryLabel || e.country || "Unknown"; if (!map[c]) map[c] = { name: c, spend: 0, credit: 0 };
-      const a = e.inrAmount ?? 0; if (a < 0) map[c].spend += Math.abs(a); else map[c].credit += a;
+      const c = e.countryLabel || e.country || "Unknown";
+      if (!map[c]) map[c] = { name: c, spend: 0, credit: 0 };
+      const a = e.inrAmount ?? 0;
+      if (a < 0) map[c].spend += Math.abs(a);
+      else map[c].credit += a;
     });
     return Object.values(map).sort((a, b) => (b.spend + b.credit) - (a.spend + a.credit)).slice(0, 8);
   }, [filteredExpenses]);
@@ -585,8 +505,11 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const deptData = useMemo(() => {
     const map = {};
     filteredExpenses.forEach(e => {
-      const d = e.department || "General"; if (!map[d]) map[d] = { name: d, spend: 0, credit: 0 };
-      const a = e.inrAmount ?? 0; if (a < 0) map[d].spend += Math.abs(a); else map[d].credit += a;
+      const d = e.department || "General";
+      if (!map[d]) map[d] = { name: d, spend: 0, credit: 0 };
+      const a = e.inrAmount ?? 0;
+      if (a < 0) map[d].spend += Math.abs(a);
+      else map[d].credit += a;
     });
     return Object.values(map).sort((a, b) => b.spend - a.spend).slice(0, 8);
   }, [filteredExpenses]);
@@ -594,8 +517,10 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const currencyData = useMemo(() => {
     const map = {};
     filteredExpenses.forEach(e => {
-      const c = e.currencyLabel || e.currency || "INR"; if (!map[c]) map[c] = { name: c, value: 0, count: 0 };
-      map[c].value += Math.abs(e.inrAmount ?? 0); map[c].count++;
+      const c = e.currencyLabel || e.currency || "INR";
+      if (!map[c]) map[c] = { name: c, value: 0, count: 0 };
+      map[c].value += Math.abs(e.inrAmount ?? 0);
+      map[c].count++;
     });
     return Object.values(map).sort((a, b) => b.value - a.value);
   }, [filteredExpenses]);
@@ -605,7 +530,9 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
     filteredExpenses.forEach(e => {
       if (!e.counterparty) return;
       if (!map[e.counterparty]) map[e.counterparty] = { name: e.counterparty, spend: 0, credit: 0, count: 0 };
-      const a = e.inrAmount ?? 0; if (a < 0) map[e.counterparty].spend += Math.abs(a); else map[e.counterparty].credit += a;
+      const a = e.inrAmount ?? 0;
+      if (a < 0) map[e.counterparty].spend += Math.abs(a);
+      else map[e.counterparty].credit += a;
       map[e.counterparty].count++;
     });
     return Object.values(map).sort((a, b) => (b.spend + b.credit) - (a.spend + a.credit)).slice(0, 10);
@@ -624,85 +551,67 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const tk = (sz = 11, col = "#9ca3af") => ({ fontSize: sz, fill: col, fontFamily: "'Poppins',sans-serif" });
   const lgnd = { iconType: "square", iconSize: 10, wrapperStyle: { fontSize: 11, fontFamily: "'Poppins',sans-serif" } };
 
-  // Get selected entity details for display
   const selectedEntityDetails = useMemo(() =>
     legalEntities.find(e => e._id === selectedEntity),
     [legalEntities, selectedEntity]
   );
 
-  // Get companies count for selected entity
   const entityCompaniesCount = useMemo(() => {
     if (selectedEntity === "__all__") return companies.length;
     return companies.filter(c => String(c.legalEntityId) === String(selectedEntity)).length;
   }, [companies, selectedEntity]);
 
   if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
-      <div style={{ textAlign: "center", fontFamily: "'Poppins',sans-serif" }}>
-        <div style={{
-          width: 40, height: 40, border: "3px solid #ede9fe", borderTopColor: ACCENT,
-          borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px",
-        }} />
-        <p style={{ color: "#9ca3af", fontSize: 13 }}>Loading analytics…</p>
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center" style={{ fontFamily: "'Poppins',sans-serif" }}>
+        <div className="w-10 h-10 border-[3px] border-violet-100 border-t-violet-600 rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-gray-400 text-[13px]">Loading analytics…</p>
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 
-  const card = {
-    background: "white", borderRadius: 14, border: "1px solid #f0f0f0",
-    padding: "22px 24px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", fontFamily: "'Poppins',sans-serif",
-  };
+  const cardClass = "bg-white rounded-2xl border border-gray-100 p-6 shadow-sm";
 
   return (
-    <div style={{ fontFamily: "'Poppins',sans-serif", minHeight: "100vh", padding: "0 0 60px", background: "#fafafa" }}>
+    <div className="min-h-screen pb-16 bg-gray-50" style={{ fontFamily: "'Poppins',sans-serif" }}>
 
       {/* Header */}
-      <div style={{
-        background: "white", borderBottom: "1px solid #f0f0f0", padding: "18px 28px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        flexWrap: "wrap", gap: 12, position: "sticky", top: 0, zIndex: 30,
-        boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: ACCENT, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <BarChart2 size={20} style={{ color: "white" }} />
+      <div className="bg-white border-b border-gray-100 px-7 py-[18px] flex items-center justify-between flex-wrap gap-3 sticky top-0 z-30 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-[10px] flex items-center justify-center" style={{ background: ACCENT }}>
+            <BarChart2 size={20} className="text-white" />
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#111827" }}>Expense Analytics</h1>
-            <p style={{ margin: 0, fontSize: 11, color: "#9ca3af", marginTop: 1 }}>
+            <h1 className="m-0 text-xl font-bold text-gray-900">Expense Analytics</h1>
+            <p className="m-0 text-[11px] text-gray-400 mt-0.5">
               {filteredExpenses.length} transactions · {entityCompaniesCount} companies
               {selectedEntityDetails && (
-                <span style={{ marginLeft: 8, padding: "2px 8px", background: "#ede9fe", color: "#3730a3", borderRadius: 12, fontSize: 10 }}>
+                <span className="ml-2 px-2 py-0.5 bg-violet-100 text-indigo-800 rounded-xl text-[10px]">
                   {selectedEntityDetails.companyName}
                 </span>
               )}
             </p>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="flex items-center gap-2.5">
           <LegalEntitySelector
             entities={legalEntities}
             value={selectedEntity}
             onChange={setSelectedEntity}
           />
           <button
-            onClick={() => {
-              fetchExpenses();
-              fetchLegalEntities();
-              fetchCompanies();
-            }}
-            className="inline-flex items-center gap-1.25 px-[12px] py-[12px] bg-white border border-gray-300 rounded-full text-[12px] font-semibold text-gray-700 cursor-pointer font-[Poppins] transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 active:scale-95"
+            onClick={() => { fetchExpenses(); fetchLegalEntities(); fetchCompanies(); }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-full text-[12px] font-semibold text-gray-700 cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 active:scale-95"
           >
             <RefreshCw size={12} className="transition-transform duration-300 active:rotate-180" />
           </button>
         </div>
       </div>
 
-      <div style={{ padding: "28px", maxWidth: 1400, margin: "0 auto" }}>
+      <div className="px-3 py-7 max-w-350 mx-auto">
 
         {/* KPIs */}
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 32 }}>
+        <div className="flex gap-4 flex-wrap mb-8">
           <StatCard label="Total Spend" value={totalSpend} color={RED} icon={TrendingDown}
             sub={`${filteredExpenses.filter(e => (e.inrAmount ?? 0) < 0).length} debit transactions`} />
           <StatCard label="Total Credit" value={totalCredit} color={GREEN} icon={TrendingUp}
@@ -715,8 +624,8 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
         </div>
 
         {/* Monthly Cash Flow */}
-        {monthlyData.length > 0 && (  
-          <div style={{ ...card, marginBottom: 24 }}>
+        {monthlyData.length > 0 && (
+          <div className={`${cardClass} mb-6`}>
             <SectionHeader icon={Calendar} title="Monthly Cash Flow" sub="Hover any point for details" />
             <ResponsiveContainer width="100%" height={350}>
               <ComposedChart data={monthlyData} margin={{ top: 4, right: 20, bottom: 4, left: 0 }}>
@@ -739,11 +648,11 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
           </div>
         )}
 
-        {/* Company Breakdown - Only show when All Entities is selected or when entity has multiple companies */}
+        {/* Company Breakdown */}
         {(selectedEntity === "__all__" || companyData.length > 1) && companyData.length > 0 && (
-          <div style={{ ...card, marginBottom: 24 }}>
+          <div className={`${cardClass} mb-6`}>
             <SectionHeader icon={Building2} title="Company Breakdown" sub="Hover bars for details" />
-            <ResponsiveContainer  width="90%" height={Math.max(260, companyData.length * 60)}>
+            <ResponsiveContainer width="90%" height={Math.max(260, companyData.length * 60)}>
               <BarChart data={companyData} layout="vertical" margin={{ top: 4, right: 15, bottom: 4, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" horizontal={false} />
                 <XAxis type="number" tickFormatter={v => "₹" + fmt(v)} tick={tk(11, "#9ca3af")} />
@@ -757,39 +666,31 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
           </div>
         )}
 
-        {/* If entity selected, show company summary */}
+        {/* Single company summary */}
         {selectedEntity !== "__all__" && companyData.length === 1 && (
-          <div style={{ ...card, marginBottom: 24, background: "#f8f7ff", borderColor: "#c4b5fd" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{
-                  width: 48, height: 48, borderRadius: 12,
-                  background: ACCENT + "22",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
+          <div className={`${cardClass} mb-6 bg-violet-50 border-violet-300`}>
+            <div className="flex items-center gap-4 justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: ACCENT + "22" }}>
                   <Building2 size={24} style={{ color: ACCENT }} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
-                    {companyData[0].company}
-                  </h3>
-                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#6b7280" }}>
-                    Single company under this legal entity
-                  </p>
+                  <h3 className="m-0 text-base font-bold text-gray-900">{companyData[0].company}</h3>
+                  <p className="m-0 mt-1 text-xs text-gray-500">Single company under this legal entity</p>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 24 }}>
+              <div className="flex gap-6">
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Spend</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: RED }}>₹{fmt(companyData[0].spend)}</span>
+                  <span className="text-[11px] text-gray-400 block">Spend</span>
+                  <span className="text-base font-bold" style={{ color: RED }}>₹{fmt(companyData[0].spend)}</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Credit</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: GREEN }}>₹{fmt(companyData[0].credit)}</span>
+                  <span className="text-[11px] text-gray-400 block">Credit</span>
+                  <span className="text-base font-bold" style={{ color: GREEN }}>₹{fmt(companyData[0].credit)}</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Net</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: companyData[0].net >= 0 ? GREEN : RED }}>
+                  <span className="text-[11px] text-gray-400 block">Net</span>
+                  <span className="text-base font-bold" style={{ color: companyData[0].net >= 0 ? GREEN : RED }}>
                     {companyData[0].net >= 0 ? "+" : "-"}₹{fmt(Math.abs(companyData[0].net))}
                   </span>
                 </div>
@@ -799,13 +700,11 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
         )}
 
         {/* Type Pie + Ratio Pie */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
-
-          {/* Transaction Type */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
           {typeData.length > 0 && (
-            <div style={card}>
+            <div className={cardClass}>
               <SectionHeader icon={PieChart} title="By Transaction Type" />
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div className="flex items-center gap-2">
                 <RPie width={220} height={220}>
                   <Pie
                     data={typeData} cx={110} cy={110}
@@ -818,30 +717,29 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
                     {typeData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                 </RPie>
-                <div style={{ flex: 1, paddingLeft: 4 }}>
+                <div className="flex-1 pl-1">
                   {typeData.map((t, i) => {
                     const tot = typeData.reduce((s, x) => s + x.value, 0);
                     const isActive = i === activePieType;
                     return (
-                      <div key={t.name}
+                      <div
+                        key={t.name}
                         onMouseEnter={() => setActivePieType(i)}
-                        style={{
-                          display: "flex", alignItems: "center", gap: 8, marginBottom: 6,
-                          padding: "6px 8px", borderRadius: 8, cursor: "pointer",
-                          background: isActive ? COLORS[i % COLORS.length] + "12" : "transparent",
-                          transition: "background 0.15s",
-                        }}
+                        className="flex items-center gap-2 mb-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-colors duration-150"
+                        style={{ background: isActive ? COLORS[i % COLORS.length] + "12" : "transparent" }}
                       >
-                        <span style={{ width: 10, height: 10, borderRadius: 2, background: COLORS[i % COLORS.length], flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{
-                            fontSize: 11, fontWeight: isActive ? 700 : 600,
-                            color: isActive ? COLORS[i % COLORS.length] : "#374151",
-                            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                          }}>{t.name}</div>
-                          <div style={{ fontSize: 10, color: "#9ca3af" }}>{t.count} txn · {pct(t.value, tot)}</div>
+                        <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className="text-[11px] truncate"
+                            style={{
+                              fontWeight: isActive ? 700 : 600,
+                              color: isActive ? COLORS[i % COLORS.length] : "#374151",
+                            }}
+                          >{t.name}</div>
+                          <div className="text-[10px] text-gray-400">{t.count} txn · {pct(t.value, tot)}</div>
                         </div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: COLORS[i % COLORS.length] }}>
+                        <div className="text-[11px] font-bold" style={{ color: COLORS[i % COLORS.length] }}>
                           ₹{fmt(t.value)}
                         </div>
                       </div>
@@ -852,11 +750,10 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
             </div>
           )}
 
-          {/* Spend vs Credit Ratio */}
           {(totalSpend > 0 || totalCredit > 0) && (
-            <div style={card}>
+            <div className={cardClass}>
               <SectionHeader icon={Activity} title="Spend vs Credit Ratio" />
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 32 }}>
+              <div className="flex items-center justify-center gap-8">
                 <RPie width={220} height={220}>
                   <Pie
                     data={ratioData} cx={110} cy={110}
@@ -876,22 +773,22 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
                     const isActive = i === activePieRatio;
                     const col = i === 0 ? RED : GREEN;
                     return (
-                      <div key={r.name}
+                      <div
+                        key={r.name}
                         onMouseEnter={() => setActivePieRatio(i)}
+                        className="mb-4 px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-150"
                         style={{
-                          marginBottom: 16, padding: "10px 14px", borderRadius: 10, cursor: "pointer",
                           background: isActive ? col + "10" : "transparent",
                           border: isActive ? `1px solid ${col}30` : "1px solid transparent",
-                          transition: "all 0.15s",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                          <span style={{ width: 10, height: 10, borderRadius: 2, background: col }} />
-                          <span style={{ fontSize: 12, fontWeight: 700, color: col }}>{r.name}</span>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: col }} />
+                          <span className="text-xs font-bold" style={{ color: col }}>{r.name}</span>
                         </div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: col }}>₹{fmt(r.value)}</div>
-                        <div style={{ fontSize: 11, color: "#9ca3af" }}>{pct(r.value, tot)} of total flow</div>
-                        <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>{fmtFull(r.value)}</div>
+                        <div className="text-xl font-bold" style={{ color: col }}>₹{fmt(r.value)}</div>
+                        <div className="text-[11px] text-gray-400">{pct(r.value, tot)} of total flow</div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">{fmtFull(r.value)}</div>
                       </div>
                     );
                   })}
@@ -903,9 +800,9 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
 
         {/* Department Spend */}
         {deptData.length > 0 && (
-          <div style={{ ...card, marginBottom: 24 }}>
+          <div className={`${cardClass} mb-6`}>
             <SectionHeader icon={Layers} title="Department Spend" sub="Hover bars for details" />
-            <ResponsiveContainer width="100%" height={Math.max(220, deptData.length * 52)}>
+            <ResponsiveContainer width="90%" height={Math.max(220, deptData.length * 52)}>
               <BarChart data={deptData} layout="vertical" margin={{ top: 4, right: 15, bottom: 4, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" horizontal={false} />
                 <XAxis type="number" tickFormatter={v => "₹" + fmt(v)} tick={tk(11, "#9ca3af")} />
@@ -920,9 +817,9 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
         )}
 
         {/* Country + Currency */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+        <div className="grid grid-cols-2 gap-6 mb-6">
           {countryData.length > 0 && (
-            <div style={card}>
+            <div className={cardClass}>
               <SectionHeader icon={Globe} title="By Country" sub="Top 8 countries — hover for details" />
               <ResponsiveContainer width="100%" height={Math.max(220, countryData.length * 52)}>
                 <BarChart data={countryData} layout="vertical" margin={{ top: 4, right: 12, bottom: 4, left: 0 }}>
@@ -939,7 +836,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
           )}
 
           {currencyData.length > 0 && (
-            <div style={card}>
+            <div className={cardClass}>
               <SectionHeader icon={DollarSign} title="By Currency" sub="INR equivalent — hover for details" />
               <ResponsiveContainer width="100%" height={Math.max(220, currencyData.length * 52)}>
                 <BarChart data={currencyData} layout="vertical" margin={{ top: 4, right: 12, bottom: 4, left: 50 }}>
@@ -958,18 +855,18 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
 
         {/* Top Counterparties */}
         {cpData.length > 0 && (
-          <div style={{ ...card, marginBottom: 24 }}>
+          <div className={`${cardClass} mb-6`}>
             <SectionHeader icon={Activity} title="Top Counterparties" sub="Hover rows for details" />
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr style={{ borderBottom: "2px solid #f0f0f0" }}>
+                  <tr className="border-b-2 border-gray-100">
                     {["#", "Counterparty", "Transactions", "Spend", "Credit", "Net", "Share"].map(h => (
-                      <th key={h} style={{
-                        padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "#9ca3af",
-                        textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap",
-                        textAlign: h === "#" || h === "Transactions" ? "center" : h === "Counterparty" ? "left" : "right",
-                      }}>{h}</th>
+                      <th
+                        key={h}
+                        className="py-2.5 px-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap"
+                        style={{ textAlign: h === "#" || h === "Transactions" ? "center" : h === "Counterparty" ? "left" : "right" }}
+                      >{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -985,7 +882,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
 
         {/* Net Flow by Company */}
         {selectedEntity === "__all__" && companyData.length > 1 && (
-          <div style={card}>
+          <div className={cardClass}>
             <SectionHeader icon={BarChart2} title="Net Flow by Company" sub="Positive = surplus · Negative = deficit — hover for details" />
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={companyData} margin={{ top: 4, right: 20, bottom: 56, left: 0 }}>
@@ -1003,47 +900,41 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
           </div>
         )}
 
-        {/* Legal Entity Details Card - Additional Info */}
+        {/* Legal Entity Details Card */}
         {selectedEntity !== "__all__" && selectedEntityDetails && (
-          <div style={{ ...card, marginTop: 24, background: "#f8f7ff", borderColor: "#c4b5fd" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: 12,
-                background: ACCENT + "22",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
+          <div className={`${cardClass} mt-6 bg-violet-50 border-violet-300`}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: ACCENT + "22" }}>
                 <Building2 size={24} style={{ color: ACCENT }} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#111827" }}>
-                  {selectedEntityDetails.companyName}
-                </h3>
-                <div style={{ display: "flex", gap: 16, marginTop: 4, flexWrap: "wrap" }}>
+                <h3 className="m-0 text-base font-bold text-gray-900">{selectedEntityDetails.companyName}</h3>
+                <div className="flex gap-4 mt-1 flex-wrap">
                   {selectedEntityDetails.countryName && (
-                    <span style={{ fontSize: 12, color: "#6b7280", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
                       <Globe size={12} /> {selectedEntityDetails.countryName}
                     </span>
                   )}
                   {selectedEntityDetails.localCurrencyCode && (
-                    <span style={{ fontSize: 12, color: "#6b7280", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
                       <DollarSign size={12} /> Local: {selectedEntityDetails.localCurrencyCode}
                     </span>
                   )}
                   {selectedEntityDetails.foreignCurrencyCode && (
-                    <span style={{ fontSize: 12, color: "#6b7280", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
                       <DollarSign size={12} /> Foreign: {selectedEntityDetails.foreignCurrencyCode}
                     </span>
                   )}
                 </div>
               </div>
-              <div style={{ marginLeft: "auto", display: "flex", gap: 16 }}>
+              <div className="ml-auto flex gap-4">
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Companies</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: ACCENT }}>{entityCompaniesCount}</span>
+                  <span className="text-[11px] text-gray-400 block">Companies</span>
+                  <span className="text-base font-bold" style={{ color: ACCENT }}>{entityCompaniesCount}</span>
                 </div>
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", display: "block" }}>Transactions</span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: ACCENT }}>{txCount}</span>
+                  <span className="text-[11px] text-gray-400 block">Transactions</span>
+                  <span className="text-base font-bold" style={{ color: ACCENT }}>{txCount}</span>
                 </div>
               </div>
             </div>
@@ -1052,12 +943,10 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
 
         {/* No Data Message */}
         {filteredExpenses.length === 0 && selectedEntity !== "__all__" && (
-          <div style={{ ...card, textAlign: "center", padding: "48px 24px" }}>
-            <Building2 size={48} style={{ color: "#9ca3af", marginBottom: 16, opacity: 0.3 }} />
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: "#374151", marginBottom: 8 }}>
-              No Expenses Found
-            </h3>
-            <p style={{ fontSize: 13, color: "#9ca3af", maxWidth: 400, margin: "0 auto" }}>
+          <div className={`${cardClass} text-center py-12`}>
+            <Building2 size={48} className="text-gray-400 mb-4 opacity-30 mx-auto" />
+            <h3 className="text-base font-semibold text-gray-700 mb-2">No Expenses Found</h3>
+            <p className="text-[13px] text-gray-400 max-w-[400px] mx-auto">
               No expenses found for {selectedEntityDetails?.companyName}.
             </p>
           </div>

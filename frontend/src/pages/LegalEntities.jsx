@@ -408,9 +408,7 @@ export default function LegalEntities() {
   const getCompanyCount = (entityId) =>
     allCompanies.filter((c) => c.legalEntityId === entityId).length;
 
-  // Calculate financial metrics for each entity
   const getEntityFinancials = (entityId) => {
-    // Get all companies under this legal entity
     const entityCompanies = allCompanies
       .filter(c => String(c.legalEntityId) === String(entityId))
       .map(c => c.companyName);
@@ -419,10 +417,8 @@ export default function LegalEntities() {
       return { spend: 0, credit: 0, net: 0 };
     }
 
-    // Calculate totals from expenses
     let spend = 0;
     let credit = 0;
-
     allExpenses.forEach(expense => {
       if (entityCompanies.includes(expense.company)) {
         const amount = expense.inrAmount ?? 0;
@@ -434,11 +430,7 @@ export default function LegalEntities() {
       }
     });
 
-    return {
-      spend,
-      credit,
-      net: credit - spend
-    };
+    return { spend, credit, net: credit - spend };
   };
 
   const totalActive = [
@@ -536,10 +528,11 @@ export default function LegalEntities() {
                   <span className="text-sm font-semibold text-green-600">₹{fmt(stats.totalCredit)}</span>
                 </div>
               </div>
-              <div className="flex flex-col items-end px-2.5 py-0.5">
+              <div className="flex flex-col items-enditems-mi px-2.5 py-0.5">
                 <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Net</span>
-                <span className={`text-sm font-bold ${stats.net >= 0 ? "text-green-600" : "text-red-600"}`}>
-                  {stats.net >= 0 ? "+" : "-"}₹{fmt(Math.abs(stats.net))}
+                {/* FIX 1: inline-flex keeps +/− sign and number on the same line */}
+                <span className={`text-sm  font-bold inline-flex items-center whitespace-nowrap ${stats.net >= 0 ? "text-green-600" : "text-red-600"}`}>
+                  {stats.net >= 0 ? "+" : "−"}₹{fmt(Math.abs(stats.net))}
                 </span>
               </div>
             </div>
@@ -600,7 +593,7 @@ export default function LegalEntities() {
 
       {/* ── Table ── */}
       <div className="p-4">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded border border-slate-200 shadow-sm overflow-x-auto">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
@@ -623,11 +616,11 @@ export default function LegalEntities() {
               {!search && totalActive === 0 && <p className="text-xs mt-1">Click "Create" to add one</p>}
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" style={{ minWidth: 900 }}>
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  {["Company", "Country", "Local Currency", "Foreign Currency", "Net", "Spend", "Credit", "Companies", ""].map((col) => (
-                    <th key={col} className="px-4 py-3 text-left text-xs font-bold text-slate-500 tracking-wider uppercase">{col}</th>
+                  {["Company", "Country", "Local Currency", "Foreign Currency", "Spend", "Credit", "Net", "Companies", ""].map((col) => (
+                    <th key={col} className="px-7 py-3 text-left text-sm font-bold text-black tracking-[0.02em] whitespace-nowrap">{col}</th>
                   ))}
                 </tr>
               </thead>
@@ -637,22 +630,22 @@ export default function LegalEntities() {
                   const financials = getEntityFinancials(entity._id);
                   const h = entityHue(entity.companyName);
                   return (
-                    <tr key={entity._id} className="hover:bg-slate-50 transition-colors group">
-                      <td className="px-4 py-3">
-                        <div className="flex gap-3">
+                    <tr key={entity._id} className="hover:bg-slate-50 transition-colors group align-middle">
+                      <td className="px-7 py-3 whitespace-nowrap">
+                        <div className="flex gap-3 items-center">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                             style={{ background: `hsl(${h},60%,88%)`, color: `hsl(${h},55%,32%)` }}>
                             {entity.companyName?.slice(0, 2).toUpperCase()}
                           </div>
-                          <span className="font-semibold pt-1.5 text-slate-800">{entity.companyName}</span>
+                          <span className="font-semibold text-slate-800">{entity.companyName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-7 py-3 whitespace-nowrap ">
                         {entity.countryName
-                          ? <span className="flex items-center gap-1.5 text-slate-600"><Globe size={13} className="text-slate-400" />{entity.countryName}</span>
+                          ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-slate-100 text-slate-700"><Globe size={13} className="text-slate-600" />{entity.countryName}</span>
                           : <span className="text-slate-300 text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-7 py-3 whitespace-nowrap">
                         {entity.localCurrencyCode
                           ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-green-50 text-green-700">
                             <span className="text-base leading-none">{getCurrencySymbol(entity.localCurrencyCode)}</span>
@@ -660,7 +653,7 @@ export default function LegalEntities() {
                           </span>
                           : <span className="text-slate-300 text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-7 py-3 whitespace-nowrap">
                         {entity.foreignCurrencyCode
                           ? <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-violet-50 text-violet-700">
                             <span className="text-base leading-none">{getCurrencySymbol(entity.foreignCurrencyCode)}</span>
@@ -668,30 +661,19 @@ export default function LegalEntities() {
                           </span>
                           : <span className="text-slate-300 text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-red-600">₹{fmt(financials.spend)}</span>
-                          
-                        </div>
+                      <td className="px-7 py-3 whitespace-nowrap">
+                        <span className="font-semibold text-red-600">₹{fmt(financials.spend)}</span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-green-600">₹{fmt(financials.credit)}</span>
-                        
-                        </div>
+                      <td className="px-7 py-3 whitespace-nowrap">
+                        <span className="font-semibold text-green-600">₹{fmt(financials.credit)}</span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col">
-                          <span className={`font-bold ${financials.net >= 0 ? "text-green-600" : "text-red-600"}`}>
-                            {financials.net >= 0 ? "+" : "-"}₹{fmt(Math.abs(financials.net))}
-                          </span>
-                          <span className={`text-[10px] mt-0.5 ${financials.net >= 0 ? "text-green-500" : "text-red-500"}`}>
-                            {financials.net >= 0 ? "Surplus" : "Deficit"}
-                          </span>
-                        </div>
+                      <td className="px-7 py-3 text-center whitespace-nowrap">
+                        <span className={`font-bold inline-flex items-left gap-1 whitespace-nowrap ${financials.net >= 0 ? "text-green-600" : "text-red-600"}`}>
+                          {financials.net >= 0 ? "+" : "−"}₹{fmt(Math.abs(financials.net))}
+                          {financials.net >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        </span>
                       </td>
-
-                      <td className="px-4 py-3">
+                      <td className="px-7 py-3 whitespace-nowrap">
                         <button onClick={() => setAssignEntity(entity)} className="flex items-center gap-2 cursor-pointer group/btn">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition ${count > 0
                             ? "bg-blue-50 text-blue-700 group-hover/btn:bg-blue-100"
@@ -704,7 +686,7 @@ export default function LegalEntities() {
                           </span>
                         </button>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-7 py-3">
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
                           <button onClick={() => openEdit(entity)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer">

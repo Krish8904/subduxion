@@ -105,7 +105,7 @@ const ContactInquiries = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
                         <svg
-                          className="w-6 h-6 text-white"
+                          className="w-8 h-15 text-white"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"

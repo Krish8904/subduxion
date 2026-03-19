@@ -71,7 +71,6 @@ app.use("/api/expense-masters", ExpenseMasterRoutes);
 
 app.use("/api", invoiceCounter);
 
-
 app.use("/api/legal-entities", legalentityRoutes);  
 
 

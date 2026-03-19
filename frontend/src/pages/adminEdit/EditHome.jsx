@@ -586,9 +586,9 @@ const EditHome = ({ pageTitle }) => {
       {showFullPreview && (
         <div className="fixed inset-0 bg-black/60 z-9999 flex items-center justify-center p-6 backdrop-blur-sm text-left">
           <div className="bg-white w-[95%] h-[95%] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div className="p-5 border-b flex justify-between items-center bg-gray-50 px-10">
+            <div className=" border-b flex justify-between items-center bg-gray-50 pl-2">
               <span className="font-bold uppercase tracking-widest text-[10px] bg-blue-600 text-white px-3 py-1 rounded-full">Live Home Preview</span>
-              <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl leading-none cursor-pointer">&times;</button>
+              <button onClick={() => setShowFullPreview(false)} className="text-gray-400 hover:text-red-500 text-4xl leading-none pr-2 cursor-pointer">&times;</button>
             </div>
 
             <iframe
@@ -596,9 +596,6 @@ const EditHome = ({ pageTitle }) => {
               className="flex-1 w-full border-none"
               title="Home Preview"
             />
-            <div className="p-4 border-t flex justify-end bg-gray-50 px-10">
-              <button onClick={() => setShowFullPreview(false)} className="bg-slate-900 text-white px-10 py-2 rounded-xl font-bold cursor-pointer">Close Preview</button>
-            </div>
           </div>
         </div>
       )}

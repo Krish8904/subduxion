@@ -145,7 +145,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
         onClick={handleOverlay}
         className="fixed inset-0 z-1000 flex items-center justify-center p-5 bg-slate-900/50 backdrop-blur-sm"
       >
-        <div className="bg-white w-full max-w-300 h-full max-h-[93vh] flex flex-col border shadow-2xl overflow-hidden rounded-sm">
+        <div className="bg-white w-full max-w-300 h-full max-h-[93vh] flex flex-col  border-transparent shadow-2xl overflow-hidden rounded-md">
 
           {/* ── HEADER ── */}
           <div className="flex items-center justify-between px-6 border-b border-slate-700 bg-slate-700 shrink-0" style={{ height: 52 }}>
@@ -195,7 +195,7 @@ const CompanyLedgerModal = ({ company, allExpenses = [], onClose, sourceExpense 
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Period</span>
             {[
               { label: "From", val: fromDate, set: setFromDate, max: toDate, min: undefined },
-              { label: "To", val: toDate, set: setToDate, max: undefined, min: fromDate },
+              { label: "to", val: toDate, set: setToDate, max: undefined, min: fromDate },
             ].map(({ label, val, set, max, min }) => (
               <div key={label} className="flex items-center gap-2">
                 <label className="text-xs text-slate-500 font-medium">{label}</label>
