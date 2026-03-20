@@ -1,5 +1,5 @@
 import express from "express";
-import Booking from "../models/booking.js";
+import booking from '../models/Booking.js'
 import addLog from "../utils/addLog.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
