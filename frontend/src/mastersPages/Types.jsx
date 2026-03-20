@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:5000/api/expense-masters";
+const API = "https://subduxion.onrender.com/api/expense-masters";
 
 export default function AdminTypesPage() {
   const [types, setTypes] = useState([]);

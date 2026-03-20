@@ -9,10 +9,10 @@ import {
 } from "lucide-react";
 import FilterLegalEntities, { DEFAULT_FILTERS } from "../utils/FilterLegalEntity";
 
-const API = "http://localhost:5000/api/legal-entities";
-const MASTERS_API = "http://localhost:5000/api/expense-masters/all";
-const COMPANIES_API = "http://localhost:5000/api/companies";
-const EXPENSES_API = "http://localhost:5000/api/expenses";
+const API = "https://subduxion.onrender.com/api/legal-entities";
+const MASTERS_API = "https://subduxion.onrender.com/api/expense-masters/all";
+const COMPANIES_API = "https://subduxion.onrender.com/api/companies";
+const EXPENSES_API = "https://subduxion.onrender.com/api/expenses";
 
 const fmt = (num) =>
   num == null ? "—" : Number(num).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });

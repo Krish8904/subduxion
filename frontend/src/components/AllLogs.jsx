@@ -13,7 +13,7 @@ export default function AllLogs() {
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.get("http://localhost:5000/api/logs");
+      const res = await axios.get("https://subduxion.onrender.com/api/logs");
 
       // Ensure logs is always an array
       const data = Array.isArray(res.data.logs)

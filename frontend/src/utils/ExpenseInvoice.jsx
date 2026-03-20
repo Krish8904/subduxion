@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 async function getNextInvoiceNumber(company) {
-  const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/invoice-number/${encodeURIComponent(company)}`, { method: "POST" });
+  const res = await fetch(`${import.meta.env.VITE_API_URL || "https://subduxion.onrender.com"}/api/invoice-number/${encodeURIComponent(company)}`, { method: "POST" });
   if (!res.ok) throw new Error("Failed to fetch invoice number");
   const { invNum } = await res.json();
   return invNum;

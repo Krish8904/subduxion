@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Plus } from "lucide-react";
 
-const API = "http://localhost:5000/api/expense-masters";
+const API = "https://subduxion.onrender.com/api/expense-masters";
 
 export default function AdminCountriesPage() {
   const [countries, setCountries] = useState([]);

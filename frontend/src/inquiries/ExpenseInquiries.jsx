@@ -389,7 +389,7 @@ const ExpenseInquiries = () => {
 
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/expenses");
+      const res = await axios.get("https://subduxion.onrender.com/api/expenses");
       if (res.data.success) setExpenses(res.data.data);
     } catch (err) {
       console.error(err);
@@ -400,7 +400,7 @@ const ExpenseInquiries = () => {
 
   const fetchLegalEntities = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/legal-entities");
+      const res = await axios.get("https://subduxion.onrender.com/api/legal-entities");
       const raw = res.data;
       const list = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : Array.isArray(raw?.legalEntities) ? raw.legalEntities : [];
       setLegalEntities(list);
@@ -411,7 +411,7 @@ const ExpenseInquiries = () => {
 
   const fetchAllCompanies = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/companies");
+      const res = await axios.get("https://subduxion.onrender.com/api/companies");
       const raw = res.data;
       const list = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : Array.isArray(raw?.companies) ? raw.companies : [];
       setAllCompanies(list);

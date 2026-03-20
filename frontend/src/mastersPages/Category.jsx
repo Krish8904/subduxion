@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Globe, Plus, Pencil, Trash2, X, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 
-const API = "http://localhost:5000/api/masters";
+const API = "https://subduxion.onrender.com/api/masters";
 
 export default function Category() {
   const [categories, setCategories] = useState([]);

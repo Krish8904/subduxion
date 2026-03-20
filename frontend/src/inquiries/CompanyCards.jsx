@@ -332,7 +332,7 @@ export default function CompanyCards({ search: externalSearch = "" }) {
   const fetchCompanies = () => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api/companies")
+      .get("https://subduxion.onrender.com/api/companies")
       .then((res) => { if (res.data.success) setCompanies(res.data.data); })
       .catch(console.error)
       .finally(() => setLoading(false));

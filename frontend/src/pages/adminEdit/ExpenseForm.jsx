@@ -4,9 +4,9 @@ import axios from "axios";
 import { Receipt, Building2, DollarSign, TrendingUp, TrendingDown, X, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader, Search, ChevronDown } from "lucide-react";
 import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs";
  
-const MASTERS_API       = "http://localhost:5000/api/expense-masters/all";
-const COMPANIES_API     = "http://localhost:5000/api/companies";
-const LEGAL_ENTITIES_API = "http://localhost:5000/api/legal-entities";
+const MASTERS_API       = "https://subduxion.onrender.com/api/expense-masters/all";
+const COMPANIES_API     = "https://subduxion.onrender.com/api/companies";
+const LEGAL_ENTITIES_API = "https://subduxion.onrender.com/api/legal-entities";
  
 const COL_MAP = {
   "date": "date", "m": "month", "month": "month", "country": "country",
@@ -346,7 +346,7 @@ function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], curren
           country:  resolveId(masters.country,  row.country)  ?? row.country,
           currency: resolveId(masters.currency, row.currency) ?? row.currency,
         };
-        const res = await axios.post("http://localhost:5000/api/expenses", payload);
+        const res = await axios.post("https://subduxion.onrender.com/api/expenses", payload);
         if (res.data.success) success++; else failed++;
       } catch { failed++; }
     }
@@ -612,8 +612,8 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
       };
  
       const res = isEditMode
-        ? await axios.put(`http://localhost:5000/api/expenses/${editData._id}`, payload)
-        : await axios.post("http://localhost:5000/api/expenses", payload);
+        ? await axios.put(`https://subduxion.onrender.com/api/expenses/${editData._id}`, payload)
+        : await axios.post("https://subduxion.onrender.com/api/expenses", payload);
  
       if (!res.data.success) throw new Error(res.data.message);
       showNotification("success", isEditMode ? "Transaction updated!" : "Transaction saved!");

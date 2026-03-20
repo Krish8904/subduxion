@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const API = "http://localhost:5000";
+const API = "https://subduxion.onrender.com";
 
 /* ── palette ── */
 const BLUE = "#3b82f6";

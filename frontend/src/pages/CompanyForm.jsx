@@ -44,7 +44,7 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
   useEffect(() => {
     const fetchMasters = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/masters/all");
+        const response = await axios.get("https://subduxion.onrender.com/api/masters/all");
         if (response.data.success) {
           const data = response.data.data;
           const subcategoryMap = {};
@@ -102,9 +102,9 @@ const CompanyForm = ({ editData = null, onSuccess = null, onClose = null }) => {
     try {
       let response;
       if (isEditMode) {
-        response = await axios.put("http://localhost:5000/api/companies/" + editData._id, formData);
+        response = await axios.put("https://subduxion.onrender.com/api/companies/" + editData._id, formData);
       } else {
-        response = await axios.post("http://localhost:5000/api/companies", formData);
+        response = await axios.post("https://subduxion.onrender.com/api/companies", formData);
       }
       if (response.data.success) {
         showNotification("success", isEditMode ? "Company updated successfully!" : "Company registered successfully!");

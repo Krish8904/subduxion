@@ -338,8 +338,8 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const [activePieType, setActivePieType] = useState(0);
   const [activePieRatio, setActivePieRatio] = useState(0);
 
-  const LEGAL_ENTITIES_API = "http://localhost:5000/api/legal-entities";
-  const COMPANIES_API = "http://localhost:5000/api/companies";
+  const LEGAL_ENTITIES_API = "https://subduxion.onrender.com/api/legal-entities";
+  const COMPANIES_API = "https://subduxion.onrender.com/api/companies";
 
   useEffect(() => {
     if (propExpenses) setExpenses(propExpenses);
@@ -360,7 +360,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const r = await axios.get("http://localhost:5000/api/expenses");
+      const r = await axios.get("https://subduxion.onrender.com/api/expenses");
       if (r.data.success) setExpenses(r.data.data);
     } catch (error) {
       console.error("Failed to fetch expenses:", error);

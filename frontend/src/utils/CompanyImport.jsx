@@ -3,7 +3,7 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import { Upload, X, CheckCircle, AlertCircle, Loader2, FileSpreadsheet } from "lucide-react";
 
-const API = "http://localhost:5000/api";
+const API = "https://subduxion.onrender.com/api";
 const COLUMN_MAP = {
   "Company": "companyName",
   "Company Email": "companyEmail",

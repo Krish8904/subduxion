@@ -223,7 +223,7 @@ export default function AdminDashboard() {
 
   const fetchAllPages = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/pages');
+      const response = await axios.get('https://subduxion.onrender.com/api/pages');
       setAllPages(response.data);
     } catch (error) { console.error(error); }
   };
@@ -232,10 +232,10 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const [pagesRes, companiesRes, jobAppsRes, bookingsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/pages'),
-        axios.get('http://localhost:5000/api/companies'),
-        axios.get('http://localhost:5000/api/career/applications'),
-        axios.get('http://localhost:5000/api/bookings'),
+        fetch('https://subduxion.onrender.com/api/pages'),
+        axios.get('https://subduxion.onrender.com/api/companies'),
+        axios.get('https://subduxion.onrender.com/api/career/applications'),
+        axios.get('https://subduxion.onrender.com/api/bookings'),
       ]);
 
       const pages = await pagesRes.json();
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
 
   const fetchLogs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/logs");
+      const res = await axios.get("https://subduxion.onrender.com/api/logs");
       setLogs(res.data.slice(0, 6));
     } catch (err) { console.error(err); }
   };
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
   const fetchJobs = async () => {
     try {
       setJobsLoading(true);
-      const response = await fetch('http://localhost:5000/api/pages/career');
+      const response = await fetch('https://subduxion.onrender.com/api/pages/career');
       const data = await response.json();
       const allJobs = [];
       if (data.sections?.jobCategories) {

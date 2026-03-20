@@ -20,7 +20,7 @@ export default function Overview() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/pages");
+      const response = await fetch("https://subduxion.onrender.com/api/pages");
       const pages = await response.json();
 
       let servicesCount = 0;
@@ -59,7 +59,7 @@ export default function Overview() {
 
   const fetchLogs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/logs");
+      const res = await axios.get("https://subduxion.onrender.com/api/logs");
       setLogs(res.data.slice(0, 6));
     } catch (err) {
       console.error("Error fetching logs:", err);
@@ -68,7 +68,7 @@ export default function Overview() {
 
   const fetchBookingsCount = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/bookings");
+      const res = await axios.get("https://subduxion.onrender.com/api/bookings");
       setBookingCount(res.data.length);
     } catch (err) {
       console.error("Error fetching bookings:", err);

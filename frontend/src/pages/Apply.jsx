@@ -48,7 +48,7 @@ const Apply = () => {
     formData.append("coverLetter", coverLetter);
     if (resume) formData.append("resume", resume);
     try {
-      const res = await fetch("http://localhost:5000/api/career/apply", { method: "POST", body: formData });
+      const res = await fetch("https://subduxion.onrender.com/api/career/apply", { method: "POST", body: formData });
       const data = await res.json();
       if (res.ok) {
         showNotification("success", data.message || "Application submitted successfully!");

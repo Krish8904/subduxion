@@ -97,7 +97,7 @@ const CompanyInquiries = () => {
 
   const fetchCompanies = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/companies");
+      const res = await axios.get("https://subduxion.onrender.com/api/companies");
       if (res.data.success) setCompanies(res.data.data);
     } catch (err) {
       console.error(err);
