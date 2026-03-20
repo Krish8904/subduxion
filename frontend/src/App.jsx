@@ -68,12 +68,10 @@ function App() {
       smoothWheel: true,
       prevent: (node) => {
         return !!(
-          node.closest?.("#bp-web-widget-container") ||
-          node.closest?.("#botpress-webchat") ||
-          node.closest?.('[id*="botpress"]') ||
+          node.closest?.('[class*="bp"]') ||
+          node.closest?.('[id*="bp"]') ||
           node.closest?.('[class*="botpress"]') ||
-          node.closest?.('[id*="bp-"]') ||
-          node.closest?.('[class*="bp-"]')
+          node.closest?.('[id*="botpress"]')
         );
       },
     });
