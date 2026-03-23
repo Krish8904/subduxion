@@ -78,9 +78,8 @@ const Sidebar = ({
           {!sidebarCollapsed && (
             <div className="animate-fade-in">
               <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                SubDuxion
+                Admin Dashboard
               </h1>
-              <p className="text-xs text-slate-400 mt-1">Admin Dashboard</p>
             </div>
           )}
           <button

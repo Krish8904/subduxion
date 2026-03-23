@@ -165,7 +165,7 @@ const CPRow = ({ cp, i, total }) => {
       <td className="py-3 px-3.5 text-sm font-semibold text-gray-900">
         <div className="flex items-center gap-2">
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-colors duration-150"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors duration-150"
             style={{
               background: COLORS[i % COLORS.length] + (hov ? "44" : "22"),
               color: COLORS[i % COLORS.length],
@@ -217,7 +217,7 @@ const StatCard = ({ label, value, sub, color, icon: Icon }) => {
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      className="bg-white rounded-2xl p-5 flex-1 min-w-[160px] transition-all duration-200 cursor-default"
+      className="bg-white rounded-2xl p-5 flex-1 min-w-40 transition-all duration-200 cursor-default"
       style={{
         border: `1px solid ${hov ? color + "44" : "#f0f0f0"}`,
         boxShadow: hov ? `0 8px 24px ${color}22` : "0 2px 10px rgba(0,0,0,0.04)",
@@ -297,7 +297,7 @@ const LegalEntitySelector = ({ entities, value, onChange }) => {
         <ChevronDown size={12} className="opacity-60" />
       </button>
       {open && (
-        <div className="absolute left-0 top-[calc(100%+4px)] bg-white border border-gray-200 rounded-xl z-50 min-w-[220px] shadow-xl max-h-[280px] overflow-y-auto">
+        <div className="absolute left-0 top-[calc(100%+4px)] bg-white border border-gray-200 rounded-xl z-50  min-w-55 shadow-xl max-h-[280px] overflow-y-auto">
           {entityOptions.map(opt => (
             <button
               key={opt.key}
@@ -355,7 +355,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
     if (!propExpenses) fetchExpenses();
     fetchLegalEntities();
     fetchCompanies();
-  }, []);
+  }, []); 
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -728,7 +728,7 @@ const ExpenseAnalytics = ({ expenses: propExpenses }) => {
                         className="flex items-center gap-2 mb-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-colors duration-150"
                         style={{ background: isActive ? COLORS[i % COLORS.length] + "12" : "transparent" }}
                       >
-                        <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
                         <div className="flex-1 min-w-0">
                           <div
                             className="text-[11px] truncate"
