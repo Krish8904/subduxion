@@ -66,7 +66,7 @@ const Sidebar = ({
 
   return (
     <div
-      className={`${sidebarCollapsed ? 'w-20' : 'w-72'
+      className={`${sidebarCollapsed ? 'w-20' : 'w-65'
         } bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 text-white h-screen flex flex-col transition-all duration-300 ease-in-out border-r border-slate-700/50 backdrop-blur-xl relative overflow-hidden`}
     >
       {/* Animated background */}
@@ -78,7 +78,7 @@ const Sidebar = ({
           {!sidebarCollapsed && (
             <div className="animate-fade-in">
               <h1 className="text-xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Admin Dashboard
+                Admin Panel
               </h1>
             </div>
           )}

@@ -41,7 +41,7 @@ const ChartTT = ({ active, payload, label }) => {
     <div style={{
       background: "white", border: "1px solid #e2e8f0", borderRadius: 10,
       padding: "10px 14px", boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
-      fontFamily: "'DM Sans', sans-serif", fontSize: 12,
+      fontFamily: "'poppins', sans-serif", fontSize: 12,
     }}>
       {label && <p style={{ color: "#94a3b8", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em", fontSize: 10 }}>{label}</p>}
       {payload.map((p, i) => (
@@ -60,7 +60,7 @@ const StatCard = ({ icon: Icon, value, label, sub, color, delay = 0 }) => (
   <div style={{
     background: "white", borderRadius: 16, padding: "20px 22px",
     border: "1px solid #f1f5f9", boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-    fontFamily: "'DM Sans', sans-serif", animation: `fadeUp 0.5s ease ${delay}ms both`,
+    fontFamily: "'poppins', sans-serif", animation: `fadeUp 0.5s ease ${delay}ms both`,
   }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
       <div style={{ width: 40, height: 40, borderRadius: 10, background: color + "18", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -79,7 +79,7 @@ const Section = ({ title, children, delay = 0 }) => (
   <div style={{ animation: `fadeUp 0.5s ease ${delay}ms both` }}>
     <p style={{
       fontSize: 10, fontWeight: 800, color: "#94a3b8", letterSpacing: "0.12em",
-      textTransform: "uppercase", marginBottom: 12, fontFamily: "'DM Sans', sans-serif",
+      textTransform: "uppercase", marginBottom: 12, fontFamily: "'poppins', sans-serif",
     }}>{title}</p>
     {children}
   </div>
@@ -90,7 +90,7 @@ const ChartCard = ({ title, icon: Icon, color, children, height = 260 }) => (
   <div style={{
     background: "white", borderRadius: 16, border: "1px solid #f1f5f9",
     boxShadow: "0 2px 12px rgba(0,0,0,0.05)", overflow: "hidden",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'poppins', sans-serif",
   }}>
     <div style={{
       display: "flex", alignItems: "center", gap: 10,
@@ -114,7 +114,7 @@ const Row = ({ primary, secondary, badge, badgeColor, date }) => {
     <div style={{
       display: "flex", alignItems: "center", gap: 10,
       padding: "10px 20px", borderBottom: "1px solid #f8fafc",
-      fontFamily: "'DM Sans', sans-serif",
+      fontFamily: "'poppins', sans-serif",
     }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{primary}</div>
@@ -214,7 +214,7 @@ function Analytics() {
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
-      <div style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", fontFamily: "'poppins', sans-serif" }}>
         <div style={{ width: 40, height: 40, border: "3px solid #e2e8f0", borderTopColor: BLUE, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }} />
         <p style={{ color: "#94a3b8", fontSize: 13 }}>Loading analytics…</p>
       </div>
@@ -237,14 +237,13 @@ function Analytics() {
     { name: "Companies", value: data.companyRegistrations, fill: GREEN },
   ];
 
-  const tk = { fontSize: 11, fill: "#94a3b8", fontFamily: "'DM Sans', sans-serif" };
+  const tk = { fontSize: 11, fill: "#94a3b8", fontFamily: "'poppins', sans-serif" };
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", maxWidth: 1300, paddingBottom: 60 }}>
+    <div style={{ fontFamily: "'poppins', sans-serif", maxWidth: 1300, paddingBottom: 60 }}>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-        @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');        @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
         @keyframes spin   { to { transform: rotate(360deg); } }
       `}</style>
 
@@ -301,7 +300,7 @@ function Analytics() {
                 <XAxis dataKey="label" tick={tk} />
                 <YAxis tick={tk} allowDecimals={false} />
                 <Tooltip content={<ChartTT />} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans', sans-serif" }} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, fontFamily: "'poppins', sans-serif" }} />
                 <Area type="monotone" dataKey="bookings" name="Bookings" stroke={BLUE} strokeWidth={2} fill="url(#gBook)" dot={{ r: 3, fill: BLUE }} activeDot={{ r: 5 }} />
                 <Area type="monotone" dataKey="applications" name="Applications" stroke={PURPLE} strokeWidth={2} fill="url(#gApp)" dot={{ r: 3, fill: PURPLE }} activeDot={{ r: 5 }} />
                 <Area type="monotone" dataKey="contacts" name="Contacts" stroke={TEAL} strokeWidth={2} fill="url(#gCon)" dot={{ r: 3, fill: TEAL }} activeDot={{ r: 5 }} />
@@ -362,7 +361,7 @@ function Analytics() {
                   </Pie>
                   <Tooltip content={<ChartTT />} />
                   <Legend iconType="circle" iconSize={8} layout="vertical" align="right" verticalAlign="middle"
-                    wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans', sans-serif" }} />
+                    wrapperStyle={{ fontSize: 11, fontFamily: "'poppins', sans-serif" }} />
                 </PieChart>
               </ResponsiveContainer>
             }
@@ -379,7 +378,7 @@ function Analytics() {
                   </Pie>
                   <Tooltip content={<ChartTT />} />
                   <Legend iconType="circle" iconSize={8} layout="vertical" align="right" verticalAlign="middle"
-                    wrapperStyle={{ fontSize: 11, fontFamily: "'DM Sans', sans-serif" }} />
+                    wrapperStyle={{ fontSize: 11, fontFamily: "'poppins', sans-serif" }} />
                 </PieChart>
               </ResponsiveContainer>
             }

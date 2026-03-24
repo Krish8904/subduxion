@@ -446,7 +446,7 @@ export default function AdminDashboard() {
         ) : (
           <>
             {/* ── KPI Cards ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               <StatCard icon={<Briefcase size={24} />} value={stats.openRoles} label="Open Roles" color="from-blue-500 to-blue-600" delay={0} />
               <StatCard icon={<Wrench size={24} />} value={stats.services} label="Total Services" color="from-purple-500 to-purple-600" delay={100} />
               <StatCard icon={<Building2 size={24} />} value={stats.useCases} label="Total Use Cases" color="from-orange-500 to-orange-600" delay={200} />
@@ -456,7 +456,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* ── Charts Row 1: Trend + Inquiry Bar ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
 
               {/* 6-month trend */}
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-fade-in-up" style={{ animationDelay: '300ms' }}>
