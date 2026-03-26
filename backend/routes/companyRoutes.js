@@ -64,33 +64,6 @@ const lookupPipeline = [
   { $sort: { createdAt: -1 } },
 ];
 
-/* ─────────────────────────────────────────────
-   Helper: sync a saved company → LegalEntity
-───────────────────────────────────────────── */
-async function syncLegalEntity(savedDoc) {
-  try {
-    if (!savedDoc?.companyName) return;
-    await LegalEntity.findOneAndUpdate(
-      { companyName: savedDoc.companyName.trim() },
-      {
-        $set: {
-          country:         savedDoc.country         || null,
-          localCurrency:   savedDoc.localCurrency   || null,
-          foreignCurrency: savedDoc.foreignCurrency || null,
-        },
-        $setOnInsert: {
-          countryName:         "",
-          localCurrencyCode:   "",
-          foreignCurrencyCode: "",
-        },
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-  } catch (err) {
-    console.warn("LegalEntity sync warning:", err.message);
-  }
-}
-
 /* ── GET all ── */
 router.get("/", async (req, res) => {
   try {
@@ -106,8 +79,6 @@ router.post("/", async (req, res) => {
   try {
     const company = new Company(sanitizeBody(req.body));
     const saved   = await company.save();
-
-    await syncLegalEntity(saved);
 
     const [resolved] = await Company.aggregate([
       { $match: { _id: saved._id } },
@@ -134,7 +105,6 @@ router.post("/bulk", async (req, res) => {
         const doc   = new Company(sanitizeBody(company));
         const saved = await doc.save();
         inserted.push(saved._id);
-        await syncLegalEntity(saved);
       } catch (err) {
         errors.push(`${company.companyName ?? "Unknown"}: ${err.message}`);
       }
