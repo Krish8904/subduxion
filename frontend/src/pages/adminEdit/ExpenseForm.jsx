@@ -393,11 +393,11 @@ function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], curren
     : [];
 
   return (
-    <div className="flex flex-col gap-4 flex-1 min-h-0">
+    <div className="flex flex-col justify-center items-center gap-4 flex-1 min-h-0">
 
       {/* Drop zone */}
       <div
-        className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50 transition-colors shrink-0"
+        className="border-2 border-dashed mt-0  min-w-2xl border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50 transition-colors shrink-0"
         onClick={() => fileRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
@@ -985,7 +985,7 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
       <NotificationBanner />
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 w-full min-w-4xl flex flex-col" style={{ height: "95vh", padding: "16px 20px" }}>
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 w-full min-w-4xl flex flex-col" style={{ height: "95vh", padding: "16px 20px" }}>
         {inner}
       </div>
     </div>

@@ -708,11 +708,11 @@ const ExpenseInquiries = () => {
                   <ChevronDown size={14} />
                 </button>
                 {actionsOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50"
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 shadow-2xl rounded-lg z-50"
                     style={{ fontFamily: "'Poppins', sans-serif" }}>
                     <button
                       onClick={() => { openImport(); setActionsOpen(false); }}
-                      className="w-full flex cursor-pointer items-center gap-3 px-5 py-3 text-sm font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-800 transition"
+                      className="w-full flex cursor-pointer items-center gap-3 px-5 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-violet-50 hover:text-violet-800 transition"
                     >
                       <FilePlus size={16} />
                       Import
@@ -785,7 +785,7 @@ const ExpenseInquiries = () => {
               <table className="min-w-max w-full">
                 <thead>
                   <tr style={{ background: "#f0f2f5", borderBottom: "2px solid #d1d5db" }}>
-                    {["#", "Transaction ID", "Date", "Company", "Type", "Country", "Department", "Counterparty", "Description", "Account", "Amount", "Currency", "FX", "INR Amount", "Ledger"].map((h) => (
+                    {["#", "Transaction ID", "Date", "Customer", "Type", "Country", "Department", "Counterparty", "Description", "Account", "Amount", "Currency", "FX", "INR Amount"].map((h) => (
                       <th key={h} className="px-6 py-3.5 text-center whitespace-nowrap"
                         style={{ fontSize: 14, fontWeight: 700, color: "black", letterSpacing: "0.02em" }}>
                         {h}
@@ -793,9 +793,9 @@ const ExpenseInquiries = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y text-center divide-gray-200">
                   {paginated.length === 0 ? (
-                    <tr><td colSpan={15}><EmptyState /></td></tr>
+                    <tr><td colSpan={14}><EmptyState /></td></tr>
                   ) : (
                     paginated.map((e, idx) => {
                       const rowNum = (page - 1) * pageSize + idx + 1;
@@ -813,8 +813,13 @@ const ExpenseInquiries = () => {
                             <span className="text-sm font-bold text-center whitespace-nowrap" style={{ color: "#3730a3", fontFamily: "monospace" }}>{e.transactionId}</span>
                           </td>
                           <td className="px-6 py-4 text-sm font-medium whitespace-nowrap" style={{ color: "#374151" }}>{fmtDate(e.date)}</td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm font-semibold whitespace-nowrap" style={{ color: "#111827" }}>{e.company}</span>
+                          <td className="px-6 py-4" onClick={(ev) => { ev.stopPropagation(); setLedgerExpense(e); }}>
+                            <span
+                              className="text-sm font-semibold whitespace-nowrap cursor-pointer hover:text-indigo-600 hover:underline transition-colors"
+                              style={{ color: "#111827" }}
+                            >
+                              {e.company}
+                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Pill label={e.typeLabel || e.type} typeColors={typeColors} />
@@ -851,17 +856,6 @@ const ExpenseInquiries = () => {
                                 ₹{fmt(Math.abs(e.inrAmount ?? 0))}
                               </span>
                             </div>
-                          </td>
-                          <td className="px-4 py-4" onClick={(ev) => ev.stopPropagation()}>
-                            <button
-                              onClick={(ev) => { ev.stopPropagation(); setLedgerExpense(e); }}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all whitespace-nowrap cursor-pointer"
-                              style={{ background: "#f5f3ff", color: "#4F46E5", border: "1px solid #c4b5fd" }}
-                              onMouseEnter={(ev) => { ev.currentTarget.style.background = "#4F46E5"; ev.currentTarget.style.color = "white"; }}
-                              onMouseLeave={(ev) => { ev.currentTarget.style.background = "#f5f3ff"; ev.currentTarget.style.color = "#4F46E5"; }}
-                            >
-                              <BookOpen size={12} /> Ledger
-                            </button>
                           </td>
                         </tr>
                       );
