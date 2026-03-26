@@ -181,8 +181,7 @@ const Apply = () => {
                   ) : (
                     <div>
                       <div className="w-10 h-10 rounded-xl bg-[#eceae4] border border-[#d4d0c8] flex items-center justify-center mx-auto mb-3 text-[#aaa]">↑</div>
-                      <p className="text-sm text-[#aaa] font-light">Drag & drop your resume here<br />or <span className="text-[#4a7c59] font-medium">click to upload</span></p>
-                      <p className="text-xs text-[#ccc] mt-1">PDF, DOC, DOCX accepted</p>
+                      <p className="text-sm text-[#aaa] font-light">Drag & drop your resume here<br />or <span className="text-[#4a7c59] font-medium">click to upload.</span></p>
                     </div>
                   )}
                   <input type="file" ref={inputRef} className="hidden" onChange={handleChange} accept=".pdf,.doc,.docx" disabled={isSubmitting} />
