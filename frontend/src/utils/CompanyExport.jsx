@@ -182,22 +182,22 @@ const CompanyExport = ({ data, fileName = "CompanyInquiries" }) => {
       </div>
 
       {/* Dropdown */}
-      <div className="absolute right-0 w-44 bg-white border rounded-md shadow-lg hidden group-hover:block z-50">
+      <div className="absolute right-0 top-full mt-0.5 w-44 bg-white border border-slate-200 rounded-lg shadow-xl hidden group-hover:block z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
         <div
           onClick={() => handleExport("pdf")}
-          className="px-4 py-2 hover:bg-gray-100  cursor-pointer"
+          className="px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer"
         >
           PDF (.pdf)
         </div>
         <div
           onClick={() => handleExport("xlsx")}
-          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer"
         >
           Excel (.xlsx)
         </div>
         <div
           onClick={() => handleExport("docx")}
-          className="px-4 py-2 hover:bg-gray-100 rounded-b-lg cursor-pointer"
+          className="px-4 py-3 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer"
         >
           Word (.docx)
         </div>

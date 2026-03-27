@@ -92,7 +92,7 @@ const Sidebar = ({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent relative">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-100 scrollbar-track-transparent relative">
         <NavItem
           icon={<LayoutDashboard size={20} />}
           label="Overview"

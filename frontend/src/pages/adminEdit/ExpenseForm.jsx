@@ -244,9 +244,7 @@ function CompanySearchDropdown({ value, onChange, disabled, allCompanies, legalE
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EXCEL IMPORT PANEL
-═══════════════════════════════════════════════════════════════ */
+/* EXCEL IMPORT PANEL*/
 function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], currency: [] } }) {
   const [rows, setRows] = useState([]);
   const [errors, setErrors] = useState([]);
@@ -316,7 +314,7 @@ function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], curren
             country: r.country ? String(r.country).trim() : undefined,
             company: r.company ? String(r.company).trim() : "",
             type: translatedType,
-            _originalType: rawType !== translatedType ? rawType : undefined,  // keep for display
+            _originalType: rawType !== translatedType ? rawType : undefined,
             department: r.department ? String(r.department).trim() : undefined,
             counterparty: r.counterparty ? String(r.counterparty).trim() : undefined,
             description: r.description ? String(r.description).trim() : undefined,
@@ -541,9 +539,7 @@ function ExcelImportPanel({ onSuccess, masters = { type: [], country: [], curren
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   MAIN EXPENSE FORM
-═══════════════════════════════════════════════════════════════ */
+/* MAIN EXPENSE FORM */
 const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaultTab = "manual" }) => {
   const isEditMode = !!editData;
   const [activeTab, setActiveTab] = useState(defaultTab);
@@ -936,7 +932,7 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
               </div>
             ) : (
               <span className="text-sm font-bold text-slate-800">
-                {activeTab === "import" ? "Import from Excel" : "New Transaction"}
+                {activeTab === "import" ? "Import from Excel" : "Create New Transaction"}
               </span>
             )}
           </div>
@@ -974,7 +970,7 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
       <>
         <NotificationBanner />
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full min-w-4xl flex flex-col" style={{ height: "90vh", padding: "16px 20px" }}>
+          <div className="bg-white rounded-xl shadow-2xl w-full min-w-4xl flex flex-col" style={{ height: "95vh", padding: "16px 20px" }}>
             {inner}
           </div>
         </div>
