@@ -20,17 +20,20 @@ const GREEN = "#10b981";
 const ORANGE = "#f97316";
 const YELLOW = "#eab308";
 const PINK = "#ec4899";
+const CYAN = "#06b6d4";
+const INDIGO = "#6366f1";
+const RED = "#ef4444";
 
 const ChartTT = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-md text-xs">
-      {label && <p className="text-slate-400 font-semibold uppercase tracking-wide mb-1" style={{ fontSize: 10 }}>{label}</p>}
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-lg text-xs">
+      {label && <p className="text-gray-500 font-semibold uppercase tracking-wide mb-1" style={{ fontSize: 10 }}>{label}</p>}
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2 mb-0.5">
           <span className="w-1.5 h-1.5 rounded-sm shrink-0" style={{ background: p.fill || p.stroke }} />
-          <span className="text-slate-500">{p.name}:</span>
-          <span className="font-semibold text-slate-800">{p.value}</span>
+          <span className="text-gray-600">{p.name}:</span>
+          <span className="font-semibold text-gray-900">{p.value}</span>
         </div>
       ))}
     </div>
@@ -38,16 +41,16 @@ const ChartTT = ({ active, payload, label }) => {
 };
 
 const STAT_CARDS = [
-  { key: 'openRoles', label: 'Open Roles', icon: Briefcase, bg: 'bg-blue-50', text: 'text-blue-500', bar: 'bg-blue-500' },
-  { key: 'services', label: 'Total Services', icon: Wrench, bg: 'bg-purple-50', text: 'text-purple-500', bar: 'bg-purple-500' },
-  { key: 'useCases', label: 'Total Use Cases', icon: Building2, bg: 'bg-orange-50', text: 'text-orange-500', bar: 'bg-orange-500' },
-  { key: 'bookingCount', label: 'Call Bookings', icon: LucidePhoneCall, bg: 'bg-green-50', text: 'text-green-500', bar: 'bg-green-500' },
-  { key: 'companiesCount', label: 'Registered Companies', icon: Building2, bg: 'bg-yellow-50', text: 'text-yellow-500', bar: 'bg-yellow-400' },
-  { key: 'jobAppsCount', label: 'Job Applications', icon: Users, bg: 'bg-pink-50', text: 'text-pink-500', bar: 'bg-pink-500' },
+  { key: 'openRoles', label: 'Open Roles', icon: Briefcase, bg: 'bg-blue-100', text: 'text-blue-700', bar: 'bg-blue-500' },
+  { key: 'services', label: 'Total Services', icon: Wrench, bg: 'bg-purple-100', text: 'text-purple-700', bar: 'bg-purple-500' },
+  { key: 'useCases', label: 'Total Use Cases', icon: Building2, bg: 'bg-orange-100', text: 'text-orange-700', bar: 'bg-orange-500' },
+  { key: 'bookingCount', label: 'Call Bookings', icon: LucidePhoneCall, bg: 'bg-green-100', text: 'text-green-700', bar: 'bg-green-500' },
+  { key: 'companiesCount', label: 'Registered Companies', icon: Building2, bg: 'bg-yellow-100', text: 'text-yellow-700', bar: 'bg-yellow-500' },
+  { key: 'jobAppsCount', label: 'Job Applications', icon: Users, bg: 'bg-pink-100', text: 'text-pink-700', bar: 'bg-pink-500' },
 ];
 
 // Only first 4 shown in the 2×2 grid; remaining 2 go into the summary chart
-const GRID_CARDS = STAT_CARDS.slice(0, 4);
+const GRID_CARDS = STAT_CARDS.slice(0, 6);
 const CHART_CARDS = STAT_CARDS.slice(4);
 
 export default function AdminDashboard() {
@@ -153,7 +156,7 @@ export default function AdminDashboard() {
       jobAppsRes.data.forEach(a => { const m = last6.find(x => x.key === toKey(a.createdAt)); if (m) m.applications++; });
       setTrendData(last6);
     } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    finally { setLoading(false); }                  
   };
 
   const fetchLogs = async () => {
@@ -195,13 +198,13 @@ export default function AdminDashboard() {
     }
 
     return (
-      <div className="flex items-center gap-1.5 mb-5 flex-wrap">
+      <div className="flex items-center gap-1.5 mb-6 flex-wrap">
         {crumbs.map((crumb, i) => (
           <React.Fragment key={i}>
-            {i > 0 && <ChevronRight size={13} className="text-slate-300 shrink-0" />}
+            {i > 0 && <ChevronRight size={13} className="text-gray-400 shrink-0" />}
             {crumb.action
-              ? <button onClick={crumb.action} className="text-xs text-slate-500 hover:text-blue-500 transition-colors bg-transparent border-none cursor-pointer p-0">{crumb.label}</button>
-              : <span className={`text-xs ${i === crumbs.length - 1 ? 'text-slate-800 font-semibold' : 'text-slate-500'}`}>{crumb.label}</span>
+              ? <button onClick={crumb.action} className="text-xs text-gray-500 hover:text-blue-600 transition-colors bg-transparent border-none cursor-pointer p-0 font-medium">{crumb.label}</button>
+              : <span className={`text-xs ${i === crumbs.length - 1 ? 'text-gray-800 font-semibold' : 'text-gray-500'}`}>{crumb.label}</span>
             }
           </React.Fragment>
         ))}
@@ -210,7 +213,7 @@ export default function AdminDashboard() {
   };
 
   const OverviewContent = () => {
-    const tk = { fontSize: 11, fill: "#94a3b8" };
+    const tk = { fontSize: 11, fill: "#9ca3af" };
 
     const statValues = {
       openRoles: stats.openRoles,
@@ -235,11 +238,11 @@ export default function AdminDashboard() {
     return (
       <div>
         {/* Page header */}
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">Dashboard Overview</h2>
-          <p className="text-sm text-slate-500 flex items-center gap-2">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Dashboard Overview</h2>
+          <p className="text-sm text-gray-500 flex items-center gap-2">
             Here's what's happening with SubDuxion
-            <span className="inline-flex items-center gap-1.5 text-xs text-green-600 bg-green-50 border border-green-200 rounded-full px-2.5 py-0.5 font-medium">
+            <span className="inline-flex items-center gap-1.5 text-xs text-green-700 bg-green-100 border border-green-200 rounded-full px-2.5 py-0.5 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               Live
             </span>
@@ -248,59 +251,59 @@ export default function AdminDashboard() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="w-8 h-8 border-2 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
-            <p className="text-sm text-slate-400">Loading dashboard data...</p>
+            <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+            <p className="text-sm text-gray-400">Loading dashboard data...</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
 
             {/* ── Top Row: 2×2 KPI Grid  +  Radar chart ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               {/* 2×2 stat cards */}
-              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <div className="grid grid-cols-2">
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="grid grid-cols-3">
                   {GRID_CARDS.map((card, i) => {
                     const Icon = card.icon;
                     const val = statValues[card.key];
-                    const borderRight = i % 2 === 0 ? 'border-r border-slate-100' : '';
-                    const borderBottom = i < 2 ? 'border-b border-slate-100' : '';
+                    const borderRight = i % 2 === 0 ? 'border-r border-gray-100' : '';
+                    const borderBottom = i < 2 ? 'border-b border-gray-100' : '';
                     return (
                       <div
                         key={card.key}
-                        className={`relative flex flex-col gap-3 p-5 hover:bg-slate-50 transition-colors ${borderRight} ${borderBottom}`}
+                        className={`relative flex flex-col gap-3 p-5 hover:bg-gray-50 transition-colors ${borderRight} ${borderBottom}`}
                       >
                         {/* top accent bar */}
-                        <div className={`absolute top-0 left-0 right-0 h-[3px] ${card.bar}`} />
+                        <div className={`absolute top-0 left-0 right-0 h-1 ${card.bar} rounded-t-xl`} />
 
-                        <div className={`w-9 h-9 rounded-lg ${card.bg} ${card.text} flex items-center justify-center shrink-0 mt-1`}>
-                          <Icon size={16} />
+                        <div className={`w-10 h-10 rounded-xl ${card.bg} ${card.text} flex items-center justify-center shrink-0 mt-1`}>
+                          <Icon size={18} />
                         </div>
 
                         <div className="min-w-0">
-                          <p className="text-3xl font-bold text-slate-800 leading-none tracking-tight">{val}</p>
-                          <p className="text-xs text-slate-400 mt-2 font-medium leading-tight">{card.label}</p>
+                          <p className="text-3xl font-bold text-gray-900 leading-none tracking-tight">{val}</p>
+                          <p className="text-xs text-gray-500 mt-2 font-medium leading-tight">{card.label}</p>
                         </div>
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="grid grid-cols-2 border-t border-slate-100">
+                <div className="grid grid-cols-2 border-t border-gray-100 bg-gray-50/50">
                   {CHART_CARDS.map((card, i) => {
                     const Icon = card.icon;
                     const val = statValues[card.key];
                     return (
                       <div
                         key={card.key}
-                        className={`flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors ${i === 0 ? 'border-r border-slate-100' : ''}`}
+                        className={`flex items-center gap-3 px-5 py-3.5 hover:bg-gray-100 transition-colors ${i === 0 ? 'border-r border-gray-100' : ''}`}
                       >
-                        <div className={`w-7 h-7 rounded-md ${card.bg} ${card.text} flex items-center justify-center shrink-0`}>
-                          <Icon size={13} />
+                        <div className={`w-8 h-8 rounded-lg ${card.bg} ${card.text} flex items-center justify-center shrink-0`}>
+                          <Icon size={14} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-base font-bold text-slate-800 leading-none">{val}</p>
-                          <p className="text-[11px] text-slate-400 mt-1 font-medium truncate">{card.label}</p>
+                          <p className="text-lg font-bold text-gray-900 leading-none">{val}</p>
+                          <p className="text-[10px] text-gray-500 mt-1 font-medium truncate">{card.label}</p>
                         </div>
                       </div>
                     );
@@ -308,21 +311,21 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-                  <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
-                    <BarChart3 size={13} className="text-purple-500" />
+              <div className="bg-white border max-w-sm border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+                    <BarChart3 size={14} className="text-purple-600" />
                   </div>
-                  <span className="text-sm font-semibold text-slate-800">Inquiry Totals</span>
+                  <span className="text-sm font-semibold text-gray-800">Inquiry Totals</span>
                 </div>
                 <div className="p-4" style={{ height: 230 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={inquiryBar} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                       <XAxis dataKey="name" tick={tk} axisLine={false} tickLine={false} />
                       <YAxis tick={tk} axisLine={false} tickLine={false} allowDecimals={false} />
-                      <Tooltip content={<ChartTT />} />
-                      <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]} maxBarSize={44}>
+                      <Tooltip content={<ChartTT />} cursor={{ fill: '#f9fafb' }} />
+                      <Bar dataKey="value" name="Count" radius={[6, 6, 0, 0]} maxBarSize={44}>
                         {inquiryBar.map((entry, i) => <Cell key={i} fill={entry.fill} fillOpacity={0.85} />)}
                       </Bar>
                     </BarChart>
@@ -333,33 +336,33 @@ export default function AdminDashboard() {
 
               <div className="">
                 {/* Area chart */}
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                  <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                      <TrendingUp size={13} className="text-blue-500" />
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                      <TrendingUp size={14} className="text-blue-600" />
                     </div>
-                    <span className="text-sm font-semibold text-slate-800">6-Month Activity Trend</span>
+                    <span className="text-sm font-semibold text-gray-800">6-Month Activity Trend</span>
                   </div>
                   <div className="p-4" style={{ height: 230 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={trendData} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
                         <defs>
                           <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={BLUE} stopOpacity={0.12} />
+                            <stop offset="5%" stopColor={BLUE} stopOpacity={0.2} />
                             <stop offset="95%" stopColor={BLUE} stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={PURPLE} stopOpacity={0.12} />
+                            <stop offset="5%" stopColor={PURPLE} stopOpacity={0.2} />
                             <stop offset="95%" stopColor={PURPLE} stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                         <XAxis dataKey="label" tick={tk} axisLine={false} tickLine={false} />
                         <YAxis tick={tk} axisLine={false} tickLine={false} allowDecimals={false} />
                         <Tooltip content={<ChartTT />} />
                         <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
-                        <Area type="monotone" dataKey="bookings" name="Bookings" stroke={BLUE} strokeWidth={1.5} fill="url(#gB)" dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
-                        <Area type="monotone" dataKey="applications" name="Applications" stroke={PURPLE} strokeWidth={1.5} fill="url(#gP)" dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
+                        <Area type="monotone" dataKey="bookings" name="Bookings" stroke={BLUE} strokeWidth={2} fill="url(#gB)" dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: BLUE }} />
+                        <Area type="monotone" dataKey="applications" name="Applications" stroke={PURPLE} strokeWidth={2} fill="url(#gP)" dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: PURPLE }} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -368,18 +371,18 @@ export default function AdminDashboard() {
               </div>
 
               {/* Pie */}
-              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-                  <div className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
-                    <Wrench size={13} className="text-orange-500" />
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
+                    <Wrench size={14} className="text-orange-600" />
                   </div>
-                  <span className="text-sm font-semibold text-slate-800">Content Distribution</span>
+                  <span className="text-sm font-semibold text-gray-800">Content Distribution</span>
                 </div>
                 <div className="p-4" style={{ height: 220 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={contentPie} cx="50%" cy="44%" innerRadius={52} outerRadius={74} dataKey="value" paddingAngle={3} stroke="none">
-                        {contentPie.map((entry, i) => <Cell key={i} fill={entry.fill} fillOpacity={0.88} />)}
+                        {contentPie.map((entry, i) => <Cell key={i} fill={entry.fill} fillOpacity={0.85} />)}
                       </Pie>
                       <Tooltip content={<ChartTT />} />
                       <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 11 }} />
@@ -389,41 +392,41 @@ export default function AdminDashboard() {
               </div>
             </div>
             {/* Recent logs */}
-            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4.5 border-b border-slate-100">
-                <span className="text-lg font-semibold text-slate-800">Recent Activity</span>
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <span className="text-lg font-semibold text-gray-800">Recent Activity</span>
                 <button
                   onClick={() => navigate('/admin/all-logs')}
-                  className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 transition-colors bg-transparent border-none cursor-pointer p-0 font-medium"
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 transition-colors bg-transparent border-none cursor-pointer p-0 font-medium"
                 >
                   View all <ChevronRight size={12} />
                 </button>
               </div>
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-gray-100">
                 {logs.map((log) => (
                   <div
                     key={log._id}
-                    className="flex items-start justify-between gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
+                    className="flex items-start justify-between gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors"
                   >
                     {/* LEFT SIDE */}
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0 mt-2" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 mt-2" />
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-medium text-slate-700 truncate">
+                        <p className="text-sm font-medium text-gray-800 truncate">
                           {log.message}
                         </p>
 
-                        <div className="flex items-center gap-2 mt-1">
-                          <Clock size={10} className="text-slate-300 shrink-0" />
-                          <span className="text-xs text-slate-400">
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Clock size={10} className="text-gray-400 shrink-0" />
+                          <span className="text-xs text-gray-500">
                             {new Date(log.createdAt).toLocaleString()}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <span className="text-[10px] font-medium text-slate-400 bg-slate-100 rounded px-1.5 py-0.5 shrink-0">
+                    <span className="text-[10px] font-medium text-gray-500 bg-gray-100 rounded-full px-2 py-0.5 shrink-0">
                       {log.type}
                     </span>
                   </div>
@@ -438,7 +441,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden" onClick={() => setShowPageMenu(null)}>
+    <div className="flex h-screen bg-gray-50 overflow-hidden" onClick={() => setShowPageMenu(null)}>
       <Sidebar
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
@@ -457,7 +460,7 @@ export default function AdminDashboard() {
       />
 
       <div className="flex-1 overflow-auto min-w-0">
-        <div className={`max-w-7xl mx-auto ${isCompanyPage ? '' : 'p-4'}`}>
+        <div className={`max-w-7xl mx-auto ${isCompanyPage ? '' : 'p-6'}`}>
           <Breadcrumb />
           {activeSection === 'overview' ? <OverviewContent /> : <Outlet context={{ sidebarCollapsed }} />}
         </div>
