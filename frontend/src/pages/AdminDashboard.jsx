@@ -238,15 +238,24 @@ export default function AdminDashboard() {
     return (
       <div>
         {/* Page header */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Dashboard Overview</h2>
-          <p className="text-sm text-gray-500 flex items-center gap-2">
-            Here's what's happening with SubDuxion
-            <span className="inline-flex items-center gap-1.5 text-xs text-green-700 bg-green-100 border border-green-200 rounded-full px-2.5 py-0.5 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Live
-            </span>
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+
+          {/* Left side */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-1">
+              Dashboard Overview
+            </h2>
+            <p className="text-sm text-gray-500">
+              Here's what's happening with SubDuxion
+            </p>
+          </div>
+
+          {/* Right side */}
+          <span className="inline-flex items-center gap-1.5 text-xs text-green-700 bg-green-100 border border-green-200 rounded-full mt-5 mr-10 px-2.5 py-0.5 font-medium">Status  
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            Live
+          </span>
+
         </div>
 
         {loading ? (
@@ -258,7 +267,7 @@ export default function AdminDashboard() {
           <div className="space-y-6">
 
             {/* ── Top Row: 2×2 KPI Grid  +  Radar chart ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1.2fr] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1.2fr] gap-4">
 
               {/* 2×2 stat cards */}
               <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
