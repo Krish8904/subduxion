@@ -156,7 +156,7 @@ export default function AdminDashboard() {
       jobAppsRes.data.forEach(a => { const m = last6.find(x => x.key === toKey(a.createdAt)); if (m) m.applications++; });
       setTrendData(last6);
     } catch (e) { console.error(e); }
-    finally { setLoading(false); }                  
+    finally { setLoading(false); }
   };
 
   const fetchLogs = async () => {
@@ -198,7 +198,7 @@ export default function AdminDashboard() {
     }
 
     return (
-      <div className="flex items-center gap-1.5 mb-6 flex-wrap">
+      <div className="flex items-center gap-1.5 mb-3 flex-wrap">
         {crumbs.map((crumb, i) => (
           <React.Fragment key={i}>
             {i > 0 && <ChevronRight size={13} className="text-gray-400 shrink-0" />}
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
           <div className="space-y-6">
 
             {/* ── Top Row: 2×2 KPI Grid  +  Radar chart ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1.2fr] gap-6">
 
               {/* 2×2 stat cards */}
               <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -289,29 +289,10 @@ export default function AdminDashboard() {
                   })}
                 </div>
 
-                <div className="grid grid-cols-2 border-t border-gray-100 bg-gray-50/50">
-                  {CHART_CARDS.map((card, i) => {
-                    const Icon = card.icon;
-                    const val = statValues[card.key];
-                    return (
-                      <div
-                        key={card.key}
-                        className={`flex items-center gap-3 px-5 py-3.5 hover:bg-gray-100 transition-colors ${i === 0 ? 'border-r border-gray-100' : ''}`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg ${card.bg} ${card.text} flex items-center justify-center shrink-0`}>
-                          <Icon size={14} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-lg font-bold text-gray-900 leading-none">{val}</p>
-                          <p className="text-[10px] text-gray-500 mt-1 font-medium truncate">{card.label}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+
               </div>
 
-              <div className="bg-white border max-w-sm border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-white border w-full border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100">
                   <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
                     <BarChart3 size={14} className="text-purple-600" />
@@ -460,7 +441,7 @@ export default function AdminDashboard() {
       />
 
       <div className="flex-1 overflow-auto min-w-0">
-        <div className={`max-w-7xl mx-auto ${isCompanyPage ? '' : 'p-6'}`}>
+        <div className={`max-w-7xl mx-auto ${isCompanyPage ? '' : 'p-3'}`}>
           <Breadcrumb />
           {activeSection === 'overview' ? <OverviewContent /> : <Outlet context={{ sidebarCollapsed }} />}
         </div>

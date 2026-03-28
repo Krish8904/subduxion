@@ -979,9 +979,9 @@ const ExpenseForm = ({ editData = null, onSuccess = null, onClose = null, defaul
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 flex  items-center justify-center">
       <NotificationBanner />
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 w-full min-w-4xl flex flex-col" style={{ height: "95vh", padding: "16px 20px" }}>
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 w-full min-w-4xl flex flex-col" style={{ height: "95vh", padding: "10px 20px" }}>
         {inner}
       </div>
     </div>
